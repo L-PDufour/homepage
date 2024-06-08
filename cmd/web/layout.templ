@@ -1,0 +1,56 @@
+package web
+
+import (
+"fmt"
+"time"
+)
+
+templ Base() {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link href="/assets/css/output.css" rel="stylesheet">
+<title>Go Blueprint Hello</title>
+<script src="/assets/js/htmx.min.js"></script>
+</head>
+<body>
+  <h1 class="text-4xl font-bold">
+    Hello world!
+  </h1>
+  <p class="text-lg text-gray-600">
+    This is a test of Tailwind CSS integration.
+  </p>
+  <button class="bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+    Test Button
+  </button>
+@Header()
+@navBar()
+<main>
+{ children... }
+</main>
+</body>
+@Footer()
+</html>
+}
+
+templ Header() {
+	<header data-testid="headerTemplate">
+		<h1>Page personnel</h1>
+	</header>
+}
+
+templ navBar() {
+	<nav data-testid="navTemplate">
+		<ul>
+			<li><a href="/web">Home</a></li>
+			<li><a href="/about">about</a></li>
+		</ul>
+	</nav>
+}
+
+templ Footer() {
+	<footer data-testid="footerTemplate">
+		<div>&copy; { fmt.Sprintf("%d", time.Now().Year()) }</div>
+	</footer>
+}

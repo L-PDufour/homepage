@@ -3,9 +3,14 @@
 # Build the application
 all: build
 
+.PHONY: tailwind-build
+tailwind-build:
+	@tailwindcss -i ./cmd/web/assets/css/input.css -o ./cmd/web/assets/css/output.css
+
 build:
 	@echo "Building..."
 	@templ generate
+	@make tailwind-build
 	@go build -o main cmd/api/main.go
 
 # Run the application

@@ -5,7 +5,7 @@ all: build
 
 .PHONY: tailwind-build
 tailwind-build:
-	@tailwindcss -i ./cmd/web/assets/css/input.css -o ./cmd/web/assets/css/output.css
+	@tailwindcss -i ./cmd/web/assets/css/input.css -o ./cmd/web/assets/css/output.css --minify
 
 build:
 	@echo "Building..."

@@ -23,6 +23,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// mux.Handle("/assets/", fileServer)
 	mux.Handle("/", templ.Handler(web.HelloForm()))
 	mux.Handle("GET /about", templ.Handler(web.About()))
+	mux.Handle("GET /cv", templ.Handler(web.CV()))
 	mux.HandleFunc("/hello", web.HelloWebHandler)
 	mux.HandleFunc("GET /bonjour", web.BonjourWebHandler)
 

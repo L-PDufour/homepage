@@ -1,0 +1,30 @@
+package web
+
+templ CV() {
+	@Base() {
+		<style>
+            {%! raw %}
+            .pdf-container {
+                width: 100%;
+                height: 100vh;
+            }
+            .pdf-container object,
+            .pdf-container iframe {
+                width: 100%;
+                height: 100%;
+            }
+            {%! endraw %}
+        </style>
+		<div class="pdf-container">
+			<object
+				data="/assets/CV.pdf"
+				type="application/pdf"
+			>
+				<iframe src="/assets/CV.pdf">
+					This browser does not support PDFs. Please download the PDF to view it:
+					<a href="/assets/CV.pdf">Download PDF</a>
+				</iframe>
+			</object>
+		</div>
+	}
+}

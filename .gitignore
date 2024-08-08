@@ -23,6 +23,7 @@ go.work
 go.work.sum
 tmp/
 bin/**
+result/**
 bin/
 # IDE specific files
 .vscode

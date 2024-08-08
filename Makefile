@@ -1,4 +1,5 @@
 # Simple Makefile for a Go project
+MAKEFILE_PATH ?= ./Makefile
 
 # Build the application
 all: build

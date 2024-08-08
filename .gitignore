@@ -4,6 +4,8 @@
 *.dll
 *.so
 *.dylib
+*_templ.txt
+**/output.css
 main
 # Test binary, built with `go test -c`
 *_templ.go
@@ -20,7 +22,8 @@ main
 go.work
 go.work.sum
 tmp/
-
+bin/**
+bin/
 # IDE specific files
 .vscode
 .idea

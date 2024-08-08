@@ -4,7 +4,7 @@
 *.dll
 *.so
 *.dylib
-
+main
 # Test binary, built with `go test -c`
 *_templ.go
 # Test binary, built with "go test -c"
@@ -24,7 +24,7 @@ tmp/
 # IDE specific files
 .vscode
 .idea
-.direnv/
+.direnv/**
 # .env file
 .env
 .envrc

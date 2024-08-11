@@ -17,7 +17,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	mux.HandleFunc("/health", s.healthHandler)
 
-	fileServer := http.FileServer(http.Dir("/cmd/web/assets"))
+	fileServer := http.FileServer(http.Dir("./cmd/web/assets"))
 	mux.Handle("/assets/", http.StripPrefix("/assets", fileServer))
 	// fileServer := http.FileServer(http.FS(web.Files))
 	// mux.Handle("/assets/", fileServer)

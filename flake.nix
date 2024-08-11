@@ -33,7 +33,7 @@
           overlays = [ gomod2nix.overlays.default ];
         };
         homepage = pkgs.buildGoApplication {
-          name = "homepage";
+          name = "api";
           src = ./.;
           modules = ./gomod2nix.toml;
           preBuild = ''
@@ -41,6 +41,7 @@
             ${pkgs.tailwindcss}/bin/tailwindcss -i ./cmd/web/assets/css/input.css -o $TMPDIR/output.css --minify
             mkdir -p $out/cmd/web/assets/css
             cp $TMPDIR/output.css $out/cmd/web/assets/css/
+            cp -R ./cmd/web/assets $out/cmd/web/
           '';
         };
       in

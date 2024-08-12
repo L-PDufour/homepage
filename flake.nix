@@ -35,6 +35,7 @@
         homepage = pkgs.buildGoApplication {
           name = "api";
           src = ./.;
+          buildInputs = [ pkgs.sqlcipher ];
           modules = ./gomod2nix.toml;
           preBuild = ''
             ${templ.packages.${system}.templ}/bin/templ generate
@@ -42,6 +43,7 @@
             mkdir -p $out/cmd/web/assets/css
             cp $TMPDIR/output.css $out/cmd/web/assets/css/
             cp -R ./cmd/web/assets $out/cmd/web/
+            mkdir -p $out/data
           '';
         };
       in
@@ -64,6 +66,7 @@
           tag = "latest";
           contents = [
             packages.default
+            pkgs.sqlcipher
             (pkgs.runCommand "assets" { } ''
               mkdir -p $out/cmd/web/assets
               cp -R ${./cmd/web/assets}/* $out/cmd/web/assets/
@@ -77,25 +80,39 @@
           config = {
             Cmd = [ "${packages.default}/bin/api" ];
             WorkingDir = "/";
+            Volumes = {
+              "/data" = { };
+            };
+            Env = [
+              "IN_CONTAINER=true"
+              "DB_ENCRYPTION_KEY=${placeholder "DB_ENCRYPTION_KEY"}"
+            ];
           };
         };
-        packages.containerWithCachix =
-          pkgs.runCommand "container-with-cachix" { buildInputs = [ pkgs.cachix ]; }
-            ''
-              # Build the container
-              container=$(nix-build -E '(import ./. {}).packages.${system}.container' --no-out-link)
-
-              # Push the container to Cachix
-              cachix push mycache $container
-
-              # Create a symlink to the built container
-              ln -s $container $out
-            '';
         apps = {
           default = flake-utils.lib.mkApp { drv = homepage; };
+          init-db = flake-utils.lib.mkApp {
+            drv = pkgs.writeShellScriptBin "init-db" ''
+              mkdir -p ./data
+              export DB_ENCRYPTION_KEY=$(${pkgs.openssl}/bin/openssl rand -base64 32)
+              ${pkgs.sqlcipher}/bin/sqlcipher ./data/database.db <<EOF
+              PRAGMA key = '$DB_ENCRYPTION_KEY';
+              CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);
+              INSERT INTO users (name) VALUES ('John Doe');
+              EOF
+              echo "Database initialized with encryption key: $DB_ENCRYPTION_KEY"
+              echo "Make sure to securely store this key!"
+            '';
+          };
           run = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "run" ''
-              ${pkgs.go}/bin/go run cmd/api/main.go
+              if [ -f .env ]; then
+                 export $(cat .env | xargs)
+               else
+                 echo ".env file not found"
+                 exit 1
+               fi
+               ${pkgs.go}/bin/go run cmd/api/main.go
             '';
           };
           test = flake-utils.lib.mkApp {
@@ -106,7 +123,7 @@
           };
           watch = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "watch" ''
-              ${pkgs.air}/bin/air
+              make watch
             '';
           };
         };

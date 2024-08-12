@@ -38,25 +38,32 @@ templ Header() {
 
 templ navBar() {
 <nav data-testid="navTemplate" class="p-4 bg-[#1e1e2e]">
-  <ul class="flex flex-wrap justify-center gap-2 sm:gap-4">
+  <ul class="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
     <li>
-      <a href="/bio"
-        class="text-[#f5e0dc] px-2 py-1 sm:px-3 sm:py-2 rounded transition-colors hover:bg-[#f5e0dc] hover:text-[#1e1e2e] text-sm sm:text-base">Bio</a>
+      <a hx-get="/home" hx-target="body" hx-push-url="true"
+        class="text-[#f5e0dc] p-2 sm:p-3 rounded transition-colors hover:bg-[#f5e0dc] hover:text-[#1e1e2e] flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+          </path>
+        </svg>
+      </a>
     </li>
     <li>
-      <a href="/cv"
+      <a hx-get="/cv" hx-target="body" hx-push-url="true"
         class="text-[#cba6f7] px-2 py-1 sm:px-3 sm:py-2 rounded transition-colors hover:bg-[#cba6f7] hover:text-[#1e1e2e] text-sm sm:text-base">CV</a>
     </li>
     <li>
-      <a href="/projects"
+      <a hx-get="/projects" hx-target="body" hx-push-url="true"
         class="text-[#b4befe] px-2 py-1 sm:px-3 sm:py-2 rounded transition-colors hover:bg-[#b4befe] hover:text-[#1e1e2e] text-sm sm:text-base">Projets</a>
     </li>
     <li>
-      <a href="/blog"
+      <a hx-get="/blog" hx-target="body" hx-push-url="true"
         class="text-[#a6e3a1] px-2 py-1 sm:px-3 sm:py-2 rounded transition-colors hover:bg-[#a6e3a1] hover:text-[#1e1e2e] text-sm sm:text-base">Blogue</a>
     </li>
     <li>
-      <a href="/kids"
+      <a hx-get="/kids" hx-target="body" hx-push-url="true"
         class="text-[#e78284] px-2 py-1 sm:px-3 sm:py-2 rounded transition-colors hover:bg-[#e78284] hover:text-[#1e1e2e] text-sm sm:text-base">Enfants</a>
     </li>
   </ul>

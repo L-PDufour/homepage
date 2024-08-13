@@ -1,43 +1,52 @@
 package web
 
 templ Projects() {
-@Base() {
-<div class="flex flex-col p-4">
-  <div class="relative mb-4">
-    <button class="w-full font-semibold text-center text-white block bg-emerald-400 rounded p-4
+	@Base() {
+		<div class="flex flex-col p-4">
+			<div class="relative mb-4">
+				<button
+					class="w-full font-semibold text-center text-white block bg-emerald-400 rounded p-4
              focus:outline-none transition-all duration-300
              hover:bg-emerald-500 hover:shadow-md
-             active:bg-emerald-600 active:transform" hx-on:click="toggleVisibility('content-1')">
-      Site web
-    </button>
-    <div class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300" id="content-1">
-      @ProjectContent(1)
-    </div>
-  </div>
-  <div class="relative mb-4">
-    <button class="w-full font-semibold text-center text-white block bg-rose-400 rounded p-4
+             active:bg-emerald-600 active:transform"
+					hx-on:click="toggleVisibility('content-1')"
+				>
+					Site web
+				</button>
+				<div class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300" id="content-1">
+					@ProjectContent(1)
+				</div>
+			</div>
+			<div class="relative mb-4">
+				<button
+					class="w-full font-semibold text-center text-white block bg-rose-400 rounded p-4
              focus:outline-none transition-all duration-300
              hover:bg-rose-500 hover:shadow-md
-             active:bg-rose-600 active:transform" hx-on:click="toggleVisibility('content-2')">
-      Guignolée du Centre de pédiatrie sociale de Québec
-    </button>
-    <div class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300" id="content-2">
-      @ProjectContent(2)
-    </div>
-  </div>
-  <div class="relative mb-4">
-    <button class="w-full font-semibold text-center text-white block bg-violet-400 rounded p-4
+             active:bg-rose-600 active:transform"
+					hx-on:click="toggleVisibility('content-2')"
+				>
+					Guignolée du Centre de pédiatrie sociale de Québec
+				</button>
+				<div class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300" id="content-2">
+					@ProjectContent(2)
+				</div>
+			</div>
+			<div class="relative mb-4">
+				<button
+					class="w-full font-semibold text-center text-white block bg-violet-400 rounded p-4
              focus:outline-none transition-all duration-300
              hover:bg-violet-500 hover:shadow-md
-             active:bg-violet-600 active:transform" hx-on:click="toggleVisibility('content-3')">
-      Divers
-    </button>
-    <div class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300" id="content-3">
-      @ProjectContent(3)
-    </div>
-  </div>
-</div>
-<script>
+             active:bg-violet-600 active:transform"
+					hx-on:click="toggleVisibility('content-3')"
+				>
+					Divers
+				</button>
+				<div class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300" id="content-3">
+					@ProjectContent(3)
+				</div>
+			</div>
+		</div>
+		<script>
   function toggleVisibility(id) {
     const element = document.getElementById(id);
     if (element.style.display === 'none') {
@@ -47,86 +56,95 @@ templ Projects() {
     }
   }
 </script>
-}
+	}
 }
 
 templ ProjectContent(id int) {
-if id == 1 {
-<p class="mb-3">
-  Ce site web est un projet personnel qui démontre l'utilisation de technologies modernes pour créer une
-  expérience utilisateur fluide et dynamique. Le code source est disponible sur
-  <a href="https://github.com/L-PDufour/homepage" class="text-[#cba6f7] underline hover:text-[#f5e0dc]" target="_blank"
-    rel="noopener noreferrer">GitHub</a>.
-</p>
-<h4 class="font-semibold mt-4 mb-2">Technologies utilisées :</h4>
-<ul class="list-disc list-inside mb-3">
-  <li>
-    <strong>Backend :</strong> Go, utilisant uniquement la bibliothèque standard pour un serveur léger et
-    performant.
-  </li>
-  <li>
-    <strong>Frontend :</strong>
-    <ul class="list-circle list-inside ml-4">
-      <li>Rendu visuel : Go templ et Tailwind CSS</li>
-      <li>Interactivité : HTMX</li>
-    </ul>
-  </li>
-  <li>
-    <strong>Déploiement :</strong> Docker pour la conteneurisation, Nix pour la gestion des dépendances et le
-    déploiement.
-  </li>
-</ul>
-<p class="mt-4">
-  Ce projet illustre ma passion pour l'utilisation d'outils modernes et efficaces dans la construction
-  d'applications web robustes et performantes. Il met en avant une approche minimaliste mais puissante, en
-  combinant des technologies de pointe pour offrir une expérience utilisateur optimale.
-</p>
-} else if id == 2 {
-<p class="mb-3">
-  Une application pour l'inscription et la gestion des bénévoles à la Guignolée du Centre de pédiatrie sociale de
-  Québec.
-  <a href="https://github.com/L-PDufour/homepage" class="text-[#cba6f7] underline hover:text-[#f5e0dc]" target="_blank"
-    rel="noopener noreferrer">Placeholder</a>.
-</p>
-<h4 class="font-semibold mt-4 mb-2">Technologies utilisées :</h4>
-<ul class="list-disc list-inside mb-3">
-  <li>
-    <strong>Backend :</strong> NestJs, Prisma
-  </li>
-  <li>
-    <strong>Frontend :</strong> React
-  </li>
-  <li>
-    <strong>Déploiement :</strong> Docker pour la conteneurisation
-  </li>
-</ul>
-<p class="mt-4">
-  Il s'agit de mon premier projet web qui est en développement depuis plusieurs mois auquel plusieurs personnes
-  participent
-</p>
-} else if id == 3 {
-<p class="mb-3">
-  Sur mon profil
-  <a href="https://github.com/L-PDufour/" class="text-[#cba6f7] underline hover:text-[#f5e0dc]" target="_blank"
-    rel="noopener noreferrer">GitHub</a>,
-  vous trouverez divers projets et tutoriels qui reflètent mon désir d'apprendre et ma passion pour relever de
-  nouveaux défis techniques.
-</p>
-<h4 class="font-semibold mt-4 mb-2">Langages explorés :</h4>
-<ul class="list-disc list-inside mb-3">
-  <li>
-    <strong>C :</strong> Apprentissage des fondamentaux de la programmation et exploration des mécanismes sous-jacents.
-  </li>
-  <li>
-    <strong>Go :</strong> Développement d'APIs, backend et serveurs.
-  </li>
-  <li>
-    <strong>Python :</strong> Découverte de la programmation orientée objet.
-  </li>
-</ul>
-<p class="mt-4">
-  Chaque projet représente une nouvelle étape dans mon évolution en tant que développeur, démontrant ma volonté
-  d'apprendre et de m'adapter à différentes technologies.
-</p>
-}
+	if id == 1 {
+		<p class="mb-3">
+			Ce site web personnel est mon premier projet complet, développé après ma première année d'apprentissage en
+			programmation. Il illustre mon exploration des technologies web modernes pour créer une expérience utilisateur simple
+			mais efficace. Le code source est disponible sur
+			<a
+				href="https://github.com/L-PDufour/homepage"
+				class="text-[#cba6f7] underline hover:text-[#f5e0dc]"
+				target="_blank"
+				rel="noopener noreferrer"
+			>GitHub</a>.
+		</p>
+		<h4 class="font-semibold mt-4 mb-2">Technologies explorées :</h4>
+		<ul class="list-disc list-inside mb-3">
+			<li>
+				<strong>Backend :</strong> Go (bibliothèque standard), me permettant de comprendre les bases d'un serveur web.
+			</li>
+			<li>
+				<strong>Frontend :</strong>
+				<ul class="list-circle list-inside ml-4">
+					<li>Go templ et Tailwind CSS pour découvrir le rendu côté serveur et le styling moderne</li>
+					<li>HTMX pour expérimenter avec l'interactivité côté client de manière simple</li>
+				</ul>
+			</li>
+			<li>
+				<strong>Déploiement :</strong> Initiation à Docker pour la conteneurisation et à Nix pour la gestion de
+				l'environnement.
+			</li>
+		</ul>
+		<p class="mt-4">
+			Ce projet reflète mon enthousiasme à apprendre et à appliquer de nouvelles technologies. Bien que je sois encore en
+			début de parcours, je m'efforce de comprendre et d'utiliser des outils modernes pour améliorer continuellement mes
+			compétences en développement web.
+		</p>
+	} else if id == 2 {
+		<p class="mb-3">
+			Dans le cadre de mon apprentissage, j'ai eu l'opportunité de contribuer au développement d'une application web pour
+			l'inscription et la gestion des bénévoles de la Guignolée du Centre de pédiatrie sociale de Québec. Ce projet
+			collaboratif a été une excellente occasion d'appliquer mes connaissances dans un contexte réel.
+		</p>
+		<h4 class="font-semibold mt-4 mb-2">Technologies découvertes :</h4>
+		<ul class="list-disc list-inside mb-3">
+			<li>
+				<strong>Backend :</strong> Initiation à NestJS et Prisma, découvrant ainsi les frameworks backend modernes
+			</li>
+			<li>
+				<strong>Frontend :</strong> Premiers pas avec React pour comprendre le développement d'interfaces utilisateur
+			</li>
+			<li>
+				<strong>Déploiement :</strong> Découverte de Docker et de ses principes de base
+			</li>
+		</ul>
+		<p class="mt-4">
+			Ce projet, toujours en développement, marque mes débuts dans un environnement de développement collaboratif. Il m'a
+			permis de découvrir le travail en équipe et d'appliquer mes connaissances théoriques à un cas pratique, tout en
+			apprenant énormément de mes collègues plus expérimentés.
+		</p>
+	} else if id == 3 {
+		<p class="mb-3">
+			Mon profil <a
+	href="https://github.com/L-PDufour/"
+	class="text-[#cba6f7] underline hover:text-[#f5e0dc]"
+	target="_blank"
+	rel="noopener noreferrer"
+>GitHub</a>
+			témoigne de mon parcours d'apprentissage au cours de cette
+			première année en programmation. Il regroupe divers projets d'exercice et tutoriels que j'ai suivis pour développer
+			mes compétences.
+		</p>
+		<h4 class="font-semibold mt-4 mb-2">Langages explorés et apprentissages :</h4>
+		<ul class="list-disc list-inside mb-3">
+			<li>
+				<strong>C :</strong> Découverte des bases de la programmation à travers de petits exercices algorithmiques.
+			</li>
+			<li>
+				<strong>Go :</strong> Apprentissage de la création d'APIs simples et de serveurs web basiques.
+			</li>
+			<li>
+				<strong>Python :</strong> Initiation à la programmation orientée objet via de petits projets guidés.
+			</li>
+		</ul>
+		<p class="mt-4">
+			Chaque projet, aussi modeste soit-il, représente une étape dans mon apprentissage. Je suis conscient qu'il me reste
+			encore beaucoup à apprendre, mais je suis enthousiaste à l'idée de continuer à progresser et à relever de nouveaux
+			défis.
+		</p>
+	}
 }

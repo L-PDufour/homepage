@@ -1,48 +1,29 @@
-# Project homepage
+# Page Personnelle de Léon-Pierre Dufour
 
+## Description
+Ce projet est mon site web personnel, conçu pour présenter mon profil professionnel et mes compétences en développement. Il est construit avec une stack technologique moderne et innovante, mettant en avant mes compétences en Go, développement web, et configuration système.
 
-## Getting Started
+## Technologies utilisées
+- Go templ : Pour la génération de templates HTML
+- HTMX : Pour des interactions dynamiques côté client
+- Nix : Pour la gestion de l'environnement de développement et des dépendances
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+## Structure du projet
+- `flake.nix` : Déclaration de l'environnement de développement et gestion des dépendances
 
-## MakeFile
+## Fonctionnalités
+- Présentation de mon profil professionnel
+- Mise en avant de mes compétences techniques
+- (Autres fonctionnalités à venir)
 
-run all make commands with clean tests
-```bash
-make all build
-```
+## Installation et exécution locale(WIP)
+1. Assurez-vous d'avoir Nix installé sur votre système
+2. Clonez ce dépôt
+3. Naviguez dans le dossier du projet
 
-build the application
-```bash
-make build
-```
+## Développement
+Ce projet est en cours de développement. Les prochaines étapes incluent :
+- L'intégration d'une base de données
+- L'authentification
+- Un todo personnel
 
-run the application
-```bash
-make run
-```
-
-Create DB container
-```bash
-make docker-run
-```
-
-Shutdown DB container
-```bash
-make docker-down
-```
-
-live reload the application
-```bash
-make watch
-```
-
-run the test suite
-```bash
-make test
-```
-
-clean up binary from the last build
-```bash
-make clean
-```

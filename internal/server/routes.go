@@ -18,6 +18,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.Handle("/", templ.Handler(web.Bio()))
 	// mux.Handle("GET /bio", templ.Handler(web.Bio()))
 	mux.Handle("GET /projects", templ.Handler(web.Projects()))
+	mux.Handle("GET /blog", templ.Handler(web.Blog()))
 	mux.Handle("GET /cv", templ.Handler(web.CV()))
 	mux.Handle("GET /kids", templ.Handler(web.Kids()))
 	return mux

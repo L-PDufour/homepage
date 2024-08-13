@@ -3,67 +3,130 @@ package web
 templ Projects() {
 @Base() {
 <div class="flex flex-col p-4">
-  <div class="relative group">
-    <a href="#"
-      class="font-semibold text-center text-[#f5e0dc] block bg-[#cba6f7] rounded p-4 focus:outline-none transition-colors duration-300">
+  <div class="relative mb-4">
+    <button class="w-full font-semibold text-center text-white block bg-emerald-400 rounded p-4
+             focus:outline-none transition-all duration-300
+             hover:bg-emerald-500 hover:shadow-md
+             active:bg-emerald-600 active:transform" hx-on:click="toggleVisibility('content-1')">
       Site web
-    </a>
-    <div
-      class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300 opacity-0 max-h-0 overflow-hidden group-hover:overflow-y-auto group-hover:max-h-96 group-hover:opacity-100">
-      <h3 class="text-xl font-bold mb-3">Mon projet de site web personnel</h3>
-      <p class="mb-3">
-        Ce site web est un projet personnel qui démontre l'utilisation de technologies modernes pour créer une
-        expérience utilisateur fluide et dynamique. Le code source est disponible sur
-        <a href="https://github.com/L-PDufour/homepage" class="text-[#cba6f7] underline hover:text-[#f5e0dc]"
-          target="_blank" rel="noopener noreferrer">GitHub</a>.
-      </p>
-      <h4 class="font-semibold mt-4 mb-2">Technologies utilisées :</h4>
-      <ul class="list-disc list-inside mb-3">
-        <li>
-          <strong>Backend :</strong> Go, utilisant uniquement la bibliothèque standard pour un serveur léger et
-          performant.
-        </li>
-        <li>
-          <strong>Frontend :</strong>
-          <ul class="list-circle list-inside ml-4">
-            <li>Rendu visuel : Go templ et Tailwind CSS</li>
-            <li>Interactivité : HTMX</li>
-          </ul>
-        </li>
-        <li>
-          <strong>Déploiement :</strong> Docker pour la conteneurisation, Nix pour la gestion des dépendances et le
-          déploiement.
-        </li>
-      </ul>
-      <p class="mt-4">
-        Ce projet illustre ma passion pour l'utilisation d'outils modernes et efficaces dans la construction
-        d'applications web robustes et performantes. Il met en avant une approche minimaliste mais puissante, en
-        combinant des technologies de pointe pour offrir une expérience utilisateur optimale.
-      </p>
+    </button>
+    <div class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300" id="content-1">
+      @ProjectContent(1)
     </div>
   </div>
-  <div class="relative group mt-4">
-    <a href="#"
-      class="font-semibold text-center text-[#f5e0dc] block bg-[#cba6f7] rounded p-4 focus:outline-none transition-colors duration-300">
-      Project 1
-    </a>
-    <div
-      class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300 opacity-0 max-h-0 overflow-hidden group-hover:max-h-96 group-hover:opacity-100">
-      <h3 class="font-bold mb-2">Project 1</h3>
-      <p>Description of Project 1. You can add <strong>HTML</strong> here.</p>
+  <div class="relative mb-4">
+    <button class="w-full font-semibold text-center text-white block bg-rose-400 rounded p-4
+             focus:outline-none transition-all duration-300
+             hover:bg-rose-500 hover:shadow-md
+             active:bg-rose-600 active:transform" hx-on:click="toggleVisibility('content-2')">
+      Guignolée du Centre de pédiatrie sociale de Québec
+    </button>
+    <div class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300" id="content-2">
+      @ProjectContent(2)
+    </div>
+  </div>
+  <div class="relative mb-4">
+    <button class="w-full font-semibold text-center text-white block bg-violet-400 rounded p-4
+             focus:outline-none transition-all duration-300
+             hover:bg-violet-500 hover:shadow-md
+             active:bg-violet-600 active:transform" hx-on:click="toggleVisibility('content-3')">
+      Divers
+    </button>
+    <div class="text-[#cdd6f4] mt-2 bg-[#585b70] p-4 rounded shadow-lg transition-all duration-300" id="content-3">
+      @ProjectContent(3)
     </div>
   </div>
 </div>
+<script>
+  function toggleVisibility(id) {
+    const element = document.getElementById(id);
+    if (element.style.display === 'none') {
+      element.style.display = 'block';
+    } else {
+      element.style.display = 'none';
+    }
+  }
+</script>
 }
 }
 
-// Exemple de code block
-// <div class="mt-4 bg-[#1E1D2D] p-4 rounded">
-  // <pre class="text-[#f8f8f2] whitespace-pre-wrap">
-    // <code>
-      // package main
-      // import "fmt"
-      // func main() {
-      // fmt.Println("Hello, World!")
-      // }
-      // </code>
+templ ProjectContent(id int) {
+if id == 1 {
+<p class="mb-3">
+  Ce site web est un projet personnel qui démontre l'utilisation de technologies modernes pour créer une
+  expérience utilisateur fluide et dynamique. Le code source est disponible sur
+  <a href="https://github.com/L-PDufour/homepage" class="text-[#cba6f7] underline hover:text-[#f5e0dc]" target="_blank"
+    rel="noopener noreferrer">GitHub</a>.
+</p>
+<h4 class="font-semibold mt-4 mb-2">Technologies utilisées :</h4>
+<ul class="list-disc list-inside mb-3">
+  <li>
+    <strong>Backend :</strong> Go, utilisant uniquement la bibliothèque standard pour un serveur léger et
+    performant.
+  </li>
+  <li>
+    <strong>Frontend :</strong>
+    <ul class="list-circle list-inside ml-4">
+      <li>Rendu visuel : Go templ et Tailwind CSS</li>
+      <li>Interactivité : HTMX</li>
+    </ul>
+  </li>
+  <li>
+    <strong>Déploiement :</strong> Docker pour la conteneurisation, Nix pour la gestion des dépendances et le
+    déploiement.
+  </li>
+</ul>
+<p class="mt-4">
+  Ce projet illustre ma passion pour l'utilisation d'outils modernes et efficaces dans la construction
+  d'applications web robustes et performantes. Il met en avant une approche minimaliste mais puissante, en
+  combinant des technologies de pointe pour offrir une expérience utilisateur optimale.
+</p>
+} else if id == 2 {
+<p class="mb-3">
+  Une application pour l'inscription et la gestion des bénévoles à la Guignolée du Centre de pédiatrie sociale de
+  Québec.
+  <a href="https://github.com/L-PDufour/homepage" class="text-[#cba6f7] underline hover:text-[#f5e0dc]" target="_blank"
+    rel="noopener noreferrer">Placeholder</a>.
+</p>
+<h4 class="font-semibold mt-4 mb-2">Technologies utilisées :</h4>
+<ul class="list-disc list-inside mb-3">
+  <li>
+    <strong>Backend :</strong> NestJs, Prisma
+  </li>
+  <li>
+    <strong>Frontend :</strong> React
+  </li>
+  <li>
+    <strong>Déploiement :</strong> Docker pour la conteneurisation
+  </li>
+</ul>
+<p class="mt-4">
+  Il s'agit de mon premier projet web qui est en développement depuis plusieurs mois auquel plusieurs personnes
+  participent
+</p>
+} else if id == 3 {
+<p class="mb-3">
+  Sur mon profil
+  <a href="https://github.com/L-PDufour/" class="text-[#cba6f7] underline hover:text-[#f5e0dc]" target="_blank"
+    rel="noopener noreferrer">GitHub</a>,
+  vous trouverez divers projets et tutoriels qui reflètent mon désir d'apprendre et ma passion pour relever de
+  nouveaux défis techniques.
+</p>
+<h4 class="font-semibold mt-4 mb-2">Langages explorés :</h4>
+<ul class="list-disc list-inside mb-3">
+  <li>
+    <strong>C :</strong> Apprentissage des fondamentaux de la programmation et exploration des mécanismes sous-jacents.
+  </li>
+  <li>
+    <strong>Go :</strong> Développement d'APIs, backend et serveurs.
+  </li>
+  <li>
+    <strong>Python :</strong> Découverte de la programmation orientée objet.
+  </li>
+</ul>
+<p class="mt-4">
+  Chaque projet représente une nouvelle étape dans mon évolution en tant que développeur, démontrant ma volonté
+  d'apprendre et de m'adapter à différentes technologies.
+</p>
+}
+}

@@ -17,7 +17,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	mux.Handle("/assets/", http.StripPrefix("/assets", fileServer))
 	mux.Handle("/", templ.Handler(web.Bio()))
 	mux.Handle("GET /projects", templ.Handler(web.Projects()))
-	mux.Handle("GET /blog", templ.Handler(web.Blog()))
+	mux.HandleFunc("GET /blog", BlogHandler)
 	mux.Handle("GET /cv", templ.Handler(web.CV()))
 	mux.Handle("GET /kids", templ.Handler(web.Kids()))
 	return mux

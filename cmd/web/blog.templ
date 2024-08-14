@@ -1,9 +1,20 @@
 package web
 
-templ Blog() {
-@Base() {
-<div class="text-center">
-  <p>À venir</p>
-</div>
+import (
+	"context"
+)
+
+func rawHTML(ctx context.Context) templ.Component {
+	if content, ok := ctx.Value("blogContent").(string); ok {
+		return templ.Raw(content)
+	}
+	return templ.Raw("No content available")
 }
+
+templ Blog() {
+	@Base() {
+		<div class="text-center">
+			@rawHTML(ctx)
+		</div>
+	}
 }

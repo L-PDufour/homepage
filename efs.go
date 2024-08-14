@@ -1,4 +1,4 @@
-package web
+package homepage
 
 import "embed"
 

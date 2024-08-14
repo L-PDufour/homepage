@@ -3,7 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
-	"homepage/cmd/web"
+	"homepage/internal/views"
 	"log"
 	"net/http"
 	"os"
@@ -45,7 +45,7 @@ func BlogHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := context.WithValue(r.Context(), "blogContent", buf.String())
 
 	// Render the Blog component
-	err = web.Blog().Render(ctx, w)
+	err = views.Blog().Render(ctx, w)
 	if err != nil {
 		log.Printf("Error rendering Blog component: %v", err)
 		http.Error(w, "Error rendering page", http.StatusInternalServerError)

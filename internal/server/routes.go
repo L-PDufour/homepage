@@ -5,21 +5,21 @@ import (
 	"log"
 	"net/http"
 
-	"homepage/cmd/web"
-
 	"github.com/a-h/templ"
+	efs "homepage"
+	"homepage/internal/views"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", s.healthHandler)
-	fileServer := http.FileServer(http.Dir("./cmd/web/assets"))
-	mux.Handle("/assets/", http.StripPrefix("/assets", fileServer))
-	mux.Handle("/", templ.Handler(web.Bio()))
-	mux.Handle("GET /projects", templ.Handler(web.Projects()))
-	mux.HandleFunc("GET /blog", BlogHandler)
-	mux.Handle("GET /cv", templ.Handler(web.CV()))
-	mux.Handle("GET /kids", templ.Handler(web.Kids()))
+	fileServer := http.FileServer(http.FS(efs.Files))
+	mux.Handle("/assets/", fileServer)
+	mux.Handle("/", templ.Handler(views.Bio()))
+	mux.Handle("GET /projects", templ.Handler(views.Projects()))
+	// mux.HandleFunc("GET /blog", BlogHandler)
+	mux.Handle("GET /cv", templ.Handler(views.CV()))
+	mux.Handle("GET /kids", templ.Handler(views.Kids()))
 	return mux
 }
 

@@ -39,11 +39,7 @@
           modules = ./gomod2nix.toml;
           preBuild = ''
             ${templ.packages.${system}.templ}/bin/templ generate
-            ${pkgs.tailwindcss}/bin/tailwindcss -i ./cmd/web/assets/css/input.css -o $TMPDIR/output.css --minify
-            mkdir -p $out/cmd/web/assets/css
-            cp $TMPDIR/output.css $out/cmd/web/assets/css/
-            cp -R ./cmd/web/assets $out/cmd/web/
-            mkdir -p $out/data
+            ${pkgs.tailwindcss}/bin/tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify
           '';
         };
       in
@@ -67,26 +63,26 @@
           contents = [
             packages.default
             pkgs.sqlcipher
-            (pkgs.runCommand "assets" { } ''
-              mkdir -p $out/cmd/web/assets
-              cp -R ${./cmd/web/assets}/* $out/cmd/web/assets/
-              mkdir -p $out/cmd/web/assets/css
-              cp ${packages.default}/cmd/web/assets/css/output.css $out/cmd/web/assets/css/ || true
-              chmod -R 755 $out/cmd/web/assets
-              cp ${./postcss.config.js} $out/postcss.config.js
-              cp ${./tailwind.config.js} $out/tailwind.config.js
-            '')
+            #   (pkgs.runCommand "assets" { } ''
+            #     mkdir -p $out/cmd/web/assets
+            #     cp -R ${./cmd/web/assets}/* $out/cmd/web/assets/
+            #     mkdir -p $out/cmd/web/assets/css
+            #     cp ${packages.default}/cmd/web/assets/css/output.css $out/cmd/web/assets/css/ || true
+            #     chmod -R 755 $out/cmd/web/assets
+            #     cp ${./postcss.config.js} $out/postcss.config.js
+            #     cp ${./tailwind.config.js} $out/tailwind.config.js
+            #   '')
           ];
           config = {
             Cmd = [ "${packages.default}/bin/api" ];
             WorkingDir = "/";
-            Volumes = {
-              "/data" = { };
-            };
-            Env = [
-              "IN_CONTAINER=true"
-              "DB_ENCRYPTION_KEY=${placeholder "DB_ENCRYPTION_KEY"}"
-            ];
+            # Volumes = {
+            #   "/data" = { };
+            # };
+            # Env = [
+            #   "IN_CONTAINER=true"
+            #   "DB_ENCRYPTION_KEY=${placeholder "DB_ENCRYPTION_KEY"}"
+            # ];
           };
         };
         apps = {

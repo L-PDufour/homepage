@@ -1,102 +1,106 @@
 package database
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/joho/godotenv"
 	_ "github.com/mutecomm/go-sqlcipher/v4"
 	"log"
+	"net/url"
 	"os"
-	"strconv"
-	"time"
 )
 
+type Person struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type Service interface {
-	Health() map[string]string
 	Close() error
+	HealthCheck() error
+	AddPerson(name string) error
+	ListPeople() ([]Person, error)
 }
 
 type service struct {
 	db *sql.DB
 }
 
-var (
-	dbPath     = os.Getenv("DB_PATH")
-	dbKey      = os.Getenv("DB_ENCRYPTION_KEY")
-	dbInstance *service
-)
-
-func New() Service {
-	// Reuse Connection
-	if dbInstance != nil {
-		return dbInstance
-	}
-
-	db, err := sql.Open("sqlite3", dbPath)
-	if err != nil {
-		log.Fatalf("Failed to open database: %v", err)
-	}
-
-	// Enable encryption
-	_, err = db.Exec(fmt.Sprintf("PRAGMA key = '%s'", dbKey))
-	if err != nil {
-		log.Fatalf("Failed to set encryption key: %v", err)
-	}
-
-	dbInstance = &service{
-		db: db,
-	}
-	return dbInstance
+func (s *service) AddPerson(name string) error {
+	_, err := s.db.Exec("INSERT INTO example_table (name) VALUES (?)", name)
+	return err
 }
 
-// Health checks the health of the database connection by pinging the database.
-// It returns a map with keys indicating various health statistics.
-func (s *service) Health() map[string]string {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-	stats := make(map[string]string)
-
-	// Ping the database
-	err := s.db.PingContext(ctx)
+func (s *service) ListPeople() ([]Person, error) {
+	rows, err := s.db.Query("SELECT id, name FROM example_table")
 	if err != nil {
-		stats["status"] = "down"
-		stats["error"] = fmt.Sprintf("db down: %v", err)
-		log.Printf("Database health check failed: %v", err)
-		return stats
+		return nil, err
+	}
+	defer rows.Close()
+
+	var people []Person
+	for rows.Next() {
+		var p Person
+		if err := rows.Scan(&p.ID, &p.Name); err != nil {
+			return nil, err
+		}
+		people = append(people, p)
+	}
+	return people, nil
+}
+
+func New() (Service, error) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("Error loading .env file: %v", err)
 	}
 
-	// Database is up, add more statistics
-	stats["status"] = "up"
-	stats["message"] = "It's healthy"
-
-	// Get database stats
-	dbStats := s.db.Stats()
-	stats["open_connections"] = strconv.Itoa(dbStats.OpenConnections)
-	stats["in_use"] = strconv.Itoa(dbStats.InUse)
-	stats["idle"] = strconv.Itoa(dbStats.Idle)
-
-	// SQLite-specific checks
-	var pageCount, pageSize int
-	err = s.db.QueryRow("PRAGMA page_count").Scan(&pageCount)
-	if err == nil {
-		stats["page_count"] = strconv.Itoa(pageCount)
-	}
-	err = s.db.QueryRow("PRAGMA page_size").Scan(&pageSize)
-	if err == nil {
-		stats["page_size"] = strconv.Itoa(pageSize)
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "./data/database.db" // Default value
 	}
 
-	// Database size (approximate)
-	if pageCount > 0 && pageSize > 0 {
-		dbSize := pageCount * pageSize
-		stats["db_size_bytes"] = strconv.Itoa(dbSize)
+	dbKey := os.Getenv("DB_ENCRYPTION_KEY")
+	if dbKey == "" {
+		return nil, fmt.Errorf("DB_ENCRYPTION_KEY must be set")
 	}
 
-	return stats
+	// Escape the key and create the connection string
+	escapedKey := url.QueryEscape(dbKey)
+	connStr := fmt.Sprintf("%s?_pragma_key=%s&_pragma_cipher_page_size=4096", dbPath, escapedKey)
+
+	// Open the database
+	db, err := sql.Open("sqlite3", connStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open database: %v", err)
+	}
+
+	// Test connection
+	if err := db.Ping(); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to ping database: %v", err)
+	}
+
+	// Create table if not exists
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS example_table (id INTEGER PRIMARY KEY, name TEXT)`)
+	if err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to initialize database: %v", err)
+	}
+
+	log.Println("Database opened and connection verified")
+	return &service{db: db}, nil
 }
 
 func (s *service) Close() error {
-	log.Printf("Closing SQLite database connection")
 	return s.db.Close()
+}
+
+func (s *service) HealthCheck() error {
+	var result int
+	err := s.db.QueryRow("SELECT 1").Scan(&result)
+	if err != nil || result != 1 {
+		return fmt.Errorf("database health check failed: %v", err)
+	}
+	return nil
 }

@@ -1,16 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"homepage/internal/server"
+	"log"
 )
 
 func main() {
-
-	server := server.NewServer()
-
-	err := server.ListenAndServe()
+	srv, err := server.NewServer()
 	if err != nil {
-		panic(fmt.Sprintf("cannot start server: %s", err))
+		log.Fatalf("failed to create server: %v", err)
+	}
+
+	log.Printf("Server starting on port %d", srv.Addr)
+	if err := srv.ListenAndServe(); err != nil {
+		log.Fatalf("server failed: %v", err)
 	}
 }

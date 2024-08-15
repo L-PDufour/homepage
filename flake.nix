@@ -54,6 +54,8 @@
             gomod2nix.packages.${system}.default
             templ.packages.${system}.templ
             tailwindcss
+            sqlcipher
+            sqlite
             docker-compose
           ];
         };
@@ -63,43 +65,21 @@
           contents = [
             packages.default
             pkgs.sqlcipher
-            #   (pkgs.runCommand "assets" { } ''
-            #     mkdir -p $out/cmd/web/assets
-            #     cp -R ${./cmd/web/assets}/* $out/cmd/web/assets/
-            #     mkdir -p $out/cmd/web/assets/css
-            #     cp ${packages.default}/cmd/web/assets/css/output.css $out/cmd/web/assets/css/ || true
-            #     chmod -R 755 $out/cmd/web/assets
-            #     cp ${./postcss.config.js} $out/postcss.config.js
-            #     cp ${./tailwind.config.js} $out/tailwind.config.js
-            #   '')
           ];
           config = {
             Cmd = [ "${packages.default}/bin/api" ];
             WorkingDir = "/";
-            # Volumes = {
-            #   "/data" = { };
-            # };
-            # Env = [
-            #   "IN_CONTAINER=true"
-            #   "DB_ENCRYPTION_KEY=${placeholder "DB_ENCRYPTION_KEY"}"
-            # ];
+            Volumes = {
+              "/data" = { };
+            };
+            Env = [
+              "IN_CONTAINER=true"
+              "DB_PATH=/data/database.db"
+            ];
           };
         };
         apps = {
           default = flake-utils.lib.mkApp { drv = homepage; };
-          init-db = flake-utils.lib.mkApp {
-            drv = pkgs.writeShellScriptBin "init-db" ''
-              mkdir -p ./data
-              export DB_ENCRYPTION_KEY=$(${pkgs.openssl}/bin/openssl rand -base64 32)
-              ${pkgs.sqlcipher}/bin/sqlcipher ./data/database.db <<EOF
-              PRAGMA key = '$DB_ENCRYPTION_KEY';
-              CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);
-              INSERT INTO users (name) VALUES ('John Doe');
-              EOF
-              echo "Database initialized with encryption key: $DB_ENCRYPTION_KEY"
-              echo "Make sure to securely store this key!"
-            '';
-          };
           run = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "run" ''
               if [ -f .env ]; then

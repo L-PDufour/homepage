@@ -4,18 +4,6 @@ schema = 3
   [mod."github.com/a-h/templ"]
     version = "v0.2.747"
     hash = "sha256-F0tNpUY2OD6MaDLk9yVQJ8kphlHPXzACPSYlZMmkKo0="
-  [mod."github.com/jackc/pgpassfile"]
-    version = "v1.0.0"
-    hash = "sha256-H0nFbC34/3pZUFnuiQk9W7yvAMh6qJDrqvHp+akBPLM="
-  [mod."github.com/jackc/pgservicefile"]
-    version = "v0.0.0-20240606120523-5a60cdf6a761"
-    hash = "sha256-ETpGsLAA2wcm5xJBayr/mZrCE1YsWbnkbSSX3ptrFn0="
-  [mod."github.com/jackc/pgx/v5"]
-    version = "v5.6.0"
-    hash = "sha256-6Tx7UF6gWc4e572x6wBDLghoe0Inhef0cH2Fq5I8fX4="
-  [mod."github.com/jackc/puddle/v2"]
-    version = "v2.2.1"
-    hash = "sha256-Edf8SLT/8l+xfHm9IjUGxs1MHtic2VgRyfqb6OzGA9k="
   [mod."github.com/joho/godotenv"]
     version = "v1.5.1"
     hash = "sha256-kA0osKfsc6Kp+nuGTRJyXZZlJt1D/kuEazKMWYCWcQ8="
@@ -25,12 +13,6 @@ schema = 3
   [mod."github.com/yuin/goldmark"]
     version = "v1.7.4"
     hash = "sha256-1L0gZyD+AguN8GBy17rs54eFZv7LTU5dcttULEJRabI="
-  [mod."golang.org/x/crypto"]
-    version = "v0.26.0"
-    hash = "sha256-Iicrsb65fCmjfPILKoSLyBZMwe2VUcoTF5SpYTCQEuk="
-  [mod."golang.org/x/sync"]
-    version = "v0.8.0"
-    hash = "sha256-usvF0z7gq1vsX58p4orX+8WHlv52pdXgaueXlwj2Wss="
-  [mod."golang.org/x/text"]
-    version = "v0.17.0"
-    hash = "sha256-R8JbsP7KX+KFTHH7SjRnUGCdvtagylVOfngWEnVSqBc="
+  [mod."gopkg.in/yaml.v3"]
+    version = "v3.0.1"
+    hash = "sha256-FqL9TKYJ0XkNwJFnq9j0VvJ5ZUU1RvH/52h/f5bkYAU="

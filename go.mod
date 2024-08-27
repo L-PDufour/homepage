@@ -12,4 +12,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-require github.com/mutecomm/go-sqlcipher/v4 v4.4.2
+require (
+	github.com/lib/pq v1.10.9
+	github.com/mutecomm/go-sqlcipher/v4 v4.4.2
+)

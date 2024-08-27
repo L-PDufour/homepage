@@ -3,11 +3,11 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/joho/godotenv"
-	_ "github.com/mutecomm/go-sqlcipher/v4"
 	"log"
-	"net/url"
 	"os"
+
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
 type Person struct {
@@ -27,7 +27,7 @@ type service struct {
 }
 
 func (s *service) AddPerson(name string) error {
-	_, err := s.db.Exec("INSERT INTO example_table (name) VALUES (?)", name)
+	_, err := s.db.Exec("INSERT INTO example_table (name) VALUES ($1)", name)
 	return err
 }
 
@@ -55,22 +55,20 @@ func New() (Service, error) {
 		log.Printf("Error loading .env file: %v", err)
 	}
 
-	dbPath := os.Getenv("DB_PATH")
-	if dbPath == "" {
-		dbPath = "./data/database.db" // Default value
-	}
+	// Construct the connection string from environment variables
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
 
-	dbKey := os.Getenv("DB_ENCRYPTION_KEY")
-	if dbKey == "" {
-		return nil, fmt.Errorf("DB_ENCRYPTION_KEY must be set")
-	}
-
-	// Escape the key and create the connection string
-	escapedKey := url.QueryEscape(dbKey)
-	connStr := fmt.Sprintf("%s?_pragma_key=%s&_pragma_cipher_page_size=4096", dbPath, escapedKey)
+	// Construct the connection string
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		dbHost, dbPort, dbUser, dbPassword, dbName)
 
 	// Open the database
-	db, err := sql.Open("sqlite3", connStr)
+	fmt.Println(connStr)
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %v", err)
 	}
@@ -82,7 +80,7 @@ func New() (Service, error) {
 	}
 
 	// Create table if not exists
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS example_table (id INTEGER PRIMARY KEY, name TEXT)`)
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS example_table (id SERIAL PRIMARY KEY, name TEXT)`)
 	if err != nil {
 		db.Close()
 		return nil, fmt.Errorf("failed to initialize database: %v", err)

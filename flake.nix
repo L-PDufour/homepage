@@ -54,8 +54,7 @@
             gomod2nix.packages.${system}.default
             templ.packages.${system}.templ
             tailwindcss
-            sqlcipher
-            sqlite
+            postgresql
             docker-compose
           ];
         };
@@ -64,7 +63,7 @@
           tag = "latest";
           contents = [
             packages.default
-            pkgs.sqlcipher
+            pkgs.postgresqxl
           ];
           config = {
             Cmd = [ "${packages.default}/bin/api" ];
@@ -74,7 +73,11 @@
             };
             Env = [
               "IN_CONTAINER=true"
-              "DB_PATH=/data/database.db"
+              "DB_HOST=localhost" # Added for PostgreSQL connection
+              "DB_PORT=5433" # Added for PostgreSQL connection
+              "DB_NAME=mydatabase" # Added for PostgreSQL connection
+              "DB_USER=myuser" # Added for PostgreSQL connection
+              "DB_PASSWORD=mypassword" # Added for PostgreSQL connection
             ];
           };
         };

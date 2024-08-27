@@ -14,8 +14,9 @@ import (
 )
 
 type Server struct {
-	port int
-	db   database.Service
+	port    int
+	db      database.Service
+	queries *database.Queries
 }
 
 func NewServer() (*http.Server, error) {
@@ -24,14 +25,16 @@ func NewServer() (*http.Server, error) {
 		return nil, fmt.Errorf("invalid port: %v", err)
 	}
 
-	db, err := database.New()
+	db, err := database.NewService()
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize database: %v", err)
 	}
 
 	newServer := &Server{
-		port: port,
-		db:   db,
+		port:    port,
+		db:      db,
+		queries: db.GetQueries(), // Type assertion to get Queries from Service
+
 	}
 
 	// Declare Server config

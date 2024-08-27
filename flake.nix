@@ -63,7 +63,7 @@
           tag = "latest";
           contents = [
             packages.default
-            pkgs.postgresqxl
+            pkgs.postgresql
           ];
           config = {
             Cmd = [ "${packages.default}/bin/api" ];

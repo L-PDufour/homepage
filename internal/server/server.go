@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
@@ -9,14 +10,14 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
+	_ "github.com/lib/pq"
 	"homepage/internal/database"
 	"homepage/internal/middleware"
 )
 
 type Server struct {
-	port    int
-	db      database.Service
-	queries *database.Queries
+	port int
+	db   *database.Queries
 }
 
 func NewServer() (*http.Server, error) {
@@ -24,20 +25,20 @@ func NewServer() (*http.Server, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid port: %v", err)
 	}
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
 
-	db, err := database.NewService()
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize database: %v", err)
+		return nil, fmt.Errorf("failed to open database: %v", err)
 	}
+	dbQueries := database.New(db)
 
 	newServer := &Server{
-		port:    port,
-		db:      db,
-		queries: db.GetQueries(), // Type assertion to get Queries from Service
-
+		port: port,
+		db:   dbQueries,
 	}
 
-	// Declare Server config
 	stack := middleware.CreateStack(
 		middleware.AllowCors,
 		middleware.CheckPermissions,

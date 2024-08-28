@@ -48,6 +48,7 @@
         packages.default = homepage;
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
+            jq
             go
             go-tools
             air

@@ -8,11 +8,6 @@ require (
 )
 
 require (
-	github.com/yuin/goldmark v1.7.4
-	gopkg.in/yaml.v3 v3.0.1 // indirect
-)
-
-require (
 	github.com/lib/pq v1.10.9
-	github.com/mutecomm/go-sqlcipher/v4 v4.4.2
+	github.com/yuin/goldmark v1.7.4
 )

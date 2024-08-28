@@ -1,20 +1,10 @@
 package views
 
-import (
-	"context"
-)
-
-func rawHTML(ctx context.Context) templ.Component {
-	if content, ok := ctx.Value("blogContent").(string); ok {
-		return templ.Raw(content)
-	}
-	return templ.Raw("No content available")
-}
-
 templ Blog() {
 	@Base() {
-		<div class="text-center">
-			@rawHTML(ctx)
+		<div class="container mx-auto px-4 py-8">
+			<h1 class="text-3xl font-bold mb-4 text-center">{ "Happy New Year!" }</h1>
+			<div class="prose lg:prose-xl mx-auto"></div>
 		</div>
 	}
 }

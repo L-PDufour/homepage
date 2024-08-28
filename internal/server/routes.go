@@ -11,24 +11,20 @@ import (
 	"github.com/a-h/templ"
 )
 
-type Person struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-
 func (s *Server) RegisterRoutes() http.Handler {
 	mux := http.NewServeMux()
 	fileServer := http.FileServer(http.FS(efs.Files))
 	mux.Handle("/assets/", fileServer)
 	mux.Handle("/", templ.Handler(views.Bio()))
 	mux.Handle("GET /projects", templ.Handler(views.Projects()))
-	mux.HandleFunc("GET /blog", BlogHandler)
+	// mux.Handle("GET /blog", templ.Handler(views.Blog()))
 	mux.Handle("GET /cv", templ.Handler(views.CV()))
 	mux.Handle("GET /kids", templ.Handler(views.Kids()))
-	mux.HandleFunc("/ListAuthor", GetAuthorsHandler(s.queries)) // Pass s.queries
+	mux.HandleFunc("/ListAuthor", GetAuthorsHandler(s.db)) // Pass s.queries
 
 	return mux
 }
+
 func GetAuthorsHandler(q *database.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()

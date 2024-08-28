@@ -123,6 +123,24 @@ func (q *Queries) GetBlogPost(ctx context.Context, id int32) (Post, error) {
 	return i, err
 }
 
+const getBlogPostByTitle = `-- name: GetBlogPostByTitle :one
+SELECT id, title, content, author_id, created_at, updated_at FROM posts WHERE title = $1
+`
+
+func (q *Queries) GetBlogPostByTitle(ctx context.Context, title string) (Post, error) {
+	row := q.db.QueryRowContext(ctx, getBlogPostByTitle, title)
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.AuthorID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getPostTags = `-- name: GetPostTags :many
 SELECT t.id, t.name FROM tags t
 JOIN post_tags pt ON t.id = pt.tag_id

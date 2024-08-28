@@ -13,6 +13,9 @@ SELECT * FROM posts;
 -- name: GetBlogPost :one
 SELECT * FROM posts WHERE id = $1;
 
+-- name: GetBlogPostByTitle :one
+SELECT * FROM posts WHERE title = $1;
+
 -- name: CreateComment :one
 INSERT INTO comments (post_id, author_id, content) VALUES ($1, $2, $3) RETURNING *;
 

@@ -170,6 +170,43 @@ func (q *Queries) GetPostTags(ctx context.Context, postID int32) ([]Tag, error) 
 	return items, nil
 }
 
+const getRecentBlogPosts = `-- name: GetRecentBlogPosts :many
+		SELECT id, title, content, author_id, created_at, updated_at
+		FROM posts
+		ORDER BY created_at DESC
+		LIMIT $1
+`
+
+func (q *Queries) GetRecentBlogPosts(ctx context.Context, limit int32) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, getRecentBlogPosts, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.AuthorID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listAuthors = `-- name: ListAuthors :many
 SELECT id, name, email, created_at, updated_at FROM authors
 `

@@ -10,6 +10,12 @@ INSERT INTO posts (title, content, author_id) VALUES ($1, $2, $3) RETURNING *;
 -- name: ListBlogPosts :many
 SELECT * FROM posts;
 
+-- name: GetRecentBlogPosts :many
+		SELECT id, title, content, author_id, created_at, updated_at
+		FROM posts
+		ORDER BY created_at DESC
+		LIMIT $1;
+
 -- name: GetBlogPost :one
 SELECT * FROM posts WHERE id = $1;
 

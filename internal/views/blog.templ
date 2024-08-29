@@ -2,9 +2,10 @@ package views
 
 templ Blog() {
 	@Base() {
-		<div class="container mx-auto px-4 py-8">
-			<h1 class="text-3xl font-bold mb-4 text-center">{ "Happy New Year!" }</h1>
-			<div class="prose lg:prose-xl mx-auto"></div>
-		</div>
+		<article class="prose lg:prose-xl">
+			<div id="content" hx-get="/bloggy?id=18" hx-trigger="load" hx-swap="innerHTML">
+				<!-- This is where the blog content will be inserted -->
+			</div>
+		</article>
 	}
 }

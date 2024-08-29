@@ -52,3 +52,12 @@ type PostTag struct {
 	PostID int `json:"post_id"`
 	TagID  int `json:"tag_id"`
 }
+
+type BlogPostData struct {
+	ID    int
+	Title string
+}
+
+type HomePageData struct {
+	BlogPosts []BlogPostData
+}

@@ -10,3 +10,6 @@ schema = 3
   [mod."github.com/lib/pq"]
     version = "v1.10.9"
     hash = "sha256-Gl6dLtL+yk6UrTTWfas43aM4lP/pNa2l7+ITXnjQyKs="
+  [mod."github.com/yuin/goldmark"]
+    version = "v1.7.4"
+    hash = "sha256-1L0gZyD+AguN8GBy17rs54eFZv7LTU5dcttULEJRabI="

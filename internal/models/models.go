@@ -13,13 +13,6 @@ type Author struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type Blog struct {
-	ID       int    `json:"id"`
-	Title    string `json:"title"`
-	Content  string `json:"content"`
-	AuthorID int    `json:"author_id"`
-}
-
 // Post represents a blog post
 type Post struct {
 	ID        int       `json:"id"`
@@ -51,13 +44,4 @@ type Tag struct {
 type PostTag struct {
 	PostID int `json:"post_id"`
 	TagID  int `json:"tag_id"`
-}
-
-type BlogPostData struct {
-	ID    int
-	Title string
-}
-
-type HomePageData struct {
-	BlogPosts []BlogPostData
 }

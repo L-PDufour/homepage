@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -10,16 +11,18 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
-	_ "github.com/lib/pq"
 	"homepage/internal/database"
-	"homepage/internal/handlers"
+	"homepage/internal/handler"
+	"homepage/internal/markdown"
 	"homepage/internal/middleware"
+
+	_ "github.com/lib/pq"
 )
 
 type Server struct {
-	port     int
-	db       *database.Queries
-	handlers *handlers.Handlers
+	Port    int
+	DB      *database.Queries
+	Handler *handler.Handler
 }
 
 func NewServer() (*http.Server, error) {
@@ -32,13 +35,15 @@ func NewServer() (*http.Server, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}
+	logger := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	dbQueries := database.New(db)
+	mdService := markdown.NewMarkdownService(logger)
 
 	newServer := &Server{
-		port:     port,
-		db:       dbQueries,
-		handlers: handlers.NewHandlers(dbQueries),
+		Port:    port,
+		DB:      dbQueries,
+		Handler: handler.NewHandler(dbQueries, mdService),
 	}
 
 	stack := middleware.CreateStack(
@@ -50,7 +55,7 @@ func NewServer() (*http.Server, error) {
 	mux := newServer.registerRoutes()
 
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", newServer.port),
+		Addr:         fmt.Sprintf(":%d", newServer.Port),
 		Handler:      stack(mux),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,

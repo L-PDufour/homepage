@@ -2,10 +2,18 @@ package views
 
 templ Blog() {
 	@Base() {
-		<article class="prose lg:prose-xl">
-			<div id="content" hx-get="/bloggy?id=18" hx-trigger="load" hx-swap="innerHTML">
-				<!-- This is where the blog content will be inserted -->
-			</div>
-		</article>
+		<div class="text-left">
+			<article class="prose lg:prose-xl text-blue-500">
+				<div
+					id="content"
+					class="mt-4"
+					hx-get="/blog?id=18"
+					hx-trigger="load"
+					hx-swap="innerHTML"
+				>
+					Loading content...
+				</div>
+			</article>
+		</div>
 	}
 }

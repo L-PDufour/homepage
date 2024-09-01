@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"homepage/internal/blog"
 	"homepage/internal/database"
 	"homepage/internal/markdown"
 	"net/http"
@@ -8,8 +9,9 @@ import (
 )
 
 type Handler struct {
-	DB *database.Queries
-	MD markdown.MarkdownConverter
+	DB          *database.Queries
+	MD          markdown.MarkdownConverter
+	BlogService blog.BlogService
 }
 
 func NewHandler(db *database.Queries, md markdown.MarkdownConverter) *Handler {

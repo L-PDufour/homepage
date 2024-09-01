@@ -15,7 +15,7 @@ type Author struct {
 
 // Post represents a blog post
 type Post struct {
-	ID        int       `json:"id"`
+	ID        int32     `json:"id"`
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	AuthorID  int       `json:"author_id"`

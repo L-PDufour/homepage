@@ -39,6 +39,7 @@ func NewServer() (*http.Server, error) {
 
 	dbQueries := database.New(db)
 	mdService := markdown.NewMarkdownService(logger)
+	// blogService := blog.NewBlogService(dbQueries, &markdown.MarkdownService{})
 
 	newServer := &Server{
 		Port:    port,

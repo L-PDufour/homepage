@@ -22,15 +22,11 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.Handle("GET /kids", templ.Handler(views.Kids()))
 
 	// Blog routes
-	mux.HandleFunc("GET /blogy", s.Handler.BlogPage)
-	// mux.HandleFunc("GET /blog/{id}", s.Handler.GetBlogPost)
-	http.HandleFunc("/blog", s.Handler.GetBlogPost)
-	http.HandleFunc("/blog/posts", s.Handler.GetBlogPosts)
-	http.HandleFunc("/blog/new", s.Handler.NewBlogPostForm)
-	http.HandleFunc("/blog/create", s.Handler.CreateBlogPost)
-	// mux.HandleFunc("GET /blog/{id}/edit", s.Handler.EditBlogPostForm)
-	// mux.HandleFunc("PUT /blog/{id}", s.Handler.UpdateBlogPost)
-	// mux.HandleFunc("DELETE /blog/{id}", s.Handler.DeleteBlogPost)
-
+	mux.Handle("GET /blog", templ.Handler(views.Blog()))
+	mux.HandleFunc("GET /blog/posts", s.Handler.GetBlogPosts)
+	mux.HandleFunc("GET /blog/post", s.Handler.GetBlogPost)
+	mux.HandleFunc("GET /blog/new", s.Handler.NewBlogPostForm)
+	mux.HandleFunc("POST /blog/create", s.Handler.CreateBlogPost)
+	// In your server setup
 	return mux
 }

@@ -11,6 +11,7 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
+	"homepage/internal/blog"
 	"homepage/internal/database"
 	"homepage/internal/handler"
 	"homepage/internal/markdown"
@@ -35,16 +36,20 @@ func NewServer() (*http.Server, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}
-	logger := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-
 	dbQueries := database.New(db)
-	mdService := markdown.NewMarkdownService(logger)
-	// blogService := blog.NewBlogService(dbQueries, &markdown.MarkdownService{})
+
+	logger := log.New(os.Stdout, "markdown: ", log.LstdFlags)
+
+	mdService := markdown.NewMarkdownService(logger) // Now returns *MarkdownService
+
+	blogService := blog.NewBlogService(dbQueries, mdService) // Pass the pointer
+
+	handler := handler.NewHandler(dbQueries, mdService, blogService)
 
 	newServer := &Server{
 		Port:    port,
 		DB:      dbQueries,
-		Handler: handler.NewHandler(dbQueries, mdService),
+		Handler: handler,
 	}
 
 	stack := middleware.CreateStack(

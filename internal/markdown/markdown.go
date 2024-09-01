@@ -19,7 +19,7 @@ type MarkdownService struct {
 }
 
 // NewMarkdownService creates a new instance of MarkdownService.
-func NewMarkdownService(logger *log.Logger) MarkdownConverter {
+func NewMarkdownService(logger *log.Logger) *MarkdownService {
 	return &MarkdownService{
 		logger: logger,
 	}

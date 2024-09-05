@@ -1,0 +1,23 @@
+package views
+
+templ Homepage(isAdmin bool, email string) {
+	<html>
+		<body>
+			<h1>Welcome to the Home Page, { email }</h1>
+			<p>This page is protected by Cloudflare Access.</p>
+			if isAdmin {
+				<a href="/admin">Go to Admin Page</a>
+			}
+		</body>
+	</html>
+}
+
+templ Adminpage() {
+	<html>
+		<body>
+			<h1>Admin Page</h1>
+			<p>This is a protected admin page.</p>
+			<a href="/">Back to Home</a>
+		</body>
+	</html>
+}

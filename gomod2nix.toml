@@ -7,6 +7,12 @@ schema = 3
   [mod."github.com/aymerick/douceur"]
     version = "v0.2.0"
     hash = "sha256-NiBX8EfOvLXNiK3pJaZX4N73YgfzdrzRXdiBFe3X3sE="
+  [mod."github.com/coreos/go-oidc/v3"]
+    version = "v3.11.0"
+    hash = "sha256-iV7ff6YGPiorHFPxC6lnojYWszFjkgh86445eUvYywI="
+  [mod."github.com/go-jose/go-jose/v4"]
+    version = "v4.0.2"
+    hash = "sha256-vwcozYxzPXkvCkR/rQOm6DJ5Yd+Muu9YC/2VzVUP50s="
   [mod."github.com/gorilla/css"]
     version = "v1.0.1"
     hash = "sha256-6JwNHqlY2NpZ0pSQTyYPSpiNqjXOdFHqrUT10sv3y8A="
@@ -22,6 +28,12 @@ schema = 3
   [mod."github.com/yuin/goldmark"]
     version = "v1.7.4"
     hash = "sha256-1L0gZyD+AguN8GBy17rs54eFZv7LTU5dcttULEJRabI="
+  [mod."golang.org/x/crypto"]
+    version = "v0.26.0"
+    hash = "sha256-Iicrsb65fCmjfPILKoSLyBZMwe2VUcoTF5SpYTCQEuk="
   [mod."golang.org/x/net"]
     version = "v0.28.0"
     hash = "sha256-WdH/mgsX/CB+CiYtXEwJAXHN8FgtW2YhFcWwrrHNBLo="
+  [mod."golang.org/x/oauth2"]
+    version = "v0.21.0"
+    hash = "sha256-0xgi5k7fxMScMH+rDwXhDqe8raTFHh5ih727jGVS918="

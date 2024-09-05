@@ -65,6 +65,7 @@
           contents = [
             packages.default
             pkgs.postgresql
+            pkgs.cacert
           ];
           config = {
             Cmd = [ "${packages.default}/bin/api" ];

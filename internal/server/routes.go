@@ -4,19 +4,24 @@ import (
 	efs "homepage"
 	"homepage/internal/views"
 	"net/http"
-	"os"
-	"sync"
 
 	"github.com/a-h/templ"
 )
 
-type AuthenticatedUser struct {
-	Email   string
-	IsAdmin bool
+type Route struct {
+	Method  string
+	Path    string
+	Handler http.Handler
 }
 
-var authenticatedUsers = sync.Map{}
-var isProduction = os.Getenv("GO_ENV") == "production"
+func (s *Server) registerRoute(mux *http.ServeMux, method, path string, handler http.Handler) {
+	switch method {
+	case "GET":
+		mux.Handle(path, handler)
+	default:
+		mux.Handle(path, handler) // Handle other methods as needed
+	}
+}
 
 func (s *Server) registerRoutes() http.Handler {
 	mux := http.NewServeMux()
@@ -25,22 +30,35 @@ func (s *Server) registerRoutes() http.Handler {
 	fileServer := http.FileServer(http.FS(efs.Files))
 	mux.Handle("/assets/", fileServer)
 
-	// View routes
-	mux.Handle("/", templ.Handler(views.Bio()))
-	mux.Handle("GET /projects", templ.Handler(views.Projects()))
-	mux.Handle("GET /cv", templ.Handler(views.CV()))
-	mux.Handle("GET /kids", templ.Handler(views.Kids()))
-	mux.Handle("GET /blog", templ.Handler(views.Blog()))
+	// Define your routes
+	routes := []Route{
+		{"GET", "/", templ.Handler(views.Bio())}, // Only one registration for "/"
+		{"GET", "/projects", templ.Handler(views.Projects())},
+		{"GET", "/cv", templ.Handler(views.CV())},
+		{"GET", "/kids", templ.Handler(views.Kids())},
+		{"GET", "/blog", templ.Handler(views.Blog())},
+		{"GET", "/admin", http.HandlerFunc(s.Handler.Admin)},
+		{"GET", "/homepage", http.HandlerFunc(s.Handler.Home)},
 
-	// Auth
-	mux.HandleFunc("GET /admin", s.Handler.Admin)
-	mux.HandleFunc("GET /home", s.Handler.Home)
+		// Blog CRUD routes
+		{"GET", "/blog/posts", http.HandlerFunc(s.Handler.GetBlogPosts)},
+		{"GET", "/blog/post", http.HandlerFunc(s.Handler.GetBlogPost)},
+		{"GET", "/blog/new", http.HandlerFunc(s.Handler.NewBlogPostForm)},
+		{"POST", "/blog/create", http.HandlerFunc(s.Handler.CreateBlogPost)},
+		// {"GET", "/blog/edit", http.HandlerFunc(s.Handler.EditBlogPostForm)},
+		// {"POST", "/blog/update", http.HandlerFunc(s.Handler.UpdateBlogPost)},
+		// {"POST", "/blog/delete", http.HandlerFunc(s.Handler.DeleteBlogPost)},
+	}
 
-	// Blog Crud
-	mux.HandleFunc("GET /blog/posts", s.Handler.GetBlogPosts)
-	mux.HandleFunc("GET /blog/post", s.Handler.GetBlogPost)
-	mux.HandleFunc("GET /blog/new", s.Handler.NewBlogPostForm)
-	mux.HandleFunc("POST /blog/create", s.Handler.CreateBlogPost)
-	// In your server setup
+	// Register all routes
+	for _, route := range routes {
+		s.registerRoute(mux, route.Method, route.Path, route.Handler)
+	}
+
+	// // Catch-all handler for unhandled routes
+	// mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	// 	http.Redirect(w, r, "/", http.StatusFound)
+	// })
+
 	return mux
 }

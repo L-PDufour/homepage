@@ -25,6 +25,17 @@ type Comment struct {
 	UpdatedAt sql.NullTime
 }
 
+type Content struct {
+	ID        int32
+	Type      string
+	Title     string
+	Markdown  sql.NullString
+	ImageUrl  sql.NullString
+	Link      sql.NullString
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
+}
+
 type Post struct {
 	ID        int32
 	Title     string

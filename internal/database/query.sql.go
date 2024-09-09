@@ -94,6 +94,43 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (C
 	return i, err
 }
 
+const createContent = `-- name: CreateContent :one
+INSERT INTO content (type, title, markdown, image_url, link, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+RETURNING id, type, title, markdown, image_url, link, created_at, updated_at
+`
+
+type CreateContentParams struct {
+	Type     string
+	Title    string
+	Markdown sql.NullString
+	ImageUrl sql.NullString
+	Link     sql.NullString
+}
+
+// doc: Inserts a new content record and returns the newly created content
+func (q *Queries) CreateContent(ctx context.Context, arg CreateContentParams) (Content, error) {
+	row := q.db.QueryRowContext(ctx, createContent,
+		arg.Type,
+		arg.Title,
+		arg.Markdown,
+		arg.ImageUrl,
+		arg.Link,
+	)
+	var i Content
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Title,
+		&i.Markdown,
+		&i.ImageUrl,
+		&i.Link,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const createTag = `-- name: CreateTag :one
 INSERT INTO tags (name) VALUES ($1) RETURNING id, name
 `
@@ -103,6 +140,15 @@ func (q *Queries) CreateTag(ctx context.Context, name string) (Tag, error) {
 	var i Tag
 	err := row.Scan(&i.ID, &i.Name)
 	return i, err
+}
+
+const deleteContent = `-- name: DeleteContent :exec
+DELETE FROM content WHERE id = $1
+`
+
+func (q *Queries) DeleteContent(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteContent, id)
+	return err
 }
 
 const getBlogPost = `-- name: GetBlogPost :one
@@ -135,6 +181,31 @@ func (q *Queries) GetBlogPostByTitle(ctx context.Context, title string) (Post, e
 		&i.Title,
 		&i.Content,
 		&i.AuthorID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getContentByTitle = `-- name: GetContentByTitle :one
+SELECT id, type, title, markdown, image_url, link, created_at, updated_at FROM content WHERE type = $1 AND title = $2
+`
+
+type GetContentByTitleParams struct {
+	Type  string
+	Title string
+}
+
+func (q *Queries) GetContentByTitle(ctx context.Context, arg GetContentByTitleParams) (Content, error) {
+	row := q.db.QueryRowContext(ctx, getContentByTitle, arg.Type, arg.Title)
+	var i Content
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Title,
+		&i.Markdown,
+		&i.ImageUrl,
+		&i.Link,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -306,4 +377,31 @@ func (q *Queries) ListComments(ctx context.Context, postID sql.NullInt32) ([]Com
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateContent = `-- name: UpdateContent :exec
+UPDATE content
+SET type = $1, title = $2, markdown = $3, image_url = $4, link = $5, updated_at = NOW()
+WHERE id = $6
+`
+
+type UpdateContentParams struct {
+	Type     string
+	Title    string
+	Markdown sql.NullString
+	ImageUrl sql.NullString
+	Link     sql.NullString
+	ID       int32
+}
+
+func (q *Queries) UpdateContent(ctx context.Context, arg UpdateContentParams) error {
+	_, err := q.db.ExecContext(ctx, updateContent,
+		arg.Type,
+		arg.Title,
+		arg.Markdown,
+		arg.ImageUrl,
+		arg.Link,
+		arg.ID,
+	)
+	return err
 }

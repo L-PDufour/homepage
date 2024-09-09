@@ -45,3 +45,14 @@ type PostTag struct {
 	PostID int `json:"post_id"`
 	TagID  int `json:"tag_id"`
 }
+
+type Content struct {
+	ID        int32     `json:"id"`
+	Type      string    `json:"type"`
+	Title     string    `json:"title"`
+	Markdown  string    `json:"markdown"`
+	ImageUrl  *string   `json:"image_url,omitempty"`
+	Link      *string   `json:"link,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}

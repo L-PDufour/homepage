@@ -29,11 +29,11 @@ templ Base() {
 
 templ Header() {
 	<header data-testid="headerTemplate" class="bg-[#1e1e2e] text-[#cdd6f4]">
-		@navBar()
+		@NavBar()
 	</header>
 }
 
-templ navBar() {
+templ NavBar() {
 	<nav data-testid="navTemplate" class="p-4 bg-[#1e1e2e]">
 		<ul class="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
 			<li>
@@ -139,4 +139,12 @@ templ Footer() {
 		</div>
 		<div class="text-sm sm:text-base">&copy; { fmt.Sprintf("%d", time.Now().Year()) } Léon-Pierre Dufour</div>
 	</footer>
+}
+
+templ ContentSection(htmlContent string) {
+	<div class="prose lg:prose-xl">
+		<div class="mt-4">
+			@templ.Raw(htmlContent)
+		</div>
+	</div>
 }

@@ -32,13 +32,17 @@ func (s *Server) registerRoutes() http.Handler {
 
 	// Define your routes
 	routes := []Route{
-		{"GET", "/", templ.Handler(views.Bio())}, // Only one registration for "/"
+		{"GET", "/", http.HandlerFunc(s.Handler.BioHandler)},
+		// {"GET", "/", templ.Handler(views.Bio())}, // Only one registration for "/"
 		{"GET", "/projects", templ.Handler(views.Projects())},
 		{"GET", "/cv", templ.Handler(views.CV())},
 		{"GET", "/kids", templ.Handler(views.Kids())},
 		{"GET", "/blog", templ.Handler(views.Blog())},
 		{"GET", "/admin", http.HandlerFunc(s.Handler.Admin)},
 		{"GET", "/homepage", http.HandlerFunc(s.Handler.Home)},
+
+		//Content CRUD routes
+		{"GET", "/content/get", http.HandlerFunc(s.Handler.GetContentHandler)},
 
 		// Blog CRUD routes
 		{"GET", "/blog/posts", http.HandlerFunc(s.Handler.GetBlogPosts)},

@@ -128,3 +128,49 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 	}
 	views.Homepage(user.IsAdmin, user.Email).Render(context.Background(), w)
 }
+
+func (h *Handler) GetContentHandler(w http.ResponseWriter, r *http.Request) {
+	typeStr := r.URL.Query().Get("type")
+	titleStr := r.URL.Query().Get("title")
+
+	contentDB, err := h.DB.GetContentByTitle(r.Context(), database.GetContentByTitleParams{
+		Type:  typeStr,
+		Title: titleStr,
+	})
+	if err != nil {
+		http.Error(w, "Content not found", http.StatusNotFound)
+		return
+	}
+	if !contentDB.Markdown.Valid {
+		http.Error(w, "Content is empty", http.StatusNoContent)
+		return
+	}
+
+	sanitizedHTML, err := h.MD.ConvertAndSanitize(contentDB.Markdown.String)
+	if err != nil {
+		http.Error(w, "Error processing content", http.StatusInternalServerError)
+		return
+	}
+
+	// Render only the content section
+	views.ContentSection(sanitizedHTML).Render(r.Context(), w)
+}
+
+func (h *Handler) BioHandler(w http.ResponseWriter, r *http.Request) {
+	contentDB, err := h.DB.GetContentByTitle(r.Context(), database.GetContentByTitleParams{
+		Type:  "about",
+		Title: "bio",
+	})
+	if err != nil || !contentDB.Markdown.Valid {
+		// Render the Bio template with empty content if not found
+		views.Bio("").Render(r.Context(), w)
+		return
+	}
+
+	sanitizedHTML, err := h.MD.ConvertAndSanitize(contentDB.Markdown.String)
+	if err != nil {
+		sanitizedHTML = "Error processing content"
+	}
+
+	views.Bio(sanitizedHTML).Render(r.Context(), w)
+}

@@ -1,9 +1,8 @@
 package views
 
-templ Bio(content string) {
+templ Bio(content string, isAdmin bool) {
 	@Base() {
-		<div class="max-w-6xl mx-auto p-4 sm:p-6 bg-[#1e1e2e] rounded-lg shadow-lg">
-			<h1 class="text-2xl font-bold text-[#f2cdcd] mb-4">About Me</h1>
+		<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#1e1e2e] rounded-lg shadow-lg">
 			<div id="content" class="mt-4">
 				if content == "" {
 					<div
@@ -17,14 +16,16 @@ templ Bio(content string) {
 					@ContentSection(content)
 				}
 			</div>
-			<button
-				hx-get="/content/edit?type=about&title=bio"
-				hx-target="#content"
-				hx-swap="innerHTML"
-				class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-			>
-				Edit Content
-			</button>
+			if isAdmin {
+				<button
+					hx-get="/content/edit?type=about&title=bio"
+					hx-target="#content"
+					hx-swap="innerHTML"
+					class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+				>
+					Edit Content
+				</button>
+			}
 		</div>
 	}
 }

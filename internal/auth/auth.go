@@ -48,7 +48,6 @@ func NewAuthenticator() (*Authenticator, error) {
 
 func (a *Authenticator) VerifyToken(r *http.Request) (*AuthenticatedUser, error) {
 	if !isProduction {
-		log.Println("ici verify token")
 		return a.mockVerifyToken(r)
 	}
 

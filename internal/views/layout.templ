@@ -2,7 +2,6 @@ package views
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 )
 
@@ -144,13 +143,13 @@ templ Footer() {
 
 templ EditContentSection(typeStr string, titleStr string, content string, id int32) {
 	<form
-		hx-post="/content/update?id={idStr}"
+		hx-post="/content/update?id={strconv.Itoa(int(id))}"
 		hx-target="#content"
 		hx-swap="innerHTML"
 	>
-		<input type="hidden" name="type" value={ typeStr }/>
-		<input type="hidden" name="title" value={ titleStr }/>
-		<input type="hidden" name="id" value={ strconv.Itoa(int(id)) }/> <!-- Convert id to string -->
+		<input type="hidden" name="type" value="{ typeStr }"/>
+		<input type="hidden" name="title" value="{ titleStr }"/>
+		<input type="hidden" name="id" value="{ strconv.Itoa(int(id)) }"/> <!-- Convert id to string -->
 		<textarea name="content" rows="10" class="w-full p-2 border rounded">
 			{ content }
 		</textarea>
@@ -159,9 +158,8 @@ templ EditContentSection(typeStr string, titleStr string, content string, id int
 		</button>
 		<button
 			type="button"
-			hx-get="/content/get?type={typeStr}&title={titleStr}"
-			hx-target="#content"
-			hx-swap="innerHTML"
+			hx-get="/"
+			hx-target="body"
 			class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
 		>
 			Cancel
@@ -169,9 +167,22 @@ templ EditContentSection(typeStr string, titleStr string, content string, id int
 	</form>
 }
 
-// ContentSection template (unchanged)
 templ ContentSection(htmlContent string) {
-	<div class="prose lg:prose-xl">
+	<div class="prose lg:prose-xl max-w-full mx-auto">
+		<style>
+			/* Custom styles for text color and spacing */
+			.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+				color: #f2cdcd; /* Light color for headings */
+			}
+			.prose p, .prose ul, .prose ol {
+				color: #cdd6f4; /* Light color for text and lists */
+			}
+			/* Ensure full-width usage */
+			.prose {
+				padding-left: 0;
+				padding-right: 0;
+			}
+		</style>
 		<div class="mt-4">
 			@templ.Raw(htmlContent)
 		</div>

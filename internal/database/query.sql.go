@@ -212,6 +212,42 @@ func (q *Queries) GetContentByTitle(ctx context.Context, arg GetContentByTitlePa
 	return i, err
 }
 
+const getContentsByType = `-- name: GetContentsByType :many
+SELECT id, type, title, markdown, image_url, link, created_at, updated_at FROM content WHERE type = $1
+`
+
+func (q *Queries) GetContentsByType(ctx context.Context, type_ string) ([]Content, error) {
+	rows, err := q.db.QueryContext(ctx, getContentsByType, type_)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Content
+	for rows.Next() {
+		var i Content
+		if err := rows.Scan(
+			&i.ID,
+			&i.Type,
+			&i.Title,
+			&i.Markdown,
+			&i.ImageUrl,
+			&i.Link,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPostTags = `-- name: GetPostTags :many
 SELECT t.id, t.name FROM tags t
 JOIN post_tags pt ON t.id = pt.tag_id

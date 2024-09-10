@@ -65,5 +65,33 @@ func (h *Handler) BioHandler(w http.ResponseWriter, r *http.Request) {
 		sanitizedHTML = "Error processing content"
 	}
 
-	views.Bio(sanitizedHTML, user.IsAdmin).Render(r.Context(), w)
+	component := views.Bio(sanitizedHTML, user.IsAdmin)
+	component.Render(r.Context(), w)
+}
+
+func (h *Handler) ProjectsHandler(w http.ResponseWriter, r *http.Request) {
+	user, _ := r.Context().Value("user").(*auth.AuthenticatedUser)
+
+	contentDB, err := h.DB.GetContentsByType(r.Context(), "project")
+	if err != nil {
+		// Handle error appropriately, possibly render an error view
+		http.Error(w, "Error fetching projects", http.StatusInternalServerError)
+		return
+	}
+
+	// Sanitize Markdown for each project
+	for i := range contentDB {
+		if contentDB[i].Markdown.Valid {
+			sanitizedHTML, err := h.MD.ConvertAndSanitize(contentDB[i].Markdown.String)
+			if err != nil {
+				sanitizedHTML = "Error processing content"
+			}
+			contentDB[i].Markdown.String = sanitizedHTML // Update the field
+		} else {
+			contentDB[i].Markdown.String = "No content available" // Handle invalid content
+		}
+	}
+
+	component := views.Projects(contentDB, user.IsAdmin)
+	component.Render(r.Context(), w)
 }

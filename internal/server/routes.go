@@ -32,11 +32,12 @@ func (s *Server) registerRoutes() http.Handler {
 
 	// Define your routes
 	routes := []Route{
-		{"GET", "/home", http.HandlerFunc(s.Handler.BioHandler)}, // Only one registration for "/"
-		// {"GET", "/projects", templ.Handler(views.Projects())},
+		{"GET", "/bio", http.HandlerFunc(s.Handler.BioHandler)}, // Only one registration for "/"
+		{"GET", "/projects", http.HandlerFunc(s.Handler.ProjectsHandler)},
 		{"GET", "/cv", templ.Handler(views.CV())},
 		{"GET", "/kids", templ.Handler(views.Kids())},
-		{"GET", "/blog", templ.Handler(views.Blog())},
+		{"GET", "/blog", http.HandlerFunc(s.Handler.BlogPage)},
+		// {"GET", "/blog", templ.Handler(views.Blog())},
 		{"GET", "/admin", http.HandlerFunc(s.Handler.Admin)},
 
 		//Content CRUD routes
@@ -59,7 +60,9 @@ func (s *Server) registerRoutes() http.Handler {
 	}
 
 	// Catch-all handler for unhandled routes
-	// mux.HandleFunc("/", s.Handler.BioHandler)
+	mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/bio", http.StatusFound)
+	})
 
 	return mux
 }

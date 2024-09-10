@@ -17,6 +17,14 @@ templ Bio(content string) {
 					@ContentSection(content)
 				}
 			</div>
+			<button
+				hx-get="/content/edit?type=about&title=bio"
+				hx-target="#content"
+				hx-swap="innerHTML"
+				class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+			>
+				Edit Content
+			</button>
 		</div>
 	}
 }

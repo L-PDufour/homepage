@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -141,6 +142,34 @@ templ Footer() {
 	</footer>
 }
 
+templ EditContentSection(typeStr string, titleStr string, content string, id int32) {
+	<form
+		hx-post="/content/update?id={idStr}"
+		hx-target="#content"
+		hx-swap="innerHTML"
+	>
+		<input type="hidden" name="type" value={ typeStr }/>
+		<input type="hidden" name="title" value={ titleStr }/>
+		<input type="hidden" name="id" value={ strconv.Itoa(int(id)) }/> <!-- Convert id to string -->
+		<textarea name="content" rows="10" class="w-full p-2 border rounded">
+			{ content }
+		</textarea>
+		<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">
+			Save Changes
+		</button>
+		<button
+			type="button"
+			hx-get="/content/get?type={typeStr}&title={titleStr}"
+			hx-target="#content"
+			hx-swap="innerHTML"
+			class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
+		>
+			Cancel
+		</button>
+	</form>
+}
+
+// ContentSection template (unchanged)
 templ ContentSection(htmlContent string) {
 	<div class="prose lg:prose-xl">
 		<div class="mt-4">

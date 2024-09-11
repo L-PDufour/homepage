@@ -17,12 +17,10 @@ func (h *Handler) GetBlogPosts(w http.ResponseWriter, r *http.Request) {
 
 	// Check if the request is for the sidebar (recent posts)
 	if r.URL.Query().Get("recent") == "true" {
-		component := views.RecentPosts(posts)
-		component.Render(r.Context(), w)
+		views.RecentPosts(posts).Render(r.Context(), w)
 	} else {
 		// For the main content area
-		component := views.BlogPostList(posts)
-		component.Render(r.Context(), w)
+		views.BlogPostList(posts).Render(r.Context(), w)
 	}
 }
 
@@ -40,13 +38,11 @@ func (h *Handler) GetBlogPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	component := views.BlogContent(post, htmlContent)
-	component.Render(r.Context(), w)
+	views.BlogContent(post, htmlContent).Render(r.Context(), w)
 }
 
 func (h *Handler) NewBlogPostForm(w http.ResponseWriter, r *http.Request) {
-	component := views.BlogPostForm()
-	component.Render(r.Context(), w)
+	views.BlogPostForm().Render(r.Context(), w)
 }
 
 // This handler needs to change to store Markdown content
@@ -67,6 +63,5 @@ func (h *Handler) CreateBlogPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	component := views.BlogContent(post, htmlContent)
-	component.Render(r.Context(), w)
+	views.BlogContent(post, htmlContent).Render(r.Context(), w)
 }

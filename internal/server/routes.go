@@ -61,9 +61,9 @@ func (s *Server) registerRoutes() http.Handler {
 	}
 
 	// Catch-all handler for unhandled routes
-	// mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
-	// 	http.Redirect(w, r, "/bio", http.StatusFound)
-	// })
+	mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/bio", http.StatusFound)
+	})
 
 	return mux
 }

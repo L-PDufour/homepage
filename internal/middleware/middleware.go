@@ -66,11 +66,20 @@ func AllowCors(next http.Handler) http.Handler {
 func WithAuthenticator(authenticator *auth.Authenticator) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Attempt to verify the token
-			user, err := authenticator.VerifyToken(r)
+			var user *auth.AuthenticatedUser
+			var err error
+
+			// Attempt to verify the token based on the environment
+			if auth.IsProduction {
+				// Production: verify the token
+				user, err = authenticator.VerifyToken(r)
+			} else {
+				// Non-production: use mock verification
+				user, err = authenticator.MockVerifyToken(r)
+			}
 
 			if err != nil {
-				// Log the failure, but don't block access
+				// Log the failure and proceed as unauthenticated
 				log.Printf("Failed to verify token: %v. Proceeding as unauthenticated.\n", err)
 			} else {
 				// Token is valid, add the authenticated user to the context

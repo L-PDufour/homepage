@@ -1,17 +1,5 @@
 package views
 
-templ Homepage(isAdmin bool, email string) {
-	<html>
-		<body>
-			<h1>Welcome to the Home Page, { email }</h1>
-			<p>This page is protected by Cloudflare Access.</p>
-			if isAdmin {
-				<a href="/admin">Go to Admin Page</a>
-			}
-		</body>
-	</html>
-}
-
 templ Adminpage() {
 	<html>
 		<body>
@@ -28,7 +16,6 @@ templ AdminAuthPage() {
 			<h1>Authentication Successful</h1>
 			<p>You have been successfully authenticated. You can now access the admin page.</p>
 			<a href="/admin">Go to Admin Page</a>
-			<!-- Optional: Redirect automatically after a short delay -->
 			<script>
 				setTimeout(function() {
 					window.location.href = "/admin";

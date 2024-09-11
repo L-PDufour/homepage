@@ -14,7 +14,7 @@ import (
 var (
 	CfTeamDomain = os.Getenv("CF_TEAM_DOMAIN")
 	cfAudTag     = os.Getenv("CF_AUD_TAG")
-	isProduction = os.Getenv("GO_ENV") == "production"
+	IsProduction = os.Getenv("GO_ENV") == "production"
 	cfAPIKey     = os.Getenv("CF_API_KEY") // Token for Cloudflare API access
 )
 
@@ -39,7 +39,7 @@ func NewAuthenticator() (*Authenticator, error) {
 	cfCtx := context.Background()
 
 	// If not in production, return the Authenticator without OIDC setup
-	if !isProduction {
+	if !IsProduction {
 		return &Authenticator{verifier: nil, cfAPI: cfAPI, cloudflareCtx: cfCtx}, nil
 	}
 
@@ -97,7 +97,7 @@ func (a *Authenticator) VerifyToken(r *http.Request) (*AuthenticatedUser, error)
 // RedirectToLogin sends the user to the Cloudflare Access login page
 
 // mockVerifyToken is a mock function used in non-production environments for token verification
-func (a *Authenticator) mockVerifyToken(r *http.Request) (*AuthenticatedUser, error) {
+func (a *Authenticator) MockVerifyToken(r *http.Request) (*AuthenticatedUser, error) {
 	// In non-production, simulate an admin user
 	email := "leonpierre.dufour@gmail.com" // Your admin email logic
 	isAdmin := true

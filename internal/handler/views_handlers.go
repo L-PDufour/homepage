@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"fmt"
 	"homepage/internal/auth"
 	"homepage/internal/database"
@@ -11,8 +10,6 @@ import (
 )
 
 func (h *Handler) AdminAuth(w http.ResponseWriter, r *http.Request) {
-	// Render a message or perform actions after authentication.
-	// For example, you could show a welcome message or some instructions.
 	views.AdminAuthPage().Render(r.Context(), w)
 }
 
@@ -35,26 +32,8 @@ func (h *Handler) Admin(w http.ResponseWriter, r *http.Request) {
 	views.Adminpage().Render(r.Context(), w)
 }
 
-func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
-	user, ok := r.Context().Value("user").(*auth.AuthenticatedUser)
-	if !ok {
-		// Handle the case where user is not in the context
-		http.Error(w, "User not found in context", http.StatusInternalServerError)
-		return
-	}
-
-	// Check if the user is an admin
-	if user.IsAdmin {
-		fmt.Fprintf(w, "Welcome, admin! This is the home page.")
-	} else {
-		fmt.Fprintf(w, "Welcome, user! This is the home page.")
-	}
-	views.Homepage(user.IsAdmin, user.Email).Render(context.Background(), w)
-}
-
 func (h *Handler) BlogPage(w http.ResponseWriter, r *http.Request) {
-	component := views.Blog()
-	component.Render(r.Context(), w)
+	views.Blog().Render(r.Context(), w)
 }
 
 func (h *Handler) BioHandler(w http.ResponseWriter, r *http.Request) {
@@ -81,12 +60,11 @@ func (h *Handler) BioHandler(w http.ResponseWriter, r *http.Request) {
 	isAdmin := user != nil && user.IsAdmin
 
 	// Render the Bio component with sanitized content
-	component := views.Bio(sanitizedHTML, isAdmin)
-	component.Render(r.Context(), w)
+	views.Bio(sanitizedHTML, isAdmin).Render(r.Context(), w)
 }
 
 func (h *Handler) ProjectsHandler(w http.ResponseWriter, r *http.Request) {
-	user, _ := r.Context().Value("user").(*auth.AuthenticatedUser)
+	user, _ := middleware.GetUserFromContext(r.Context())
 
 	contentDB, err := h.DB.GetContentsByType(r.Context(), "project")
 	if err != nil {
@@ -108,6 +86,7 @@ func (h *Handler) ProjectsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	component := views.Projects(contentDB, user.IsAdmin)
-	component.Render(r.Context(), w)
+	isAdmin := user != nil && user.IsAdmin
+
+	views.Projects(contentDB, isAdmin).Render(r.Context(), w)
 }

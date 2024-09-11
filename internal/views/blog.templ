@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-templ Blog() {
+templ Blog(isAdmin bool) {
 	@Base() {
 		<div class="container mx-auto px-4">
 			<h1 class="text-4xl font-bold mb-8">My Blog</h1>
@@ -33,14 +33,16 @@ templ Blog() {
 							Loading recent posts...
 						</div>
 					</div>
-					<button
-						hx-get="/blog/new"
-						hx-target="#content"
-						hx-swap="innerHTML"
-						class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-					>
-						Create New Blog Post
-					</button>
+					if isAdmin {
+						<button
+							hx-get="/blog/new"
+							hx-target="#content"
+							hx-swap="innerHTML"
+							class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+						>
+							Create New Blog Post
+						</button>
+					}
 				</div>
 			</div>
 		</div>

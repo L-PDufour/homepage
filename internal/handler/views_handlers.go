@@ -19,21 +19,20 @@ func RedirectToLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Admin(w http.ResponseWriter, r *http.Request) {
-	// Fetch the user from the context
 	user, _ := middleware.GetUserFromContext(r.Context())
 
-	// If user is not authenticated, redirect them to the login page
 	if user == nil {
 		RedirectToLogin(w, r)
 		return
 	}
 
-	// If the user is authenticated, render the admin page
 	views.Adminpage().Render(r.Context(), w)
 }
 
 func (h *Handler) BlogPage(w http.ResponseWriter, r *http.Request) {
-	views.Blog().Render(r.Context(), w)
+	user, _ := middleware.GetUserFromContext(r.Context())
+	isAdmin := user != nil && user.IsAdmin
+	views.Blog(isAdmin).Render(r.Context(), w)
 }
 
 func (h *Handler) BioHandler(w http.ResponseWriter, r *http.Request) {
@@ -65,10 +64,8 @@ func (h *Handler) BioHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) ProjectsHandler(w http.ResponseWriter, r *http.Request) {
 	user, _ := middleware.GetUserFromContext(r.Context())
-
 	contentDB, err := h.DB.GetContentsByType(r.Context(), "project")
 	if err != nil {
-		// Handle error appropriately, possibly render an error view
 		http.Error(w, "Error fetching projects", http.StatusInternalServerError)
 		return
 	}
@@ -80,13 +77,12 @@ func (h *Handler) ProjectsHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				sanitizedHTML = "Error processing content"
 			}
-			contentDB[i].Markdown.String = sanitizedHTML // Update the field
+			contentDB[i].Markdown.String = sanitizedHTML
 		} else {
-			contentDB[i].Markdown.String = "No content available" // Handle invalid content
+			contentDB[i].Markdown.String = "No content available"
 		}
 	}
 
 	isAdmin := user != nil && user.IsAdmin
-
 	views.Projects(contentDB, isAdmin).Render(r.Context(), w)
 }

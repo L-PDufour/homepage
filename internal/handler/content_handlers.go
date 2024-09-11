@@ -39,7 +39,6 @@ func (h *Handler) GetContentHandler(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) EditContentHandler(w http.ResponseWriter, r *http.Request) {
 	typeStr := r.URL.Query().Get("type")
 	titleStr := r.URL.Query().Get("title")
-
 	contentDB, err := h.DB.GetContentByTitle(r.Context(), database.GetContentByTitleParams{
 		Type:  typeStr,
 		Title: titleStr,
@@ -48,7 +47,6 @@ func (h *Handler) EditContentHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Content not found", http.StatusNotFound)
 		return
 	}
-
 	views.EditContentSection(typeStr, titleStr, contentDB.Markdown.String, contentDB.ID).Render(r.Context(), w)
 }
 

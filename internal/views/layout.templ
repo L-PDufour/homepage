@@ -172,12 +172,15 @@ templ ContentSection(htmlContent string) {
 		<style>
 			/* Custom styles for text color and spacing */
 			.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-				color: #f2cdcd; /* Light color for headings */
+				color: #f2cdcd;
 			}
 			.prose p, .prose ul, .prose ol {
-				color: #cdd6f4; /* Light color for text and lists */
+				color: #cdd6f4;
 			}
-			/* Ensure full-width usage */
+			.prose strong, .prose a {
+				color: #f28fad;
+				font-weight: bold;
+			}
 			.prose {
 				padding-left: 0;
 				padding-right: 0;

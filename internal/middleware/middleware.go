@@ -14,6 +14,9 @@ type wrappedWriter struct {
 	http.ResponseWriter
 	statusCode int
 }
+type contextKey string
+
+const userContextKey contextKey = "user"
 
 func CreateStack(xs ...Middleware) Middleware {
 	return func(next http.Handler) http.Handler {
@@ -60,32 +63,29 @@ func AllowCors(next http.Handler) http.Handler {
 	})
 }
 
-func CheckPermissions(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user, ok := r.Context().Value("user").(*auth.AuthenticatedUser)
-
-		if r.URL.Path == "/admin" {
-			if !ok || !user.IsAdmin {
-				// Redirect to /admin/auth if not authenticated or not an admin
-				http.Redirect(w, r, "/admin/auth", http.StatusFound)
-				return
-			}
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
 func WithAuthenticator(authenticator *auth.Authenticator) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
+			// Attempt to verify the token
 			user, err := authenticator.VerifyToken(r)
-			if err == nil {
-				ctx := context.WithValue(r.Context(), "user", user)
-				next.ServeHTTP(w, r.WithContext(ctx))
+
+			if err != nil {
+				// Log the failure, but don't block access
+				log.Printf("Failed to verify token: %v. Proceeding as unauthenticated.\n", err)
 			} else {
-				next.ServeHTTP(w, r)
+				// Token is valid, add the authenticated user to the context
+				log.Printf("Token verified successfully for user: %+v\n", user)
+				ctx := context.WithValue(r.Context(), userContextKey, user)
+				r = r.WithContext(ctx)
 			}
+
+			// Proceed with or without the user in the context
+			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func GetUserFromContext(ctx context.Context) (*auth.AuthenticatedUser, bool) {
+	user, ok := ctx.Value(userContextKey).(*auth.AuthenticatedUser)
+	return user, ok
 }

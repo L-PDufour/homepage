@@ -39,6 +39,7 @@ func (s *Server) registerRoutes() http.Handler {
 		{"GET", "/blog", http.HandlerFunc(s.Handler.BlogPage)},
 		// {"GET", "/blog", templ.Handler(views.Blog())},
 		{"GET", "/admin", http.HandlerFunc(s.Handler.Admin)},
+		{"GET", "/admin/auth", http.HandlerFunc(s.Handler.AdminAuth)},
 
 		//Content CRUD routes
 		{"GET", "/content/get", http.HandlerFunc(s.Handler.GetContentHandler)},
@@ -60,9 +61,9 @@ func (s *Server) registerRoutes() http.Handler {
 	}
 
 	// Catch-all handler for unhandled routes
-	mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/bio", http.StatusFound)
-	})
+	// mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
+	// 	http.Redirect(w, r, "/bio", http.StatusFound)
+	// })
 
 	return mux
 }

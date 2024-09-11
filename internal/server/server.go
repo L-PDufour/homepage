@@ -28,6 +28,9 @@ type Server struct {
 }
 
 func NewServer() (*http.Server, error) {
+	// adminEmail := os.Getenv("ADMIN_EMAIL")
+	// cfApiKey := os.Getenv("CF_API_KEY")
+
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
 		return nil, fmt.Errorf("invalid port: %v", err)
@@ -46,11 +49,21 @@ func NewServer() (*http.Server, error) {
 	blogService := blog.NewBlogService(dbQueries, mdService) // Pass the pointer
 
 	handler := handler.NewHandler(dbQueries, mdService, blogService)
-
 	authenticator, err := auth.NewAuthenticator()
 	if err != nil {
 		log.Fatalf("Failed to create authenticator: %v", err)
 	}
+
+	// cf, err := cloudflare.New(cfApiKey, adminEmail)
+	// if err != nil {
+	// 	fmt.Println("Error creating Cloudflare client:", err)
+	// }
+	//
+	// // Retrieve the list of available Access policies
+	// policies, err := cf.GetAccessPolicy()
+	// if err != nil {
+	// 	fmt.Println("Error retrieving Access policies:", err)
+	// }
 
 	newServer := &Server{
 		Port:    port,
@@ -61,7 +74,6 @@ func NewServer() (*http.Server, error) {
 	stack := middleware.CreateStack(
 		middleware.AllowCors,
 		middleware.WithAuthenticator(authenticator),
-		middleware.CheckPermissions,
 		middleware.Logging,
 	)
 

@@ -7,12 +7,21 @@ schema = 3
   [mod."github.com/aymerick/douceur"]
     version = "v0.2.0"
     hash = "sha256-NiBX8EfOvLXNiK3pJaZX4N73YgfzdrzRXdiBFe3X3sE="
+  [mod."github.com/cloudflare/cloudflare-go"]
+    version = "v0.104.0"
+    hash = "sha256-i5WiHLzJQULQ1sW5MPKpxZ1CVzw3BKAYFPmdayAuvrU="
   [mod."github.com/coreos/go-oidc/v3"]
     version = "v3.11.0"
     hash = "sha256-iV7ff6YGPiorHFPxC6lnojYWszFjkgh86445eUvYywI="
   [mod."github.com/go-jose/go-jose/v4"]
     version = "v4.0.2"
     hash = "sha256-vwcozYxzPXkvCkR/rQOm6DJ5Yd+Muu9YC/2VzVUP50s="
+  [mod."github.com/goccy/go-json"]
+    version = "v0.10.3"
+    hash = "sha256-ZOzfwCXh+qp+hp+UnC0t422hUV0Cq5KANXkx8hcLp7s="
+  [mod."github.com/google/go-querystring"]
+    version = "v1.1.0"
+    hash = "sha256-itsKgKghuX26czU79cK6C2n+lc27jm5Dw1XbIRgwZJY="
   [mod."github.com/gorilla/css"]
     version = "v1.0.1"
     hash = "sha256-6JwNHqlY2NpZ0pSQTyYPSpiNqjXOdFHqrUT10sv3y8A="
@@ -29,11 +38,17 @@ schema = 3
     version = "v1.7.4"
     hash = "sha256-1L0gZyD+AguN8GBy17rs54eFZv7LTU5dcttULEJRabI="
   [mod."golang.org/x/crypto"]
-    version = "v0.26.0"
-    hash = "sha256-Iicrsb65fCmjfPILKoSLyBZMwe2VUcoTF5SpYTCQEuk="
+    version = "v0.27.0"
+    hash = "sha256-8HP4+gr4DbXI22GhdgZmCWr1ijtI9HNLsTcE0kltY9o="
   [mod."golang.org/x/net"]
-    version = "v0.28.0"
-    hash = "sha256-WdH/mgsX/CB+CiYtXEwJAXHN8FgtW2YhFcWwrrHNBLo="
+    version = "v0.29.0"
+    hash = "sha256-dH9Rdf5T04KJ4B5WvIZh12ogMbADWiWgIt77nvPTk2k="
   [mod."golang.org/x/oauth2"]
     version = "v0.21.0"
     hash = "sha256-0xgi5k7fxMScMH+rDwXhDqe8raTFHh5ih727jGVS918="
+  [mod."golang.org/x/text"]
+    version = "v0.18.0"
+    hash = "sha256-aNvJW4gQs+MTfdz6DZqyyHQS2GJ9W8L8qKPVODPn4+k="
+  [mod."golang.org/x/time"]
+    version = "v0.6.0"
+    hash = "sha256-gW9TVK9HjLk52lzfo5rBzSunc01gS0+SG2nk0X1w55M="

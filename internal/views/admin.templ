@@ -17,7 +17,23 @@ templ Adminpage() {
 		<body>
 			<h1>Admin Page</h1>
 			<p>This is a protected admin page.</p>
-			<a href="/">Back to Home</a>
+			<a href="/bio">Back to Home</a>
+		</body>
+	</html>
+}
+
+templ AdminAuthPage() {
+	<html>
+		<body>
+			<h1>Authentication Successful</h1>
+			<p>You have been successfully authenticated. You can now access the admin page.</p>
+			<a href="/admin">Go to Admin Page</a>
+			<!-- Optional: Redirect automatically after a short delay -->
+			<script>
+				setTimeout(function() {
+					window.location.href = "/admin";
+				}, 3000); // Redirect after 3 seconds
+			</script>
 		</body>
 	</html>
 }

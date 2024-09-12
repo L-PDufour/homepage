@@ -1,47 +1,33 @@
 package views
 
 import (
-	"homepage/internal/models"
 	"strconv"
+	"homepage/internal/database"
 )
 
-templ Blog(isAdmin bool) {
+templ Blog(posts []database.Content, isAdmin bool, editingID int) {
 	@Base() {
-		<div class="container mx-auto px-4">
-			<h1 class="text-4xl font-bold mb-8">My Blog</h1>
+		<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#1e1e2e] rounded-lg shadow-lg">
+			<h1 class="text-4xl font-bold mb-8 text-[#f2cdcd]">My Blog</h1>
 			<div class="flex flex-col md:flex-row">
 				<div class="md:w-3/4 pr-4">
-					<div
-						id="content"
-						class="prose lg:prose-xl"
-						hx-get="/blog/posts"
-						hx-trigger="load"
-						hx-swap="innerHTML"
-					>
-						Loading posts...
+					<div id="blog-posts-container">
+						for _, post := range posts {
+							if post.Type == "blog" {
+								<div id={ "post-" + strconv.Itoa(int(post.ID)) } class="mb-8">
+									@UnifiedContent(post, isAdmin, editingID == int(post.ID))
+								</div>
+							}
+						}
 					</div>
 				</div>
 				<div class="md:w-1/4 mt-8 md:mt-0">
-					<div class="bg-gray-100 p-4 rounded-lg">
-						<h2 class="text-xl font-semibold mb-4">Recent Posts</h2>
-						<div
-							id="recent-posts"
-							hx-get="/blog/posts"
-							hx-trigger="load"
-							hx-swap="innerHTML"
-						>
-							Loading recent posts...
-						</div>
+					<div class="bg-[#313244] p-4 rounded-lg">
+						<h2 class="text-xl font-semibold mb-4 text-[#f2cdcd]">Recent Posts</h2>
+						@recentPosts(posts)
 					</div>
 					if isAdmin {
-						<button
-							hx-get="/blog/new"
-							hx-target="#content"
-							hx-swap="innerHTML"
-							class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-						>
-							Create New Blog Post
-						</button>
+						@NewContentButton("blog")
 					}
 				</div>
 			</div>
@@ -49,85 +35,22 @@ templ Blog(isAdmin bool) {
 	}
 }
 
-templ BlogPostList(posts []models.Post) {
-	if len(posts) == 0 {
-		<p>No posts available.</p>
-	} else {
-		<ul class="space-y-4">
-			for _, post := range posts {
-				<li class="border-b pb-4">
-					<h2 class="text-2xl font-bold">
-						<a
-							href="#"
-							hx-get={ "/blog/post?id=" + strconv.Itoa(int(post.ID)) }
-							hx-target="#content"
-							hx-swap="innerHTML"
-							class="text-blue-600 hover:text-blue-800"
-						>
-							{ post.Title }
-						</a>
-					</h2>
-					<p class="text-gray-600 mt-2">{ post.Content[:min(100, len(post.Content))] }...</p>
+templ recentPosts(posts []database.Content) {
+	<ul class="space-y-2">
+		for i, post := range posts {
+			if post.Type == "blog" && i < 5 {
+				<li>
 					<a
 						href="#"
-						hx-get={ "/blog/post?id=" + strconv.Itoa(int(post.ID)) }
+						hx-get={ "/content/view?id=" + strconv.Itoa(int(post.ID)) }
 						hx-target="#content"
 						hx-swap="innerHTML"
-						class="text-blue-500 hover:underline"
+						class="text-blue-400 hover:text-blue-300"
 					>
-						Read more
+						{ post.Title }
 					</a>
 				</li>
 			}
-		</ul>
-	}
-}
-
-templ RecentPosts(posts []models.Post) {
-	<ul class="space-y-2">
-		for _, post := range posts[:min(5, len(posts))] {
-			<li>
-				<a
-					href="#"
-					hx-get={ "/blog/post?id=" + strconv.Itoa(int(post.ID)) }
-					hx-target="#content"
-					hx-swap="innerHTML"
-					class="text-blue-600 hover:text-blue-800"
-				>
-					{ post.Title }
-				</a>
-			</li>
 		}
 	</ul>
-}
-
-templ BlogPostForm() {
-	<div class="text-left">
-		<h2 class="text-2xl font-bold mb-4">Create New Blog Post</h2>
-		<form
-			id="new-post-form"
-			hx-post="/blog/create"
-			hx-target="#content"
-			hx-swap="innerHTML"
-		>
-			<div class="mb-4">
-				<label for="title" class="block mb-2">Title:</label>
-				<input type="text" id="title" name="title" required class="w-full p-2 border rounded"/>
-			</div>
-			<div class="mb-4">
-				<label for="content" class="block mb-2">Content:</label>
-				<textarea id="content" name="content" required rows="5" class="w-full p-2 border rounded"></textarea>
-			</div>
-			<button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create Post</button>
-		</form>
-	</div>
-}
-
-templ BlogContent(post models.Post, htmlContent string) {
-	<article class="prose lg:prose-xl">
-		<h1>{ post.Title }</h1>
-		<div id="post-content" class="mt-4">
-			@templ.Raw(htmlContent)
-		</div>
-	</article>
 }

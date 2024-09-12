@@ -11,20 +11,15 @@ templ Projects(projects []database.Content, isAdmin bool, editingID int) {
 			<h1 class="text-3xl font-bold text-[#f2cdcd] mb-6">Projects</h1>
 			<div id="projects-container">
 				for _, project := range projects {
-					<div id={ "project-" + strconv.Itoa(int(project.ID)) } class="mb-8">
-						@UnifiedContent(project, isAdmin, editingID == int(project.ID))
-					</div>
+					if project.Type == "project" {
+						<div id={ "project-" + strconv.Itoa(int(project.ID)) } class="mb-8">
+							@UnifiedContent(project, isAdmin, editingID == int(project.ID))
+						</div>
+					}
 				}
 			</div>
 			if isAdmin {
-				<button
-					hx-get="/content/new?type=project"
-					hx-target="#projects-container"
-					hx-swap="beforeend"
-					class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-				>
-					Add New Project
-				</button>
+				@NewContentButton("project")
 			}
 		</div>
 	}

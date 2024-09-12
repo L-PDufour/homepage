@@ -12,7 +12,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 
 	"homepage/internal/auth"
-	"homepage/internal/blog"
 	"homepage/internal/database"
 	"homepage/internal/handler"
 	"homepage/internal/middleware"
@@ -39,9 +38,7 @@ func NewServer() (*http.Server, error) {
 	}
 	dbQueries := database.New(db)
 
-	blogService := blog.NewBlogService(dbQueries)
-
-	handler := handler.NewHandler(dbQueries, blogService)
+	handler := handler.NewHandler(dbQueries)
 	authenticator, err := auth.NewAuthenticator()
 	if err != nil {
 		log.Fatalf("Failed to create authenticator: %v", err)

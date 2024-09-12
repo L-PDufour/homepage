@@ -33,35 +33,20 @@ func (h *Handler) Admin(w http.ResponseWriter, r *http.Request) {
 	views.Adminpage().Render(r.Context(), w)
 }
 
-func (h *Handler) ViewContentHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) BlogHandler(w http.ResponseWriter, r *http.Request) {
 	user, _ := middleware.GetUserFromContext(r.Context())
 	isAdmin := user != nil && user.IsAdmin
-	id := r.URL.Query().Get("id")
-	idInt, err := strconv.Atoi(id)
+
+	blogs, err := h.DB.GetContentsByType(r.Context(), "blog")
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
-		return
-	}
-	content, err := h.DB.GetContentById(r.Context(), int32(idInt))
-	if err != nil {
-		http.Error(w, "Content not found", http.StatusNotFound)
+		http.Error(w, "Error fetching projects", http.StatusInternalServerError)
 		return
 	}
 
-	isEditing := r.URL.Query().Get("edit") == "true"
+	editingID, _ := strconv.Atoi(r.URL.Query().Get("edit"))
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Trigger", "contentLoaded")
-	}
-	views.UnifiedContent(content, isAdmin, isEditing).Render(r.Context(), w)
-}
-
-func (h *Handler) BlogPage(w http.ResponseWriter, r *http.Request) {
-	user, _ := middleware.GetUserFromContext(r.Context())
-	isAdmin := user != nil && user.IsAdmin
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	views.Blog(isAdmin).Render(r.Context(), w)
+	views.Blog(blogs, isAdmin, editingID).Render(r.Context(), w)
 }
 
 func (h *Handler) BioHandler(w http.ResponseWriter, r *http.Request) {

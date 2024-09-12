@@ -6,6 +6,30 @@ import (
 	"strconv"
 )
 
+templ UnifiedContentList(contents []database.Content, contentType string, isAdmin bool) {
+	<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#1e1e2e] rounded-lg shadow-lg">
+		<h1 class="text-3xl font-bold text-[#f2cdcd] mb-6">{ contentType }</h1>
+		<div id="content-container">
+			for _, content := range contents {
+				if content.Type == contentType {
+					@UnifiedContent(content, isAdmin, false)
+				}
+			}
+		</div>
+		if isAdmin {
+			<button
+				hx-get="/content/new"
+				hx-target="#content-form"
+				hx-swap="beforeend"
+				class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+			>
+				Add New { contentType }
+			</button>
+			<div id="content-form"></div>
+		}
+	</div>
+}
+
 templ UnifiedContent(content database.Content, isAdmin bool, isEditing bool) {
 	<div id={ "content-" + strconv.Itoa(int(content.ID)) }>
 		if !isEditing {
@@ -17,7 +41,6 @@ templ UnifiedContent(content database.Content, isAdmin bool, isEditing bool) {
 }
 
 templ contentView(content database.Content, isAdmin bool) {
-	<h2>{ content.Title }</h2>
 	@contentSection(content.Markdown.String)
 	if isAdmin {
 		<button
@@ -34,22 +57,21 @@ templ contentView(content database.Content, isAdmin bool) {
 templ contentSection(markdownContent string) {
 	<div class="prose lg:prose-xl max-w-full mx-auto">
 		<style>
-			/* Custom styles for text color and spacing */
-			.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-				color: #f2cdcd;
-			}
-			.prose p, .prose ul, .prose ol {
-				color: #cdd6f4;
-			}
-			.prose strong, .prose a {
-				color: #f28fad;
-				font-weight: bold;
-			}
-			.prose {
-				padding-left: 0;
-				padding-right: 0;
-			}
-		</style>
+            .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+                color: #f2cdcd;
+            }
+            .prose p, .prose ul, .prose ol {
+                color: #cdd6f4;
+            }
+            .prose strong, .prose a {
+                color: #f28fad;
+                font-weight: bold;
+            }
+            .prose {
+                padding-left: 0;
+                padding-right: 0;
+            }
+        </style>
 		<div class="mt-4">
 			if htmlContent, err := markdown.ConvertAndSanitize(markdownContent); err == nil {
 				@templ.Raw(htmlContent)
@@ -68,11 +90,15 @@ templ editContentSection(content database.Content) {
 		hx-swap="outerHTML"
 	>
 		<input type="hidden" name="type" value={ content.Type }/>
-		<input type="hidden" name="title" value={ content.Title }/>
 		<input type="hidden" name="id" value={ strconv.Itoa(int(content.ID)) }/>
-		<textarea name="content" rows="10" class="w-full p-2 border rounded">
+		<input name="title" value={ content.Title } class="w-full p-2 border rounded mb-2"/>
+		<textarea name="content" rows="10" class="w-full p-2 border rounded mb-2">
 			{ content.Markdown.String }
 		</textarea>
+		if content.Type == "project" {
+			<input type="url" name="link" value={ content.Link.String } placeholder="Project Link" class="w-full p-2 border rounded mb-2"/>
+		}
+		<input type="url" name="image_url" value={ content.ImageUrl.String } placeholder="Image URL" class="w-full p-2 border rounded mb-2"/>
 		<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">
 			Save Changes
 		</button>
@@ -85,5 +111,49 @@ templ editContentSection(content database.Content) {
 		>
 			Cancel
 		</button>
+		<button
+			type="button"
+			hx-delete={ string(templ.SafeURL("/content/delete?id=" + strconv.Itoa(int(content.ID)))) }
+			hx-confirm="Are you sure you want to delete this content?"
+			hx-on="htmx:afterRequest: window.location.reload()"
+			class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
+		>
+			Delete
+		</button>
 	</form>
+}
+
+templ NewContentForm() {
+	<form
+		hx-post="/content/create"
+		hx-target="#content-form"
+		hx-swap="innerHTML"
+		class="mt-4 p-4 border rounded"
+	>
+		<select name="type" class="w-full p-2 border rounded mb-2" required>
+			<option value="">Select Content Type</option>
+			<option value="blog">Blog Post</option>
+			<option value="project">Project</option>
+			<option value="bio">Bio</option>
+		</select>
+		<input type="text" name="title" placeholder="Title" class="w-full p-2 border rounded mb-2" required/>
+		<textarea name="markdown" rows="10" placeholder="Content" class="w-full p-2 border rounded mb-2" required></textarea>
+		<input type="url" name="image_url" placeholder="Image URL" class="w-full p-2 border rounded mb-2"/>
+		<input type="url" name="link" placeholder="Link (for projects)" class="w-full p-2 border rounded mb-2"/>
+		<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">
+			Submit
+		</button>
+	</form>
+}
+
+templ NewContentButton(contentType string) {
+	<button
+		hx-get={ "/content/new?type=" + contentType }
+		hx-target="#content-form"
+		hx-swap="beforeend"
+		class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+	>
+		Add New { contentType }
+	</button>
+	<div id="content-form"></div>
 }

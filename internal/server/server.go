@@ -15,7 +15,6 @@ import (
 	"homepage/internal/blog"
 	"homepage/internal/database"
 	"homepage/internal/handler"
-	"homepage/internal/markdown"
 	"homepage/internal/middleware"
 
 	_ "github.com/lib/pq"
@@ -28,8 +27,6 @@ type Server struct {
 }
 
 func NewServer() (*http.Server, error) {
-	// adminEmail := os.Getenv("ADMIN_EMAIL")
-	// cfApiKey := os.Getenv("CF_API_KEY")
 
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
@@ -42,13 +39,9 @@ func NewServer() (*http.Server, error) {
 	}
 	dbQueries := database.New(db)
 
-	logger := log.New(os.Stdout, "markdown: ", log.LstdFlags)
+	blogService := blog.NewBlogService(dbQueries)
 
-	mdService := markdown.NewMarkdownService(logger) // Now returns *MarkdownService
-
-	blogService := blog.NewBlogService(dbQueries, mdService) // Pass the pointer
-
-	handler := handler.NewHandler(dbQueries, mdService, blogService)
+	handler := handler.NewHandler(dbQueries, blogService)
 	authenticator, err := auth.NewAuthenticator()
 	if err != nil {
 		log.Fatalf("Failed to create authenticator: %v", err)

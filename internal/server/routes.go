@@ -42,6 +42,7 @@ func (s *Server) registerRoutes() http.Handler {
 		{"GET", "/admin/auth", http.HandlerFunc(s.Handler.AdminAuth)},
 
 		//Content CRUD routes
+		{"GET", "/content/view", http.HandlerFunc(s.Handler.ViewContentHandler)},
 		{"GET", "/content/get", http.HandlerFunc(s.Handler.GetContentHandler)},
 		{"GET", "/content/edit", http.HandlerFunc(s.Handler.EditContentHandler)},
 		{"POST", "/content/update", http.HandlerFunc(s.Handler.UpdateContentHandler)},

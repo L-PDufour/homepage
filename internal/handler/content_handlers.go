@@ -3,84 +3,81 @@ package handler
 import (
 	"database/sql"
 	"homepage/internal/database"
+	"homepage/internal/middleware"
 	"homepage/internal/views"
-	"log"
 	"net/http"
 	"strconv"
 )
 
 func (h *Handler) GetContentHandler(w http.ResponseWriter, r *http.Request) {
-	typeStr := r.URL.Query().Get("type")
-	titleStr := r.URL.Query().Get("title")
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		http.Error(w, "Invalid content ID", http.StatusBadRequest)
+		return
+	}
 
-	contentDB, err := h.DB.GetContentByTitle(r.Context(), database.GetContentByTitleParams{
-		Type:  typeStr,
-		Title: titleStr,
-	})
+	content, err := h.DB.GetContentById(r.Context(), int32(id))
 	if err != nil {
 		http.Error(w, "Content not found", http.StatusNotFound)
 		return
 	}
-	if !contentDB.Markdown.Valid {
-		http.Error(w, "Content is empty", http.StatusNoContent)
-		return
-	}
 
-	sanitizedHTML, err := h.MD.ConvertAndSanitize(contentDB.Markdown.String)
-	if err != nil {
-		http.Error(w, "Error processing content", http.StatusInternalServerError)
-		return
-	}
+	user, _ := middleware.GetUserFromContext(r.Context())
+	isAdmin := user != nil && user.IsAdmin
 
-	// Render only the content section
-	views.ContentSection(sanitizedHTML).Render(r.Context(), w)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	views.UnifiedContent(content, isAdmin, false).Render(r.Context(), w)
 }
 
 func (h *Handler) EditContentHandler(w http.ResponseWriter, r *http.Request) {
-	typeStr := r.URL.Query().Get("type")
-	titleStr := r.URL.Query().Get("title")
-	contentDB, err := h.DB.GetContentByTitle(r.Context(), database.GetContentByTitleParams{
-		Type:  typeStr,
-		Title: titleStr,
-	})
+	user, _ := middleware.GetUserFromContext(r.Context())
+	if user == nil || !user.IsAdmin {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		http.Error(w, "Invalid content ID", http.StatusBadRequest)
+		return
+	}
+
+	content, err := h.DB.GetContentById(r.Context(), int32(id))
 	if err != nil {
 		http.Error(w, "Content not found", http.StatusNotFound)
 		return
 	}
-	views.EditContentSection(typeStr, titleStr, contentDB.Markdown.String, contentDB.ID).Render(r.Context(), w)
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	views.UnifiedContent(content, true, true).Render(r.Context(), w)
 }
 
 func (h *Handler) UpdateContentHandler(w http.ResponseWriter, r *http.Request) {
+	user, _ := middleware.GetUserFromContext(r.Context())
+	if user == nil || !user.IsAdmin {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Error parsing form", http.StatusBadRequest)
+		http.Error(w, "Failed to parse form", http.StatusBadRequest)
 		return
 	}
 
-	typeStr := r.Form.Get("type")
-	titleStr := r.Form.Get("title")
-	newContent := r.Form.Get("content")
-	idStr := r.Form.Get("id")
-	log.Println("update")
-	log.Println(idStr)
-	id, _ := strconv.ParseInt(idStr, 10, 32)
-	// Convert newContent to sql.NullString
-	nullableContent := sql.NullString{
-		String: newContent,
-		Valid:  newContent != "",
-	}
-
-	// Update content in the database
-	err := h.DB.UpdateContent(r.Context(), database.UpdateContentParams{
-		Type:     typeStr,
-		Title:    titleStr,
-		Markdown: nullableContent,
+	id, _ := strconv.Atoi(r.Form.Get("id"))
+	content := database.UpdateContentParams{
 		ID:       int32(id),
-	})
+		Type:     r.Form.Get("type"),
+		Title:    r.Form.Get("title"),
+		Markdown: sql.NullString{String: r.Form.Get("content"), Valid: true},
+	}
+
+	updatedContent, err := h.DB.UpdateContent(r.Context(), content)
 	if err != nil {
-		http.Error(w, "Error updating content", http.StatusInternalServerError)
+		http.Error(w, "Failed to update content", http.StatusInternalServerError)
 		return
 	}
 
-	// Return the updated content to render
-	views.ContentSection(nullableContent.String).Render(r.Context(), w)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	views.UnifiedContent(updatedContent, true, false).Render(r.Context(), w)
 }

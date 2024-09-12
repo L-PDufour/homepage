@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"homepage/internal/markdown"
 	"homepage/internal/views"
 	"net/http"
 	"strconv"
@@ -57,7 +58,7 @@ func (h *Handler) CreateBlogPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Convert the Markdown content to HTML for display
-	htmlContent, err := h.BlogService.MarkdownService.ConvertAndSanitize(post.Content)
+	htmlContent, err := markdown.ConvertAndSanitize(post.Content)
 	if err != nil {
 		http.Error(w, "Error processing post content", http.StatusInternalServerError)
 		return

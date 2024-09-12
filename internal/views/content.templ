@@ -1,0 +1,89 @@
+package views
+
+import (
+	"homepage/internal/database"
+	"homepage/internal/markdown"
+	"strconv"
+)
+
+templ UnifiedContent(content database.Content, isAdmin bool, isEditing bool) {
+	<div id={ "content-" + strconv.Itoa(int(content.ID)) }>
+		if !isEditing {
+			@contentView(content, isAdmin)
+		} else {
+			@editContentSection(content)
+		}
+	</div>
+}
+
+templ contentView(content database.Content, isAdmin bool) {
+	<h2>{ content.Title }</h2>
+	@contentSection(content.Markdown.String)
+	if isAdmin {
+		<button
+			hx-get={ string(templ.SafeURL("/content/edit?id=" + strconv.Itoa(int(content.ID)))) }
+			hx-target={ "#content-" + strconv.Itoa(int(content.ID)) }
+			hx-swap="outerHTML"
+			class="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
+		>
+			Edit
+		</button>
+	}
+}
+
+templ contentSection(markdownContent string) {
+	<div class="prose lg:prose-xl max-w-full mx-auto">
+		<style>
+			/* Custom styles for text color and spacing */
+			.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+				color: #f2cdcd;
+			}
+			.prose p, .prose ul, .prose ol {
+				color: #cdd6f4;
+			}
+			.prose strong, .prose a {
+				color: #f28fad;
+				font-weight: bold;
+			}
+			.prose {
+				padding-left: 0;
+				padding-right: 0;
+			}
+		</style>
+		<div class="mt-4">
+			if htmlContent, err := markdown.ConvertAndSanitize(markdownContent); err == nil {
+				@templ.Raw(htmlContent)
+			} else {
+				<p>Error rendering content.</p>
+			}
+		</div>
+	</div>
+}
+
+templ editContentSection(content database.Content) {
+	<form
+		id={ "edit-form-" + strconv.Itoa(int(content.ID)) }
+		hx-post={ string(templ.SafeURL("/content/update?id=" + strconv.Itoa(int(content.ID)))) }
+		hx-target={ "#content-" + strconv.Itoa(int(content.ID)) }
+		hx-swap="outerHTML"
+	>
+		<input type="hidden" name="type" value={ content.Type }/>
+		<input type="hidden" name="title" value={ content.Title }/>
+		<input type="hidden" name="id" value={ strconv.Itoa(int(content.ID)) }/>
+		<textarea name="content" rows="10" class="w-full p-2 border rounded">
+			{ content.Markdown.String }
+		</textarea>
+		<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">
+			Save Changes
+		</button>
+		<button
+			type="button"
+			hx-get={ string(templ.SafeURL("/content/view?id=" + strconv.Itoa(int(content.ID)))) }
+			hx-target={ "#content-" + strconv.Itoa(int(content.ID)) }
+			hx-swap="outerHTML"
+			class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
+		>
+			Cancel
+		</button>
+	</form>
+}

@@ -187,6 +187,27 @@ func (q *Queries) GetBlogPostByTitle(ctx context.Context, title string) (Post, e
 	return i, err
 }
 
+const getContentById = `-- name: GetContentById :one
+SELECT id, type, title, markdown, image_url, link, created_at, updated_at FROM content WHERE id = $1
+`
+
+// TODO
+func (q *Queries) GetContentById(ctx context.Context, id int32) (Content, error) {
+	row := q.db.QueryRowContext(ctx, getContentById, id)
+	var i Content
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Title,
+		&i.Markdown,
+		&i.ImageUrl,
+		&i.Link,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getContentByTitle = `-- name: GetContentByTitle :one
 SELECT id, type, title, markdown, image_url, link, created_at, updated_at FROM content WHERE type = $1 AND title = $2
 `
@@ -415,10 +436,11 @@ func (q *Queries) ListComments(ctx context.Context, postID sql.NullInt32) ([]Com
 	return items, nil
 }
 
-const updateContent = `-- name: UpdateContent :exec
+const updateContent = `-- name: UpdateContent :one
 UPDATE content
 SET type = $1, title = $2, markdown = $3, image_url = $4, link = $5, updated_at = NOW()
 WHERE id = $6
+RETURNING id, type, title, markdown, image_url, link, created_at, updated_at
 `
 
 type UpdateContentParams struct {
@@ -430,8 +452,8 @@ type UpdateContentParams struct {
 	ID       int32
 }
 
-func (q *Queries) UpdateContent(ctx context.Context, arg UpdateContentParams) error {
-	_, err := q.db.ExecContext(ctx, updateContent,
+func (q *Queries) UpdateContent(ctx context.Context, arg UpdateContentParams) (Content, error) {
+	row := q.db.QueryRowContext(ctx, updateContent,
 		arg.Type,
 		arg.Title,
 		arg.Markdown,
@@ -439,5 +461,16 @@ func (q *Queries) UpdateContent(ctx context.Context, arg UpdateContentParams) er
 		arg.Link,
 		arg.ID,
 	)
-	return err
+	var i Content
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Title,
+		&i.Markdown,
+		&i.ImageUrl,
+		&i.Link,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

@@ -1,47 +1,31 @@
 package views
 
 import (
-	"fmt"
+	"strconv"
 	"homepage/internal/database"
 )
 
-templ Projects(contents []database.Content, isAdmin bool) {
+templ Projects(projects []database.Content, isAdmin bool, editingID int) {
 	@Base() {
-		<div id="content" class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#1e1e2e] rounded-lg shadow-lg">
-			for i, content := range contents {
-				<div class="relative mb-4">
-					<button
-						class="w-full font-semibold text-center text-white block bg-emerald-400 rounded p-4
-							focus:outline-none transition-all duration-300
-							hover:bg-emerald-500 hover:shadow-md
-							active:bg-emerald-600 active:transform"
-						onclick="console.log('Edit button clicked')"
-					>
-						{ content.Title }
-					</button>
-					<div id={ fmt.Sprintf("content-%d", i) } class="content-section mt-2">
-						@ContentSection(content.Markdown.String)
-						if isAdmin {
-							<button
-								hx-get={ string(templ.SafeURL(fmt.Sprintf("/content/edit?type=project&title=%s", content.Title))) }
-								hx-target="#content"
-								hx-swap="innerHTML"
-								class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-							>
-								Edit Content
-							</button>
-						}
+		<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#1e1e2e] rounded-lg shadow-lg">
+			<h1 class="text-3xl font-bold text-[#f2cdcd] mb-6">Projects</h1>
+			<div id="projects-container">
+				for _, project := range projects {
+					<div id={ "project-" + strconv.Itoa(int(project.ID)) } class="mb-8">
+						@UnifiedContent(project, isAdmin, editingID == int(project.ID))
 					</div>
-				</div>
+				}
+			</div>
+			if isAdmin {
+				<button
+					hx-get="/content/new?type=project"
+					hx-target="#projects-container"
+					hx-swap="beforeend"
+					class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+				>
+					Add New Project
+				</button>
 			}
 		</div>
 	}
-	<script>
-	function toggleVisibility(contentId) {
-		const contentSection = document.getElementById(contentId);
-		contentSection.classList.toggle('hidden');
-		const button = event.target;
-		button.textContent = contentSection.classList.contains('hidden') ? 'Show Content' : 'Hide Content';
-	}
-	</script>
 }

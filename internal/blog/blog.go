@@ -8,12 +8,11 @@ import (
 )
 
 type BlogService struct {
-	DB              *database.Queries
-	MarkdownService *markdown.MarkdownService
+	DB *database.Queries
 }
 
-func NewBlogService(db *database.Queries, ms *markdown.MarkdownService) *BlogService {
-	return &BlogService{DB: db, MarkdownService: ms}
+func NewBlogService(db *database.Queries) *BlogService {
+	return &BlogService{DB: db}
 }
 
 func (s *BlogService) ListBlogPosts(ctx context.Context) ([]models.Post, error) {
@@ -50,7 +49,7 @@ func (s *BlogService) GetBlogPost(ctx context.Context, id int32) (models.Post, s
 		Title:   dbPost.Title,
 		Content: dbPost.Content,
 	}
-	htmlContent, err := s.MarkdownService.ConvertAndSanitize(post.Content)
+	htmlContent, err := markdown.ConvertAndSanitize(post.Content)
 	if err != nil {
 		return models.Post{}, "", err
 	}

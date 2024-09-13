@@ -30,20 +30,20 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.Handle("/assets/", fileServer)
 
 	routes := []Route{
-		{"GET", "/bio", http.HandlerFunc(s.Handler.BioHandler)},
-		{"GET", "/projects", http.HandlerFunc(s.Handler.ProjectsHandler)},
+		{"GET", "/bio", s.Handler.UnifiedView("bio")},
+		{"GET", "/projects", s.Handler.UnifiedView("project")},
+		{"GET", "/blog", s.Handler.UnifiedView("blog")},
 		{"GET", "/cv", templ.Handler(views.CV())},
 		{"GET", "/kids", templ.Handler(views.Kids())},
-		{"GET", "/blog", http.HandlerFunc(s.Handler.BlogHandler)},
 		{"GET", "/admin", http.HandlerFunc(s.Handler.Admin)},
-		{"GET", "/admin/auth", http.HandlerFunc(s.Handler.AdminAuth)},
+		{"GET", "/admin/auth", s.Handler.AdminAuth()},
 
-		// {"GET", "/blog", http.HandlerFunc(s.Handler.UnifiedView("blog"))},
+		{"GET", "/content/list", http.HandlerFunc(s.Handler.ListContentHandler)},
 		{"GET", "/content/view", http.HandlerFunc(s.Handler.ViewContentHandler)},
-		{"GET", "/content/get", http.HandlerFunc(s.Handler.GetContentHandler)},
-		{"GET", "/content/edit", http.HandlerFunc(s.Handler.EditContentHandler)},
 		{"GET", "/content/new", http.HandlerFunc(s.Handler.NewContentFormHandler)},
 		{"POST", "/content/create", http.HandlerFunc(s.Handler.CreateContentHandler)},
+		{"GET", "/content/edit", http.HandlerFunc(s.Handler.EditContentHandler)},
+		{"GET", "/content/get", http.HandlerFunc(s.Handler.GetContentHandler)},
 		{"POST", "/content/update", http.HandlerFunc(s.Handler.UpdateContentHandler)},
 		{"DELETE", "/content/delete", http.HandlerFunc(s.Handler.DeleteContentHandler)},
 	}

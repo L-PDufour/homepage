@@ -44,17 +44,6 @@ func NewServer() (*http.Server, error) {
 		log.Fatalf("Failed to create authenticator: %v", err)
 	}
 
-	// cf, err := cloudflare.New(cfApiKey, adminEmail)
-	// if err != nil {
-	// 	fmt.Println("Error creating Cloudflare client:", err)
-	// }
-	//
-	// // Retrieve the list of available Access policies
-	// policies, err := cf.GetAccessPolicy()
-	// if err != nil {
-	// 	fmt.Println("Error retrieving Access policies:", err)
-	// }
-
 	newServer := &Server{
 		Port:    port,
 		DB:      dbQueries,

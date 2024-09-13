@@ -16,24 +16,24 @@ templ Base() {
 			<script src="/assets/js/htmx.min.js" defer></script>
 		</head>
 		<body class="min-h-screen flex flex-col bg-[#303446] text-[#c6d0f5] font-medium">
-			@Header()
+			@header()
 			<main class="flex-grow flex">
 				<div class="w-full p-4">
 					{ children... }
 				</div>
 			</main>
-			@Footer()
+			@footer()
 		</body>
 	</html>
 }
 
-templ Header() {
+templ header() {
 	<header data-testid="headerTemplate" class="bg-[#1e1e2e] text-[#cdd6f4]">
-		@NavBar()
+		@navBar()
 	</header>
 }
 
-templ NavBar() {
+templ navBar() {
 	<nav data-testid="navTemplate" class="p-4 bg-[#1e1e2e]">
 		<ul class="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
 			<li>
@@ -95,7 +95,7 @@ templ NavBar() {
 	</nav>
 }
 
-templ Footer() {
+templ footer() {
 	<footer data-testid="footerTemplate" class="bg-[#1e1e2e] text-[#cdd6f4] p-4 text-center">
 		<div class="flex justify-center items-center gap-4 mb-2">
 			<a

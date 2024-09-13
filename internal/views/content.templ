@@ -6,10 +6,70 @@ import (
 	"strconv"
 )
 
+templ UnifiedContentView(contents []database.Content, contentType string, isAdmin bool) {
+	@Base() {
+		@chooseLayout(contents, contentType, isAdmin)
+	}
+}
+
+templ chooseLayout(contents []database.Content, contentType string, isAdmin bool) {
+	switch contentType {
+		case "blog":
+			@BlogLayout(contents, isAdmin)
+		case "project":
+			@ProjectLayout(contents, isAdmin)
+		default:
+			@UnifiedContentList(contents, contentType, isAdmin)
+	}
+}
+
+templ BlogLayout(contents []database.Content, isAdmin bool) {
+	<div class="container mx-auto px-4">
+		<h1 class="text-4xl font-bold mb-8 text-[#f2cdcd]">My Blog</h1>
+		<div class="flex flex-col md:flex-row">
+			<div class="md:w-3/4 pr-4">
+				@UnifiedContentList(contents, "blog", isAdmin)
+			</div>
+			<div class="md:w-1/4 mt-8 md:mt-0">
+				<div class="bg-[#313244] p-4 rounded-lg">
+					<h2 class="text-xl font-semibold mb-4 text-[#f2cdcd]">Recent Posts</h2>
+					@RecentPosts(contents)
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+templ ProjectLayout(contents []database.Content, isAdmin bool) {
+	<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#414559] rounded-lg shadow-lg">
+		@UnifiedContentList(contents, "project", isAdmin)
+	</div>
+}
+
+templ RecentPosts(contents []database.Content) {
+	<ul class="space-y-2">
+		for _, content := range contents[:min(5, len(contents))] {
+			if content.Type == "blog" {
+				<li>
+					<a
+						href="#"
+						hx-get={ string(templ.SafeURL("/content/view?id=" + strconv.Itoa(int(content.ID)))) }
+						hx-target="#content"
+						hx-swap="innerHTML"
+						class="text-blue-400 hover:text-blue-300"
+					>
+						{ content.Title }
+					</a>
+				</li>
+			}
+		}
+	</ul>
+}
+
 templ UnifiedContentList(contents []database.Content, contentType string, isAdmin bool) {
-	<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#1e1e2e] rounded-lg shadow-lg">
-		<h1 class="text-3xl font-bold text-[#f2cdcd] mb-6">{ contentType }</h1>
-		<div id="content-container">
+	<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#414559] rounded-lg shadow-lg">
+		<h1 class="text-3xl font-bold text-[#f2cdcd] mb-6 text-center">{ contentType }</h1>
+		<div id="content-container" class="space-y-4">
 			for _, content := range contents {
 				if content.Type == contentType {
 					@UnifiedContent(content, isAdmin, false)
@@ -17,21 +77,15 @@ templ UnifiedContentList(contents []database.Content, contentType string, isAdmi
 			}
 		</div>
 		if isAdmin {
-			<button
-				hx-get="/content/new"
-				hx-target="#content-form"
-				hx-swap="beforeend"
-				class="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-			>
-				Add New { contentType }
-			</button>
-			<div id="content-form"></div>
+			<div class="mt-4 text-center">
+				@NewContentButton(contentType)
+			</div>
 		}
 	</div>
 }
 
 templ UnifiedContent(content database.Content, isAdmin bool, isEditing bool) {
-	<div id={ "content-" + strconv.Itoa(int(content.ID)) }>
+	<div id={ "content-" + strconv.Itoa(int(content.ID)) } class="w-full">
 		if !isEditing {
 			@contentView(content, isAdmin)
 		} else {
@@ -41,45 +95,51 @@ templ UnifiedContent(content database.Content, isAdmin bool, isEditing bool) {
 }
 
 templ contentView(content database.Content, isAdmin bool) {
-	@contentSection(content.Markdown.String)
-	if isAdmin {
-		<button
-			hx-get={ string(templ.SafeURL("/content/edit?id=" + strconv.Itoa(int(content.ID)))) }
-			hx-target={ "#content-" + strconv.Itoa(int(content.ID)) }
-			hx-swap="outerHTML"
-			class="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
-		>
-			Edit
-		</button>
-	}
+	<div class="w-full mx-auto rounded-lg overflow-hidden bg-[#1e1e2e] shadow-md">
+		<div class="p-4">
+			@contentSection(content.Markdown.String)
+		</div>
+		if isAdmin {
+			<div class="p-4 text-center">
+				<button
+					hx-get={ string(templ.SafeURL("/content/edit?id=" + strconv.Itoa(int(content.ID)))) }
+					hx-target={ "#content-" + strconv.Itoa(int(content.ID)) }
+					hx-swap="outerHTML"
+					class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+				>
+					Edit
+				</button>
+			</div>
+		}
+	</div>
 }
 
 templ contentSection(markdownContent string) {
 	<div class="prose lg:prose-xl max-w-full mx-auto">
-		<style>
-            .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-                color: #f2cdcd;
-            }
-            .prose p, .prose ul, .prose ol {
-                color: #cdd6f4;
-            }
-            .prose strong, .prose a {
-                color: #f28fad;
-                font-weight: bold;
-            }
-            .prose {
-                padding-left: 0;
-                padding-right: 0;
-            }
-        </style>
 		<div class="mt-4">
-			if htmlContent, err := markdown.ConvertAndSanitize(markdownContent); err == nil {
+			if htmlContent, err := markdown.GetHTMLContent(markdownContent); err == nil {
 				@templ.Raw(htmlContent)
 			} else {
 				<p>Error rendering content.</p>
 			}
 		</div>
 	</div>
+	<style>
+		.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+			color: #f2cdcd;
+		}
+		.prose p, .prose ul, .prose ol {
+			color: #cdd6f4;
+		}
+		.prose strong, .prose a {
+			color: #f28fad;
+			font-weight: bold;
+		}
+		.prose {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	</style>
 }
 
 templ editContentSection(content database.Content) {
@@ -92,40 +152,48 @@ templ editContentSection(content database.Content) {
 		<input type="hidden" name="type" value={ content.Type }/>
 		<input type="hidden" name="id" value={ strconv.Itoa(int(content.ID)) }/>
 		<input name="title" value={ content.Title } class="w-full p-2 border rounded mb-2"/>
-		<textarea name="content" rows="10" class="w-full p-2 border rounded mb-2">
-			{ content.Markdown.String }
-		</textarea>
+		<textarea name="content" rows="10" class="w-full p-2 border rounded mb-2">{ content.Markdown.String }</textarea>
 		if content.Type == "project" {
 			<input type="url" name="link" value={ content.Link.String } placeholder="Project Link" class="w-full p-2 border rounded mb-2"/>
 		}
 		<input type="url" name="image_url" value={ content.ImageUrl.String } placeholder="Image URL" class="w-full p-2 border rounded mb-2"/>
-		<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">
-			Save Changes
-		</button>
-		<button
-			type="button"
-			hx-get={ string(templ.SafeURL("/content/view?id=" + strconv.Itoa(int(content.ID)))) }
-			hx-target={ "#content-" + strconv.Itoa(int(content.ID)) }
-			hx-swap="outerHTML"
-			class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
-		>
-			Cancel
-		</button>
-		<button
-			type="button"
-			hx-delete={ string(templ.SafeURL("/content/delete?id=" + strconv.Itoa(int(content.ID)))) }
-			hx-confirm="Are you sure you want to delete this content?"
-			hx-on="htmx:afterRequest: window.location.reload()"
-			class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
-		>
-			Delete
-		</button>
+		@editButtons(content.ID)
 	</form>
+}
+
+templ editButtons(contentID int32) {
+	<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">Save Changes</button>
+	<button
+		type="button"
+		hx-get={ string(templ.SafeURL("/content/view?id=" + strconv.Itoa(int(contentID)))) }
+		hx-target={ "#content-" + strconv.Itoa(int(contentID)) }
+		hx-swap="outerHTML"
+		class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
+	>Cancel</button>
+	<button
+		type="button"
+		hx-delete={ string(templ.SafeURL("/content/delete?id=" + strconv.Itoa(int(contentID)))) }
+		hx-confirm="Are you sure you want to delete this content?"
+		hx-on="htmx:afterRequest: window.location.reload()"
+		class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
+	>Delete</button>
+}
+
+templ NewContentButton(contentType string) {
+	<button
+		hx-get={ string(templ.SafeURL("/content/new?type=" + contentType)) }
+		hx-target="#content-form"
+		hx-swap="beforeend"
+		class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+	>
+		Add New { contentType }
+	</button>
+	<div id="content-form"></div>
 }
 
 templ NewContentForm() {
 	<form
-		hx-post="/content/create"
+		hx-post={ string(templ.SafeURL("/content/create")) }
 		hx-target="#content-form"
 		hx-swap="innerHTML"
 		class="mt-4 p-4 border rounded"
@@ -140,20 +208,6 @@ templ NewContentForm() {
 		<textarea name="markdown" rows="10" placeholder="Content" class="w-full p-2 border rounded mb-2" required></textarea>
 		<input type="url" name="image_url" placeholder="Image URL" class="w-full p-2 border rounded mb-2"/>
 		<input type="url" name="link" placeholder="Link (for projects)" class="w-full p-2 border rounded mb-2"/>
-		<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">
-			Submit
-		</button>
+		<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">Submit</button>
 	</form>
-}
-
-templ NewContentButton(contentType string) {
-	<button
-		hx-get={ "/content/new?type=" + contentType }
-		hx-target="#content-form"
-		hx-swap="beforeend"
-		class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-	>
-		Add New { contentType }
-	</button>
-	<div id="content-form"></div>
 }

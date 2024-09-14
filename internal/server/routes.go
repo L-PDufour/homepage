@@ -38,6 +38,8 @@ func (s *Server) registerRoutes() http.Handler {
 		{"GET", "/admin", http.HandlerFunc(s.Handler.Admin)},
 		{"GET", "/admin/auth", s.Handler.AdminAuth()},
 
+		{"GET", "/content/full", http.HandlerFunc(s.Handler.GetFullContent)},
+		{"GET", "/content/truncated", http.HandlerFunc(s.Handler.GetTruncatedContent)},
 		{"GET", "/content/list", http.HandlerFunc(s.Handler.ListContentHandler)},
 		{"GET", "/content/view", http.HandlerFunc(s.Handler.ViewContentHandler)},
 		{"GET", "/content/new", http.HandlerFunc(s.Handler.NewContentFormHandler)},

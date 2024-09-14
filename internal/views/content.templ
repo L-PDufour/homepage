@@ -6,6 +6,13 @@ import (
 	"strconv"
 )
 
+func truncateMarkdown(content string, length int) string {
+	if len(content) <= length {
+		return content
+	}
+	return content[:length] + "..."
+}
+
 templ UnifiedContentView(contents []database.Content, contentType string, isAdmin bool) {
 	@Base() {
 		@chooseLayout(contents, contentType, isAdmin)
@@ -25,7 +32,6 @@ templ chooseLayout(contents []database.Content, contentType string, isAdmin bool
 
 templ BlogLayout(contents []database.Content, isAdmin bool) {
 	<div class="container mx-auto px-4">
-		<h1 class="text-4xl font-bold mb-8 text-[#f2cdcd]">My Blog</h1>
 		<div class="flex flex-col md:flex-row">
 			<div class="md:w-3/4 pr-4">
 				@UnifiedContentList(contents, "blog", isAdmin)
@@ -68,7 +74,6 @@ templ RecentPosts(contents []database.Content) {
 
 templ UnifiedContentList(contents []database.Content, contentType string, isAdmin bool) {
 	<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#414559] rounded-lg shadow-lg">
-		<h1 class="text-3xl font-bold text-[#f2cdcd] mb-6 text-center">{ contentType }</h1>
 		<div id="content-container" class="space-y-4">
 			for _, content := range contents {
 				if content.Type == contentType {
@@ -97,7 +102,7 @@ templ UnifiedContent(content database.Content, isAdmin bool, isEditing bool) {
 templ contentView(content database.Content, isAdmin bool) {
 	<div class="w-full mx-auto rounded-lg overflow-hidden bg-[#1e1e2e] shadow-md">
 		<div class="p-4">
-			@contentSection(content.Markdown.String)
+			@ContentSection(content)
 		</div>
 		if isAdmin {
 			<div class="p-4 text-center">
@@ -114,32 +119,48 @@ templ contentView(content database.Content, isAdmin bool) {
 	</div>
 }
 
-templ contentSection(markdownContent string) {
-	<div class="prose lg:prose-xl max-w-full mx-auto">
+templ FullContentSection(content database.Content) {
+	<div id={ "content-wrapper-" + strconv.Itoa(int(content.ID)) } class="prose lg:prose-xl max-w-full mx-auto">
 		<div class="mt-4">
-			if htmlContent, err := markdown.GetHTMLContent(markdownContent); err == nil {
+			if htmlContent, err := markdown.GetHTMLContent(content.Markdown.String); err == nil {
 				@templ.Raw(htmlContent)
 			} else {
 				<p>Error rendering content.</p>
 			}
 		</div>
+		<button
+			class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+			hx-get={ "/content/truncated?id=" + strconv.Itoa(int(content.ID)) }
+			hx-target={ "#content-wrapper-" + strconv.Itoa(int(content.ID)) }
+			hx-swap="innerHTML"
+			hx-trigger="click"
+		>
+			Read Less
+		</button>
 	</div>
-	<style>
-		.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-			color: #f2cdcd;
-		}
-		.prose p, .prose ul, .prose ol {
-			color: #cdd6f4;
-		}
-		.prose strong, .prose a {
-			color: #f28fad;
-			font-weight: bold;
-		}
-		.prose {
-			padding-left: 0;
-			padding-right: 0;
-		}
-	</style>
+	@contentStyles()
+}
+
+templ ContentSection(content database.Content) {
+	<div id={ "content-wrapper-" + strconv.Itoa(int(content.ID)) } class="prose lg:prose-xl max-w-full mx-auto">
+		<div class="mt-4">
+			if htmlContent, err := markdown.GetHTMLContent(content.Markdown.String); err == nil {
+				@templ.Raw(truncateMarkdown(htmlContent, 200))
+			} else {
+				<p>Error rendering content.</p>
+			}
+		</div>
+		<button
+			class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+			hx-get={ "/content/full?id=" + strconv.Itoa(int(content.ID)) }
+			hx-target={ "#content-wrapper-" + strconv.Itoa(int(content.ID)) }
+			hx-swap="innerHTML"
+			hx-trigger="click"
+		>
+			Read More
+		</button>
+	</div>
+	@contentStyles()
 }
 
 templ editContentSection(content database.Content) {
@@ -210,4 +231,23 @@ templ NewContentForm() {
 		<input type="url" name="link" placeholder="Link (for projects)" class="w-full p-2 border rounded mb-2"/>
 		<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">Submit</button>
 	</form>
+}
+
+templ contentStyles() {
+	<style>
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+            color: #f2cdcd;
+        }
+        .prose p, .prose ul, .prose ol {
+            color: #cdd6f4;
+        }
+        .prose strong, .prose a {
+            color: #f28fad;
+            font-weight: bold;
+        }
+        .prose {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    </style>
 }

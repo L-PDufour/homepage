@@ -236,3 +236,28 @@ func (h *Handler) CreateContentHandler(w http.ResponseWriter, r *http.Request) {
 	// Response on success - you could reload the content list or show a success message
 	w.Header().Set("HX-Trigger", "contentCreated")
 }
+
+func (h *Handler) GetFullContent(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	idInt, _ := strconv.Atoi(id)
+	content, err := h.DB.GetContentById(r.Context(), int32(idInt))
+	if err != nil {
+		http.Error(w, "Error fetching content", http.StatusInternalServerError)
+		return
+	}
+
+	// Instead of executing a template, render the fullContentSection
+	views.FullContentSection(content).Render(r.Context(), w)
+}
+
+func (h *Handler) GetTruncatedContent(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	idInt, _ := strconv.Atoi(id)
+	content, err := h.DB.GetContentById(r.Context(), int32(idInt))
+	if err != nil {
+		http.Error(w, "Error fetching content", http.StatusInternalServerError)
+		return
+	}
+
+	views.ContentSection(content).Render(r.Context(), w)
+}

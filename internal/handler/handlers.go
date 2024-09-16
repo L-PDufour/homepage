@@ -20,8 +20,22 @@ func NewHandler(db *database.Queries) *Handler {
 		DB: db,
 	}
 }
+func ParseContentType(s string) (database.ContentType, error) {
+	switch s {
+	case "blog", "project", "bio":
+		return database.ContentType(s), nil
+	default:
+		return "", fmt.Errorf("invalid content type: %s", s)
+	}
+}
 
-func (h *Handler) UnifiedView(contentType string) http.HandlerFunc {
+func (h *Handler) ServeResume() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		views.ResumeTemplate().Render(r.Context(), w)
+	}
+}
+
+func (h *Handler) UnifiedView(contentType database.ContentType) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, _ := middleware.GetUserFromContext(r.Context())
 		isAdmin := user != nil && user.IsAdmin
@@ -33,7 +47,14 @@ func (h *Handler) UnifiedView(contentType string) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		component := views.UnifiedContentView(contents, contentType, isAdmin)
+
+		props := views.ContentViewProps{
+			Contents:    contents,
+			ContentType: contentType,
+			IsAdmin:     isAdmin,
+			IsEditing:   false,
+		}
+		component := views.UnifiedContentView(props)
 		component.Render(r.Context(), w)
 	}
 }
@@ -76,14 +97,17 @@ func (h *Handler) ViewContentHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Content not found", http.StatusNotFound)
 		return
 	}
-
 	isEditing := r.URL.Query().Get("edit") == "true"
-
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if r.Header.Get("HX-Request") == "true" {
 		w.Header().Set("HX-Trigger", "contentLoaded")
 	}
-	views.UnifiedContent(content, isAdmin, isEditing).Render(r.Context(), w)
+	props := views.ContentItemProps{
+		Content:   content,
+		IsAdmin:   isAdmin,
+		IsEditing: isEditing,
+	}
+	views.UnifiedContent(props).Render(r.Context(), w)
 }
 
 func (h *Handler) GetContentHandler(w http.ResponseWriter, r *http.Request) {
@@ -103,14 +127,23 @@ func (h *Handler) GetContentHandler(w http.ResponseWriter, r *http.Request) {
 	isAdmin := user != nil && user.IsAdmin
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	views.UnifiedContent(content, isAdmin, false).Render(r.Context(), w)
+
+	props := views.ContentItemProps{
+		Content:   content,
+		IsAdmin:   isAdmin,
+		IsEditing: false,
+	}
+	views.UnifiedContent(props).Render(r.Context(), w)
 }
 
 func (h *Handler) ListContentHandler(w http.ResponseWriter, r *http.Request) {
-	contentType := r.URL.Query().Get("type")
-	if contentType == "" {
-		contentType = "blog" // Default to blog if no type specified
+	contentTypeStr := r.URL.Query().Get("type")
+	contentType, err := ParseContentType(contentTypeStr)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
+
 	user, _ := middleware.GetUserFromContext(r.Context())
 	isAdmin := user != nil && user.IsAdmin
 
@@ -120,7 +153,14 @@ func (h *Handler) ListContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	component := views.UnifiedContentView(contents, contentType, isAdmin)
+	props := views.ContentViewProps{
+		Contents:    contents,
+		ContentType: contentType,
+		IsAdmin:     isAdmin,
+		IsEditing:   false,
+	}
+
+	component := views.UnifiedContentView(props)
 	component.Render(r.Context(), w)
 }
 
@@ -130,13 +170,12 @@ func (h *Handler) EditContentHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		http.Error(w, "Invalid content ID", http.StatusBadRequest)
 		return
 	}
-
+	isAdmin := user.IsAdmin
 	content, err := h.DB.GetContentById(r.Context(), int32(id))
 	if err != nil {
 		http.Error(w, "Content not found", http.StatusNotFound)
@@ -144,7 +183,12 @@ func (h *Handler) EditContentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	views.UnifiedContent(content, true, true).Render(r.Context(), w)
+	props := views.ContentItemProps{
+		Content:   content,
+		IsAdmin:   isAdmin,
+		IsEditing: true,
+	}
+	views.UnifiedContent(props).Render(r.Context(), w)
 }
 
 func (h *Handler) UpdateContentHandler(w http.ResponseWriter, r *http.Request) {
@@ -153,7 +197,7 @@ func (h *Handler) UpdateContentHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-
+	isAdmin := user.IsAdmin
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Failed to parse form", http.StatusBadRequest)
 		return
@@ -161,10 +205,10 @@ func (h *Handler) UpdateContentHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, _ := strconv.Atoi(r.Form.Get("id"))
 	content := database.UpdateContentParams{
-		ID:       int32(id),
-		Type:     r.Form.Get("type"),
-		Title:    r.Form.Get("title"),
-		Markdown: sql.NullString{String: r.Form.Get("content"), Valid: true},
+		ID:          int32(id),
+		ContentType: database.ContentType(r.Form.Get("type")),
+		Title:       r.Form.Get("title"),
+		Markdown:    sql.NullString{String: r.Form.Get("content"), Valid: true},
 	}
 
 	updatedContent, err := h.DB.UpdateContent(r.Context(), content)
@@ -173,8 +217,12 @@ func (h *Handler) UpdateContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	views.UnifiedContent(updatedContent, true, false).Render(r.Context(), w)
+	props := views.ContentItemProps{
+		Content:   updatedContent,
+		IsAdmin:   isAdmin,
+		IsEditing: false,
+	}
+	views.UnifiedContent(props).Render(r.Context(), w)
 }
 
 func (h *Handler) DeleteContentHandler(w http.ResponseWriter, r *http.Request) {
@@ -190,7 +238,6 @@ func (h *Handler) DeleteContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if the request was from HTMX (for partial updates)
 	if r.Header.Get("HX-Request") == "true" {
 		w.Header().Set("HX-Trigger", "contentDeleted")
 
@@ -203,37 +250,32 @@ func (h *Handler) NewContentFormHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *Handler) CreateContentHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse the form values
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "Unable to parse form", http.StatusBadRequest)
 		return
 	}
 
-	// Extract the form data
-	types := r.FormValue("type")
+	contentType := database.ContentType(r.Form.Get("type"))
 	title := r.FormValue("title")
 	markdown := r.FormValue("markdown")
 	imageUrl := r.FormValue("image_url")
 	link := r.FormValue("link")
 
-	// Prepare the parameters for the SQL insert
 	newContent := database.CreateContentParams{
-		Type:     types,
-		Title:    title,
-		Markdown: sql.NullString{String: markdown, Valid: true},
-		ImageUrl: sql.NullString{String: imageUrl, Valid: imageUrl != ""},
-		Link:     sql.NullString{String: link, Valid: link != ""},
+		ContentType: contentType,
+		Title:       title,
+		Markdown:    sql.NullString{String: markdown, Valid: true},
+		ImageUrl:    sql.NullString{String: imageUrl, Valid: imageUrl != ""},
+		Link:        sql.NullString{String: link, Valid: link != ""},
 	}
 
-	// Insert the new content into the database
 	_, err = h.DB.CreateContent(r.Context(), newContent)
 	if err != nil {
 		http.Error(w, "Unable to create content", http.StatusInternalServerError)
 		return
 	}
 
-	// Response on success - you could reload the content list or show a success message
 	w.Header().Set("HX-Trigger", "contentCreated")
 }
 
@@ -246,7 +288,6 @@ func (h *Handler) GetFullContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Instead of executing a template, render the fullContentSection
 	views.FullContentSection(content).Render(r.Context(), w)
 }
 

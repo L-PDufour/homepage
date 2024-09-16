@@ -6,6 +6,19 @@ import (
 	"strconv"
 )
 
+type ContentViewProps struct {
+	Contents    []database.Content
+	ContentType database.ContentType
+	IsAdmin     bool
+	IsEditing   bool
+}
+
+type ContentItemProps struct {
+	Content   database.Content
+	IsAdmin   bool
+	IsEditing bool
+}
+
 func truncateMarkdown(content string, length int) string {
 	if len(content) <= length {
 		return content
@@ -13,53 +26,52 @@ func truncateMarkdown(content string, length int) string {
 	return content[:length] + "..."
 }
 
-templ UnifiedContentView(contents []database.Content, contentType string, isAdmin bool) {
+templ UnifiedContentView(props ContentViewProps) {
 	@Base() {
-		@chooseLayout(contents, contentType, isAdmin)
+		@chooseLayout(props)
 	}
 }
 
-templ chooseLayout(contents []database.Content, contentType string, isAdmin bool) {
-	switch contentType {
-		case "blog":
-			@BlogLayout(contents, isAdmin)
-		case "project":
-			@ProjectLayout(contents, isAdmin)
-		default:
-			@UnifiedContentList(contents, contentType, isAdmin)
+templ chooseLayout(props ContentViewProps) {
+	if props.ContentType == database.ContentTypeBlog {
+		@BlogLayout(props)
+	} else if props.ContentType == database.ContentTypeProject {
+		@ProjectLayout(props)
+	} else {
+		@UnifiedContentList(props)
 	}
 }
 
-templ BlogLayout(contents []database.Content, isAdmin bool) {
+templ BlogLayout(props ContentViewProps) {
 	<div class="container mx-auto px-4">
 		<div class="flex flex-col md:flex-row">
 			<div class="md:w-3/4 pr-4">
-				@UnifiedContentList(contents, "blog", isAdmin)
+				@UnifiedContentList(props)
 			</div>
 			<div class="md:w-1/4 mt-8 md:mt-0">
 				<div class="bg-[#313244] p-4 rounded-lg">
 					<h2 class="text-xl font-semibold mb-4 text-[#f2cdcd]">Recent Posts</h2>
-					@RecentPosts(contents)
+					@RecentPosts(props.Contents)
 				</div>
 			</div>
 		</div>
 	</div>
 }
 
-templ ProjectLayout(contents []database.Content, isAdmin bool) {
+templ ProjectLayout(props ContentViewProps) {
 	<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#414559] rounded-lg shadow-lg">
-		@UnifiedContentList(contents, "project", isAdmin)
+		@UnifiedContentList(props)
 	</div>
 }
 
 templ RecentPosts(contents []database.Content) {
 	<ul class="space-y-2">
 		for _, content := range contents[:min(5, len(contents))] {
-			if content.Type == "blog" {
+			if content.ContentType == database.ContentTypeBlog {
 				<li>
 					<a
 						href="#"
-						hx-get={ string(templ.SafeURL("/content/view?id=" + strconv.Itoa(int(content.ID)))) }
+						hx-get={ "/content/view?id=" + strconv.Itoa(int(content.ID)) }
 						hx-target="#content"
 						hx-swap="innerHTML"
 						class="text-blue-400 hover:text-blue-300"
@@ -72,43 +84,43 @@ templ RecentPosts(contents []database.Content) {
 	</ul>
 }
 
-templ UnifiedContentList(contents []database.Content, contentType string, isAdmin bool) {
+templ UnifiedContentList(props ContentViewProps) {
 	<div class="max-w-7xl mx-auto p-4 sm:p-6 bg-[#414559] rounded-lg shadow-lg">
 		<div id="content-container" class="space-y-4">
-			for _, content := range contents {
-				if content.Type == contentType {
-					@UnifiedContent(content, isAdmin, false)
+			for _, content := range props.Contents {
+				if content.ContentType == props.ContentType {
+					@UnifiedContent(ContentItemProps{Content: content, IsAdmin: props.IsAdmin, IsEditing: props.IsEditing})
 				}
 			}
 		</div>
-		if isAdmin {
+		if props.IsAdmin {
 			<div class="mt-4 text-center">
-				@NewContentButton(contentType)
+				@NewContentButton(props.ContentType)
 			</div>
 		}
 	</div>
 }
 
-templ UnifiedContent(content database.Content, isAdmin bool, isEditing bool) {
-	<div id={ "content-" + strconv.Itoa(int(content.ID)) } class="w-full">
-		if !isEditing {
-			@contentView(content, isAdmin)
+templ UnifiedContent(props ContentItemProps) {
+	<div id={ "content-" + strconv.Itoa(int(props.Content.ID)) } class="w-full">
+		if !props.IsEditing {
+			@contentView(props)
 		} else {
-			@editContentSection(content)
+			@editContentSection(props.Content)
 		}
 	</div>
 }
 
-templ contentView(content database.Content, isAdmin bool) {
+templ contentView(props ContentItemProps) {
 	<div class="w-full mx-auto rounded-lg overflow-hidden bg-[#1e1e2e] shadow-md">
 		<div class="p-4">
-			@ContentSection(content)
+			@ContentSection(props.Content)
 		</div>
-		if isAdmin {
+		if props.IsAdmin {
 			<div class="p-4 text-center">
 				<button
-					hx-get={ string(templ.SafeURL("/content/edit?id=" + strconv.Itoa(int(content.ID)))) }
-					hx-target={ "#content-" + strconv.Itoa(int(content.ID)) }
+					hx-get={ "/content/edit?id=" + strconv.Itoa(int(props.Content.ID)) }
+					hx-target={ "#content-" + strconv.Itoa(int(props.Content.ID)) }
 					hx-swap="outerHTML"
 					class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
 				>
@@ -166,15 +178,15 @@ templ ContentSection(content database.Content) {
 templ editContentSection(content database.Content) {
 	<form
 		id={ "edit-form-" + strconv.Itoa(int(content.ID)) }
-		hx-post={ string(templ.SafeURL("/content/update?id=" + strconv.Itoa(int(content.ID)))) }
+		hx-post={ "/content/update?id=" + strconv.Itoa(int(content.ID)) }
 		hx-target={ "#content-" + strconv.Itoa(int(content.ID)) }
 		hx-swap="outerHTML"
 	>
-		<input type="hidden" name="type" value={ content.Type }/>
+		<input type="hidden" name="type" value={ string(content.ContentType) }/>
 		<input type="hidden" name="id" value={ strconv.Itoa(int(content.ID)) }/>
 		<input name="title" value={ content.Title } class="w-full p-2 border rounded mb-2"/>
 		<textarea name="content" rows="10" class="w-full p-2 border rounded mb-2">{ content.Markdown.String }</textarea>
-		if content.Type == "project" {
+		if content.ContentType == database.ContentTypeProject {
 			<input type="url" name="link" value={ content.Link.String } placeholder="Project Link" class="w-full p-2 border rounded mb-2"/>
 		}
 		<input type="url" name="image_url" value={ content.ImageUrl.String } placeholder="Image URL" class="w-full p-2 border rounded mb-2"/>
@@ -186,35 +198,35 @@ templ editButtons(contentID int32) {
 	<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">Save Changes</button>
 	<button
 		type="button"
-		hx-get={ string(templ.SafeURL("/content/view?id=" + strconv.Itoa(int(contentID)))) }
+		hx-get={ "/content/view?id=" + strconv.Itoa(int(contentID)) }
 		hx-target={ "#content-" + strconv.Itoa(int(contentID)) }
 		hx-swap="outerHTML"
 		class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
 	>Cancel</button>
 	<button
 		type="button"
-		hx-delete={ string(templ.SafeURL("/content/delete?id=" + strconv.Itoa(int(contentID)))) }
+		hx-delete={ "/content/delete?id=" + strconv.Itoa(int(contentID)) }
 		hx-confirm="Are you sure you want to delete this content?"
 		hx-on="htmx:afterRequest: window.location.reload()"
 		class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
 	>Delete</button>
 }
 
-templ NewContentButton(contentType string) {
+templ NewContentButton(contentType database.ContentType) {
 	<button
-		hx-get={ string(templ.SafeURL("/content/new?type=" + contentType)) }
+		hx-get={ "/content/new?type=" + string(contentType) }
 		hx-target="#content-form"
 		hx-swap="beforeend"
 		class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
 	>
-		Add New { contentType }
+		Add New { string(contentType) }
 	</button>
 	<div id="content-form"></div>
 }
 
 templ NewContentForm() {
 	<form
-		hx-post={ string(templ.SafeURL("/content/create")) }
+		hx-post="/content/create"
 		hx-target="#content-form"
 		hx-swap="innerHTML"
 		class="mt-4 p-4 border rounded"

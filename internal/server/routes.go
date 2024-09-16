@@ -33,7 +33,7 @@ func (s *Server) registerRoutes() http.Handler {
 		{"GET", "/bio", s.Handler.UnifiedView("bio")},
 		{"GET", "/projects", s.Handler.UnifiedView("project")},
 		{"GET", "/blog", s.Handler.UnifiedView("blog")},
-		{"GET", "/cv", templ.Handler(views.CV())},
+		{"GET", "/cv", s.Handler.ServeResume()},
 		{"GET", "/kids", templ.Handler(views.Kids())},
 		{"GET", "/admin", http.HandlerFunc(s.Handler.Admin)},
 		{"GET", "/admin/auth", s.Handler.AdminAuth()},

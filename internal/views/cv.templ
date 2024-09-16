@@ -1,30 +1,52 @@
 package views
 
-templ CV() {
+templ ResumeTemplate() {
 	@Base() {
 		<style>
-  {
-    % ! raw %
-  }
-
-  .pdf-container {
-    width: 100%;
-    height: 100vh;
-  }
-
-  .pdf-container object,
-  .pdf-container iframe {
-    width: 100%;
-    height: 100%;
-  }
-
-    {
-    % ! endraw %
-  }
-</style>
-		<div class="pdf-container">
-			//FIX ME CVEE en html et enlever gestion du temps
-			<object data="/assets/CV.pdf#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf"></object>
+			#pdf-viewer {
+				max-width: 100%;
+				height: 100vh;
+				overflow-y: auto;
+			}
+			.pdf-page {
+				margin-bottom: 10px;
+			}
+		</style>
+		<div class="flex justify-center items-start min-h-screen">
+			<div id="pdf-viewer" class=" shadow-lg"></div>
 		</div>
+		<script>
+			// URL of your PDF file
+			var url = '/assets/CV.pdf';
+
+			// Load the PDF document
+			pdfjsLib.getDocument(url).promise.then(function(pdf) {
+				// Get div#pdf-viewer
+				var viewer = document.getElementById('pdf-viewer');
+
+				// Loop through each page
+				for(var pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+					pdf.getPage(pageNumber).then(function(page) {
+						var scale = 1.5;
+						var viewport = page.getViewport({scale: scale});
+
+						// Create a canvas for each page
+						var canvas = document.createElement('canvas');
+						canvas.className = 'pdf-page';
+						canvas.height = viewport.height;
+						canvas.width = viewport.width;
+						viewer.appendChild(canvas);
+
+						// Render the page on the canvas
+						var context = canvas.getContext('2d');
+						var renderContext = {
+							canvasContext: context,
+							viewport: viewport
+						};
+						page.render(renderContext);
+					});
+				}
+			});
+		</script>
 	}
 }

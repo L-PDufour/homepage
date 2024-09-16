@@ -6,7 +6,52 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"fmt"
 )
+
+type ContentType string
+
+const (
+	ContentTypeBlog    ContentType = "blog"
+	ContentTypeProject ContentType = "project"
+	ContentTypeBio     ContentType = "bio"
+)
+
+func (e *ContentType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ContentType(s)
+	case string:
+		*e = ContentType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ContentType: %T", src)
+	}
+	return nil
+}
+
+type NullContentType struct {
+	ContentType ContentType
+	Valid       bool // Valid is true if ContentType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullContentType) Scan(value interface{}) error {
+	if value == nil {
+		ns.ContentType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ContentType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullContentType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ContentType), nil
+}
 
 type Author struct {
 	ID        int32
@@ -26,14 +71,14 @@ type Comment struct {
 }
 
 type Content struct {
-	ID        int32
-	Type      string
-	Title     string
-	Markdown  sql.NullString
-	ImageUrl  sql.NullString
-	Link      sql.NullString
-	CreatedAt sql.NullTime
-	UpdatedAt sql.NullTime
+	ID          int32
+	Title       string
+	Markdown    sql.NullString
+	ImageUrl    sql.NullString
+	Link        sql.NullString
+	CreatedAt   sql.NullTime
+	UpdatedAt   sql.NullTime
+	ContentType ContentType
 }
 
 type Post struct {

@@ -11,31 +11,42 @@ import (
 )
 
 const createContent = `-- name: CreateContent :one
-INSERT INTO content (type, title, markdown, image_url, link, created_at, updated_at)
+INSERT INTO content (content_type, title, markdown, image_url, link, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-RETURNING id, type, title, markdown, image_url, link, created_at, updated_at
+RETURNING id, content_type, title, markdown, image_url, link, created_at, updated_at
 `
 
 type CreateContentParams struct {
-	Type     string
-	Title    string
-	Markdown sql.NullString
-	ImageUrl sql.NullString
-	Link     sql.NullString
+	ContentType ContentType
+	Title       string
+	Markdown    sql.NullString
+	ImageUrl    sql.NullString
+	Link        sql.NullString
 }
 
-func (q *Queries) CreateContent(ctx context.Context, arg CreateContentParams) (Content, error) {
+type CreateContentRow struct {
+	ID          int32
+	ContentType ContentType
+	Title       string
+	Markdown    sql.NullString
+	ImageUrl    sql.NullString
+	Link        sql.NullString
+	CreatedAt   sql.NullTime
+	UpdatedAt   sql.NullTime
+}
+
+func (q *Queries) CreateContent(ctx context.Context, arg CreateContentParams) (CreateContentRow, error) {
 	row := q.db.QueryRowContext(ctx, createContent,
-		arg.Type,
+		arg.ContentType,
 		arg.Title,
 		arg.Markdown,
 		arg.ImageUrl,
 		arg.Link,
 	)
-	var i Content
+	var i CreateContentRow
 	err := row.Scan(
 		&i.ID,
-		&i.Type,
+		&i.ContentType,
 		&i.Title,
 		&i.Markdown,
 		&i.ImageUrl,
@@ -56,7 +67,7 @@ func (q *Queries) DeleteContent(ctx context.Context, id int32) error {
 }
 
 const getContentById = `-- name: GetContentById :one
-SELECT id, type, title, markdown, image_url, link, created_at, updated_at FROM content WHERE id = $1
+SELECT id, title, markdown, image_url, link, created_at, updated_at, content_type FROM content WHERE id = $1
 `
 
 // TODO
@@ -65,48 +76,48 @@ func (q *Queries) GetContentById(ctx context.Context, id int32) (Content, error)
 	var i Content
 	err := row.Scan(
 		&i.ID,
-		&i.Type,
 		&i.Title,
 		&i.Markdown,
 		&i.ImageUrl,
 		&i.Link,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ContentType,
 	)
 	return i, err
 }
 
 const getContentByTitle = `-- name: GetContentByTitle :one
-SELECT id, type, title, markdown, image_url, link, created_at, updated_at FROM content WHERE type = $1 AND title = $2
+SELECT id, title, markdown, image_url, link, created_at, updated_at, content_type FROM content WHERE content_type = $1 AND title = $2
 `
 
 type GetContentByTitleParams struct {
-	Type  string
-	Title string
+	ContentType ContentType
+	Title       string
 }
 
 func (q *Queries) GetContentByTitle(ctx context.Context, arg GetContentByTitleParams) (Content, error) {
-	row := q.db.QueryRowContext(ctx, getContentByTitle, arg.Type, arg.Title)
+	row := q.db.QueryRowContext(ctx, getContentByTitle, arg.ContentType, arg.Title)
 	var i Content
 	err := row.Scan(
 		&i.ID,
-		&i.Type,
 		&i.Title,
 		&i.Markdown,
 		&i.ImageUrl,
 		&i.Link,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ContentType,
 	)
 	return i, err
 }
 
 const getContentsByType = `-- name: GetContentsByType :many
-SELECT id, type, title, markdown, image_url, link, created_at, updated_at FROM content WHERE type = $1
+SELECT id, title, markdown, image_url, link, created_at, updated_at, content_type FROM content WHERE content_type = $1
 `
 
-func (q *Queries) GetContentsByType(ctx context.Context, type_ string) ([]Content, error) {
-	rows, err := q.db.QueryContext(ctx, getContentsByType, type_)
+func (q *Queries) GetContentsByType(ctx context.Context, contentType ContentType) ([]Content, error) {
+	rows, err := q.db.QueryContext(ctx, getContentsByType, contentType)
 	if err != nil {
 		return nil, err
 	}
@@ -116,13 +127,13 @@ func (q *Queries) GetContentsByType(ctx context.Context, type_ string) ([]Conten
 		var i Content
 		if err := rows.Scan(
 			&i.ID,
-			&i.Type,
 			&i.Title,
 			&i.Markdown,
 			&i.ImageUrl,
 			&i.Link,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.ContentType,
 		); err != nil {
 			return nil, err
 		}
@@ -139,23 +150,23 @@ func (q *Queries) GetContentsByType(ctx context.Context, type_ string) ([]Conten
 
 const updateContent = `-- name: UpdateContent :one
 UPDATE content
-SET type = $1, title = $2, markdown = $3, image_url = $4, link = $5, updated_at = NOW()
+SET content_type = $1, title = $2, markdown = $3, image_url = $4, link = $5, updated_at = NOW()
 WHERE id = $6
-RETURNING id, type, title, markdown, image_url, link, created_at, updated_at
+RETURNING id, title, markdown, image_url, link, created_at, updated_at, content_type
 `
 
 type UpdateContentParams struct {
-	Type     string
-	Title    string
-	Markdown sql.NullString
-	ImageUrl sql.NullString
-	Link     sql.NullString
-	ID       int32
+	ContentType ContentType
+	Title       string
+	Markdown    sql.NullString
+	ImageUrl    sql.NullString
+	Link        sql.NullString
+	ID          int32
 }
 
 func (q *Queries) UpdateContent(ctx context.Context, arg UpdateContentParams) (Content, error) {
 	row := q.db.QueryRowContext(ctx, updateContent,
-		arg.Type,
+		arg.ContentType,
 		arg.Title,
 		arg.Markdown,
 		arg.ImageUrl,
@@ -165,13 +176,13 @@ func (q *Queries) UpdateContent(ctx context.Context, arg UpdateContentParams) (C
 	var i Content
 	err := row.Scan(
 		&i.ID,
-		&i.Type,
 		&i.Title,
 		&i.Markdown,
 		&i.ImageUrl,
 		&i.Link,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ContentType,
 	)
 	return i, err
 }

@@ -29,4 +29,5 @@ require (
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/gorilla/css v1.0.1 // indirect
 	golang.org/x/net v0.29.0 // indirect
+	golang.org/x/sync v0.8.0
 )

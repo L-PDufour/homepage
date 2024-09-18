@@ -48,9 +48,11 @@ templ Base() {
 		<body class="min-h-screen flex flex-col bg-[#303446] text-[#c6d0f5] font-medium">
 			@header()
 			<main class="flex-grow flex">
-				<div class="w-full max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8">
-					@ContentStyles()
-					{ children... }
+				<div class="mt-4 sm:mt-6 lg:mt-8 mb-4 w-full mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="space-y-4">
+						@contentStyles()
+						{ children... }
+					</div>
 				</div>
 			</main>
 			@footer()
@@ -152,4 +154,118 @@ templ linkedinIcon() {
 			d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
 		></path>
 	</svg>
+}
+
+templ contentStyles() {
+	<style>
+:root {
+    --rosewater: #f5e0dc;
+    --flamingo: #f2cdcd;
+    --pink: #f5c2e7;
+    --mauve: #cba6f7;
+    --red: #f38ba8;
+    --maroon: #eba0ac;
+    --peach: #fab387;
+    --yellow: #f9e2af;
+    --green: #a6e3a1;
+    --teal: #94e2d5;
+    --sky: #89dceb;
+    --sapphire: #74c7ec;
+    --blue: #89b4fa;
+    --lavender: #b4befe;
+    --text: #cdd6f4;
+    --subtext1: #bac2de;
+    --subtext0: #a6adc8;
+    --overlay2: #9399b2;
+    --overlay1: #7f849c;
+    --overlay0: #6c7086;
+    --surface2: #585b70;
+    --surface1: #45475a;
+    --surface0: #313244;
+    --base: #1e1e2e;
+    --mantle: #181825;
+    --crust: #11111b;
+}
+
+.prose {
+    color: var(--text);
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    color: var(--flamingo);
+    font-weight: bold;
+}
+
+.prose p, .prose ul, .prose ol {
+    color: var(--text);
+}
+
+.prose strong {
+    color: var(--red);
+    font-weight: bold;
+}
+
+.prose em {
+    color: var(--mauve);
+    font-weight: semibold;
+  }
+.prose a {
+    color: var(--pink);
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.prose a:hover {
+    color: var(--mauve);
+}
+
+.prose blockquote {
+    border-left: 4px solid var(--overlay0);
+    padding-left: 1rem;
+    color: var(--subtext0);
+}
+
+.prose code {
+    background-color: var(--surface0);
+    color: var(--green);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+.prose pre {
+    background-color: var(--surface0);
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.prose hr {
+    border: none;
+    border-top: 1px solid var(--surface1);
+    margin: 2rem 0;
+}
+
+.prose table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.prose th, .prose td {
+    border: 1px solid var(--surface1);
+    padding: 0.5rem;
+}
+
+.prose th {
+    background-color: var(--surface0);
+    font-weight: bold;
+}
+    </style>
 }

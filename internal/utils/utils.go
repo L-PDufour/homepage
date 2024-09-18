@@ -1,10 +1,10 @@
-package markdown
+package utils
 
 import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
-	"log"
+	"homepage/internal/models"
 	"sort"
 	"sync"
 	"time"
@@ -14,20 +14,14 @@ import (
 	"golang.org/x/sync/singleflight"
 )
 
-type CachedHTML struct {
-	HTML       string
-	Timestamp  time.Time
-	LastAccess time.Time
-}
-
 const (
 	cacheExpiration = 1 * time.Hour
-	maxCacheSize    = 1000 // Adjust based on your needs
+	maxCacheSize    = 1000
 	cleanupInterval = 10 * time.Minute
 )
 
 var (
-	htmlCache         = make(map[string]CachedHTML)
+	htmlCache         = make(map[string]models.CachedHTML)
 	cacheMutex        sync.RWMutex
 	singleflightGroup singleflight.Group
 )
@@ -61,39 +55,32 @@ func GetHTMLContent(markdownContent string) (string, error) {
 	cached, exists := htmlCache[cacheKey]
 	if exists {
 		if time.Since(cached.Timestamp) < cacheExpiration {
-			// Update last access time
-			cached.LastAccess = time.Now()
 			htmlCache[cacheKey] = cached
 			cacheMutex.RUnlock()
-			log.Println("Cache hit: Returning cached HTML content")
 			return cached.HTML, nil
 		}
 	}
 	cacheMutex.RUnlock()
 
-	// Use singleflight to prevent multiple goroutines from generating the same content
 	htmlContent, err, _ := singleflightGroup.Do(cacheKey, func() (interface{}, error) {
-		log.Println("Cache miss or expired: Generating new HTML content")
 		return convertAndSanitize(markdownContent)
 	})
 
 	if err != nil {
-		log.Printf("Error converting markdown to HTML: %v", err)
 		return "", err
 	}
 
-	// Update cache
 	cacheMutex.Lock()
-	htmlCache[cacheKey] = CachedHTML{
+	htmlCache[cacheKey] = models.CachedHTML{
 		HTML:       htmlContent.(string),
 		Timestamp:  time.Now(),
 		LastAccess: time.Now(),
 	}
 	cacheMutex.Unlock()
 
-	log.Println("New HTML content cached")
 	return htmlContent.(string), nil
 }
+
 func periodicCleanup() {
 	for {
 		time.Sleep(cleanupInterval)
@@ -101,7 +88,13 @@ func periodicCleanup() {
 	}
 }
 
-// removeOldEntries removes expired and least recently used entries
+func TruncateMarkdown(content string, length int) string {
+	if len(content) <= length {
+		return content
+	}
+	return content[:length] + "..."
+}
+
 func removeOldEntries() {
 	cacheMutex.Lock()
 	defer cacheMutex.Unlock()
@@ -127,18 +120,14 @@ func removeOldEntries() {
 		}
 	}
 
-	// If still over maxCacheSize, remove least recently used
 	if len(htmlCache) > maxCacheSize {
-		// Sort entries by last access time
 		sort.Slice(entries, func(i, j int) bool {
 			return entries[i].lastAccess.Before(entries[j].lastAccess)
 		})
 
-		// Remove oldest entries until we're at maxCacheSize
 		for i := 0; i < len(entries)-maxCacheSize; i++ {
 			delete(htmlCache, entries[i].key)
 		}
 	}
 
-	log.Printf("Cache cleanup complete. Current cache size: %d", len(htmlCache))
 }

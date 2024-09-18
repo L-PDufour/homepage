@@ -15,7 +15,8 @@ var (
 	CfTeamDomain = os.Getenv("CF_TEAM_DOMAIN")
 	cfAudTag     = os.Getenv("CF_AUD_TAG")
 	IsProduction = os.Getenv("GO_ENV") == "production"
-	cfAPIKey     = os.Getenv("CF_API_KEY") // Token for Cloudflare API access
+	cfAPIKey     = os.Getenv("CF_API_KEY")  // Token for Cloudflare API access
+	adminEmail   = os.Getenv("ADMIN_EMAIL") // Token for Cloudflare API access
 )
 
 type AuthenticatedUser struct {
@@ -87,7 +88,7 @@ func (a *Authenticator) VerifyToken(r *http.Request) (*AuthenticatedUser, error)
 		return nil, fmt.Errorf("failed to parse claims: %v", err)
 	}
 
-	isAdmin := claims.Email == "leonpierre.dufour@gmail.com"
+	isAdmin := claims.Email == adminEmail
 	return &AuthenticatedUser{
 		Email:   claims.Email,
 		IsAdmin: isAdmin,
@@ -99,7 +100,7 @@ func (a *Authenticator) VerifyToken(r *http.Request) (*AuthenticatedUser, error)
 // mockVerifyToken is a mock function used in non-production environments for token verification
 func (a *Authenticator) MockVerifyToken(r *http.Request) (*AuthenticatedUser, error) {
 	// In non-production, simulate an admin user
-	email := "leonpierre.dufour@gmail.com" // Your admin email logic
+	email := adminEmail
 	isAdmin := true
 
 	// Create the user object

@@ -6,6 +6,7 @@ import (
 	"homepage/internal/auth"
 	"homepage/internal/database"
 	"homepage/internal/middleware"
+	"homepage/internal/models"
 	"homepage/internal/views"
 	"net/http"
 	"strconv"
@@ -48,7 +49,7 @@ func (h *Handler) UnifiedView(contentType database.ContentType) http.HandlerFunc
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-		props := views.ContentViewProps{
+		props := models.ContentViewProps{
 			Contents:    contents,
 			ContentType: contentType,
 			IsAdmin:     isAdmin,
@@ -102,7 +103,7 @@ func (h *Handler) ViewContentHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("HX-Request") == "true" {
 		w.Header().Set("HX-Trigger", "contentLoaded")
 	}
-	props := views.ContentItemProps{
+	props := models.ContentItemProps{
 		Content:   content,
 		IsAdmin:   isAdmin,
 		IsEditing: isEditing,
@@ -128,7 +129,7 @@ func (h *Handler) GetContentHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	props := views.ContentItemProps{
+	props := models.ContentItemProps{
 		Content:   content,
 		IsAdmin:   isAdmin,
 		IsEditing: false,
@@ -153,7 +154,7 @@ func (h *Handler) ListContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	props := views.ContentViewProps{
+	props := models.ContentViewProps{
 		Contents:    contents,
 		ContentType: contentType,
 		IsAdmin:     isAdmin,
@@ -183,7 +184,7 @@ func (h *Handler) EditContentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	props := views.ContentItemProps{
+	props := models.ContentItemProps{
 		Content:   content,
 		IsAdmin:   isAdmin,
 		IsEditing: true,
@@ -217,7 +218,7 @@ func (h *Handler) UpdateContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	props := views.ContentItemProps{
+	props := models.ContentItemProps{
 		Content:   updatedContent,
 		IsAdmin:   isAdmin,
 		IsEditing: false,

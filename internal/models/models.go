@@ -1,58 +1,25 @@
 package models
 
 import (
+	"homepage/internal/database"
 	"time"
 )
 
-// Author represents a blog post author
-type Author struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+type CachedHTML struct {
+	HTML       string
+	Timestamp  time.Time
+	LastAccess time.Time
 }
 
-// Post represents a blog post
-type Post struct {
-	ID        int32     `json:"id"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	AuthorID  int       `json:"author_id"`
-	Author    *Author   `json:"author,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+type ContentViewProps struct {
+	Contents    []database.Content
+	ContentType database.ContentType
+	IsAdmin     bool
+	IsEditing   bool
 }
 
-// Comment represents a comment on a blog post
-type Comment struct {
-	ID        int       `json:"id"`
-	PostID    int       `json:"post_id"`
-	AuthorID  int       `json:"author_id"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-}
-
-// Tag represents a tag that can be applied to blog posts
-type Tag struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-
-// PostTag represents the many-to-many relationship between posts and tags
-type PostTag struct {
-	PostID int `json:"post_id"`
-	TagID  int `json:"tag_id"`
-}
-
-type Content struct {
-	ID        int32     `json:"id"`
-	Type      string    `json:"type"`
-	Title     string    `json:"title"`
-	Markdown  string    `json:"markdown"`
-	ImageUrl  *string   `json:"image_url,omitempty"`
-	Link      *string   `json:"link,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+type ContentItemProps struct {
+	Content   database.Content
+	IsAdmin   bool
+	IsEditing bool
 }

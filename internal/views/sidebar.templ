@@ -1,0 +1,34 @@
+package views
+
+import (
+	"homepage/internal/database"
+	"fmt"
+)
+
+func GetRecentBlogPosts(contents []database.Content, count int) []database.Content {
+	var blogPosts []database.Content
+	for _, content := range contents {
+		if content.ContentType == "blog" {
+			blogPosts = append(blogPosts, content)
+			if len(blogPosts) == count {
+				break
+			}
+		}
+	}
+	return blogPosts
+}
+
+templ Sidebar(contents []database.Content) {
+	<aside class="lg:w-1/5 w-full lg:pl-4 mt-8 lg:mt-0 lg:max-w-xs" aria-label="Recent blog posts">
+		<div class="bg-[#313244] p-4 rounded-lg sticky top-4">
+			<h2 class="text-xl font-semibold mb-4 text-[#f2cdcd]">Recent Posts</h2>
+			<ul class="space-y-2">
+				for _, content := range GetRecentBlogPosts(contents, 5) {
+					<li>
+						@Button(content.Title, "blue", fmt.Sprintf("/content/view?id=%d", content.ID))
+					</li>
+				}
+			</ul>
+		</div>
+	</aside>
+}

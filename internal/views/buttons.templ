@@ -1,0 +1,45 @@
+package views
+
+import (
+	"fmt"
+	"strconv"
+)
+
+templ Button(text, color, action string) {
+	<button
+		hx-get={ action }
+		hx-target="#main-content-area"
+		hx-push-url="true"
+		class={ fmt.Sprintf("bg-%s-500 text-white px-4 py-2 rounded hover:bg-%s-600 transition duration-200 ease-in-out", color, color) }
+	>
+		{ text }
+	</button>
+}
+
+templ ReadMoreButton(contentID int32) {
+	<button
+		hx-get={ "/content/full?id=" + strconv.Itoa(int(contentID)) }
+		hx-target="#main-content-area"
+		hx-swap="outerHTML"
+		hx-push-url={ "/content/full?id=" + strconv.Itoa(int(contentID)) }
+		class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200 ease-in-out"
+	>
+		Read More
+	</button>
+}
+
+templ EditButton(contentID int32) {
+	<button
+		hx-get={ "/content/edit?id=" + strconv.Itoa(int(contentID)) }
+		hx-target={ "#content-" + strconv.Itoa(int(contentID)) }
+		hx-swap="outerHTML"
+		class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 ease-in-out"
+	>
+		Edit
+	</button>
+}
+
+templ NewContentButton(contentType string) {
+	@Button("Add New "+contentType, "blue", "/content/new?type="+contentType)
+	<div id="content-form"></div>
+}

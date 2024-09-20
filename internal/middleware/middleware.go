@@ -15,7 +15,9 @@ type wrappedWriter struct {
 	statusCode int
 }
 type contextKey string
+type HTMXContextKey string
 
+const IsHTMXRequestKey HTMXContextKey = "isHTMXRequest"
 const userContextKey contextKey = "user"
 
 func CreateStack(xs ...Middleware) Middleware {
@@ -99,4 +101,19 @@ func WithAuthenticator(authenticator *auth.Authenticator) Middleware {
 func GetUserFromContext(ctx context.Context) (*auth.AuthenticatedUser, bool) {
 	user, ok := ctx.Value(userContextKey).(*auth.AuthenticatedUser)
 	return user, ok
+}
+
+func HTMXMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		isHTMX := r.Header.Get("HX-Request") == "true"
+		ctx := context.WithValue(r.Context(), IsHTMXRequestKey, isHTMX)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func IsHTMXRequest(r *http.Request) bool {
+	if isHTMX, ok := r.Context().Value(IsHTMXRequestKey).(bool); ok {
+		return isHTMX
+	}
+	return false
 }

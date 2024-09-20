@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"homepage/internal/middleware"
 	"homepage/internal/models"
+	"net/http"
 	"sort"
 	"sync"
 	"time"
@@ -130,4 +132,9 @@ func removeOldEntries() {
 		}
 	}
 
+}
+
+func IsUserAdmin(r *http.Request) bool {
+	user, _ := middleware.GetUserFromContext(r.Context())
+	return user != nil && user.IsAdmin
 }

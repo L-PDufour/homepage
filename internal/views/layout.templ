@@ -31,7 +31,7 @@ var socialLinks = []SocialLink{
 	{"https://linkedin.com/in/l-pdufour", linkedinIcon(), "LinkedIn"},
 }
 
-templ Base() {
+templ Base(child templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -49,9 +49,13 @@ templ Base() {
 			@header()
 			<main class="flex-grow flex">
 				<div class="mt-4 sm:mt-6 lg:mt-8 mb-4 w-full mx-auto px-4 sm:px-6 lg:px-8">
-					<div class="space-y-4">
+					<div id="main-content-area" class="space-y-4">
 						@contentStyles()
-						{ children... }
+						if child != nil {
+							@child
+						} else {
+							{ children... }
+						}
 					</div>
 				</div>
 			</main>

@@ -7,6 +7,7 @@ import (
 	"homepage/internal/database"
 	"homepage/internal/middleware"
 	"homepage/internal/models"
+	"homepage/internal/utils"
 	"homepage/internal/views"
 	"net/http"
 	"strconv"
@@ -38,8 +39,6 @@ func (h *Handler) ServeResume() http.HandlerFunc {
 
 func (h *Handler) UnifiedView(contentType database.ContentType) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		user, _ := middleware.GetUserFromContext(r.Context())
-		isAdmin := user != nil && user.IsAdmin
 
 		contents, err := h.DB.GetContentsByType(r.Context(), contentType)
 		if err != nil {
@@ -49,14 +48,15 @@ func (h *Handler) UnifiedView(contentType database.ContentType) http.HandlerFunc
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-		props := models.ContentViewProps{
+		props := models.ListProps{
 			Contents:    contents,
 			ContentType: contentType,
-			IsAdmin:     isAdmin,
-			IsEditing:   false,
+			IsAdmin:     utils.IsUserAdmin(r),
+			CurrentPath: r.URL.Path,
 		}
-		component := views.UnifiedContentView(props)
-		component.Render(r.Context(), w)
+
+		fmt.Println(props.CurrentPath)
+		views.ContentList(props).Render(r.Context(), w)
 	}
 }
 
@@ -85,8 +85,6 @@ func (h *Handler) Admin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ViewContentHandler(w http.ResponseWriter, r *http.Request) {
-	user, _ := middleware.GetUserFromContext(r.Context())
-	isAdmin := user != nil && user.IsAdmin
 	id := r.URL.Query().Get("id")
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
@@ -103,12 +101,12 @@ func (h *Handler) ViewContentHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("HX-Request") == "true" {
 		w.Header().Set("HX-Trigger", "contentLoaded")
 	}
-	props := models.ContentItemProps{
+	props := models.ContentProps{
 		Content:   content,
-		IsAdmin:   isAdmin,
+		IsAdmin:   utils.IsUserAdmin(r),
 		IsEditing: isEditing,
 	}
-	views.UnifiedContent(props).Render(r.Context(), w)
+	views.ContentItem(props).Render(r.Context(), w)
 }
 
 func (h *Handler) GetContentHandler(w http.ResponseWriter, r *http.Request) {
@@ -124,17 +122,14 @@ func (h *Handler) GetContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, _ := middleware.GetUserFromContext(r.Context())
-	isAdmin := user != nil && user.IsAdmin
-
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	props := models.ContentItemProps{
+	props := models.ContentProps{
 		Content:   content,
-		IsAdmin:   isAdmin,
+		IsAdmin:   utils.IsUserAdmin(r),
 		IsEditing: false,
 	}
-	views.UnifiedContent(props).Render(r.Context(), w)
+	views.ContentItem(props).Render(r.Context(), w)
 }
 
 func (h *Handler) ListContentHandler(w http.ResponseWriter, r *http.Request) {
@@ -145,38 +140,28 @@ func (h *Handler) ListContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, _ := middleware.GetUserFromContext(r.Context())
-	isAdmin := user != nil && user.IsAdmin
-
 	contents, err := h.DB.GetContentsByType(r.Context(), contentType)
 	if err != nil {
 		http.Error(w, "Failed to fetch contents", http.StatusInternalServerError)
 		return
 	}
 
-	props := models.ContentViewProps{
+	props := models.ListProps{
 		Contents:    contents,
 		ContentType: contentType,
-		IsAdmin:     isAdmin,
-		IsEditing:   false,
+		IsAdmin:     utils.IsUserAdmin(r),
+		CurrentPath: r.URL.Path,
 	}
 
-	component := views.UnifiedContentView(props)
-	component.Render(r.Context(), w)
+	views.ContentList(props).Render(r.Context(), w)
 }
 
 func (h *Handler) EditContentHandler(w http.ResponseWriter, r *http.Request) {
-	user, _ := middleware.GetUserFromContext(r.Context())
-	if user == nil || !user.IsAdmin {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		http.Error(w, "Invalid content ID", http.StatusBadRequest)
 		return
 	}
-	isAdmin := user.IsAdmin
 	content, err := h.DB.GetContentById(r.Context(), int32(id))
 	if err != nil {
 		http.Error(w, "Content not found", http.StatusNotFound)
@@ -184,21 +169,15 @@ func (h *Handler) EditContentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	props := models.ContentItemProps{
+	props := models.ContentProps{
 		Content:   content,
-		IsAdmin:   isAdmin,
+		IsAdmin:   utils.IsUserAdmin(r),
 		IsEditing: true,
 	}
-	views.UnifiedContent(props).Render(r.Context(), w)
+	views.ContentItem(props).Render(r.Context(), w)
 }
 
 func (h *Handler) UpdateContentHandler(w http.ResponseWriter, r *http.Request) {
-	user, _ := middleware.GetUserFromContext(r.Context())
-	if user == nil || !user.IsAdmin {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-	isAdmin := user.IsAdmin
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Failed to parse form", http.StatusBadRequest)
 		return
@@ -218,12 +197,12 @@ func (h *Handler) UpdateContentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	props := models.ContentItemProps{
+	props := models.ContentProps{
 		Content:   updatedContent,
-		IsAdmin:   isAdmin,
+		IsAdmin:   utils.IsUserAdmin(r),
 		IsEditing: false,
 	}
-	views.UnifiedContent(props).Render(r.Context(), w)
+	views.ContentItem(props).Render(r.Context(), w)
 }
 
 func (h *Handler) DeleteContentHandler(w http.ResponseWriter, r *http.Request) {
@@ -282,14 +261,33 @@ func (h *Handler) CreateContentHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) GetFullContent(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-	idInt, _ := strconv.Atoi(id)
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
 	content, err := h.DB.GetContentById(r.Context(), int32(idInt))
 	if err != nil {
 		http.Error(w, "Error fetching content", http.StatusInternalServerError)
 		return
 	}
 
-	views.FullContentSection(content).Render(r.Context(), w)
+	props := models.ContentProps{
+		Content:   content,
+		IsAdmin:   utils.IsUserAdmin(r),
+		IsEditing: false,
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	if r.Header.Get("HX-Request") == "true" {
+		// If it's an HTMX request, only render the FullContentView
+		views.FullContentView(props).Render(r.Context(), w)
+	} else {
+		// For a full page load, wrap FullContentView in your Base template
+		views.Base(views.FullContentView(props)).Render(r.Context(), w)
+	}
 }
 
 func (h *Handler) GetTruncatedContent(w http.ResponseWriter, r *http.Request) {
@@ -301,5 +299,10 @@ func (h *Handler) GetTruncatedContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	views.ContentSection(content).Render(r.Context(), w)
+	props := models.ContentProps{
+		Content: content,
+		IsAdmin: utils.IsUserAdmin(r),
+	}
+
+	views.ContentItem(props).Render(r.Context(), w)
 }

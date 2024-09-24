@@ -1,3 +1,74 @@
+/* tailwind.css or your main CSS file */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom styles for Markdown-generated HTML */
+.prose {
+  @apply text-text px-0;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  @apply text-flamingo font-bold;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  @apply text-text;
+}
+
+.prose strong {
+  @apply text-red font-bold;
+}
+
+.prose em {
+  @apply text-mauve font-semibold;
+}
+
+.prose a {
+  @apply text-peach underline transition-colors duration-300;
+}
+
+.prose a:hover {
+  @apply text-mauve;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-mantle pl-4 text-text;
+}
+
+.prose code {
+  @apply bg-surface0 text-green px-1 py-0.5 rounded;
+}
+
+.prose pre {
+  @apply bg-surface0 p-4 rounded overflow-x-auto;
+}
+
+.prose img {
+  @apply max-w-full h-auto rounded;
+}
+
+.prose hr {
+  @apply border-t border-surface1 my-8;
+}
+
+.prose table {
+  @apply w-full border-collapse;
+}
+
+.prose th,
+.prose td {
+  @apply border border-surface1 p-2;
+}
+
+.prose th {
+  @apply bg-surface0 font-bold;
+}

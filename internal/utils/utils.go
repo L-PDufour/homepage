@@ -2,11 +2,11 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"homepage/internal/middleware"
 	"homepage/internal/models"
-	"net/http"
 	"sort"
 	"sync"
 	"time"
@@ -134,7 +134,7 @@ func removeOldEntries() {
 
 }
 
-func IsUserAdmin(r *http.Request) bool {
-	user, _ := middleware.GetUserFromContext(r.Context())
+func IsUserAdmin(ctx context.Context) bool {
+	user, _ := middleware.GetUserFromContext(ctx)
 	return user != nil && user.IsAdmin
 }

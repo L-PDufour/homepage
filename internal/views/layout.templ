@@ -13,11 +13,11 @@ type NavItem struct {
 }
 
 var navItems = []NavItem{
-	{"/bio", "", "text-[#f5e0dc] hover:bg-[#f5e0dc] hover:text-[#1e1e2e]", homeIcon()},
-	{"/cv", "CV", "text-[#cba6f7] hover:bg-[#cba6f7] hover:text-[#1e1e2e]", nil},
-	{"/projects", "Projets", "text-[#b4befe] hover:bg-[#b4befe] hover:text-[#1e1e2e]", nil},
-	{"/blog", "Blogue", "text-[#a6e3a1] hover:bg-[#a6e3a1] hover:text-[#1e1e2e]", nil},
-	{"/kids", "Enfants", "text-[#e78284] hover:bg-[#e78284] hover:text-[#1e1e2e]", nil},
+	{"/bio", "", "text-rosewater hover:bg-rosewater hover:text-base", homeIcon()},
+	{"/cv", "CV", "text-mauve hover:bg-mauve hover:text-base", nil},
+	{"/projects", "Projets", "text-blue hover:bg-blue hover:text-base", nil},
+	{"/blog", "Blogue", "text-green hover:bg-green hover:text-base", nil},
+	{"/kids", "Enfants", "text-red hover:bg-red hover:text-base", nil},
 }
 
 type SocialLink struct {
@@ -45,19 +45,14 @@ templ Base(child templ.Component) {
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js"></script>
 			<script src="/assets/js/htmx.min.js" defer></script>
 		</head>
-		<body class="min-h-screen flex flex-col bg-[#303446] text-[#c6d0f5] font-medium">
+		<body id="main-body" class="flex flex-col min-h-screen bg-surface1">
 			@header()
-			<main class="flex-grow flex">
-				<div class="mt-4 sm:mt-6 lg:mt-8 mb-4 w-full mx-auto px-4 sm:px-6 lg:px-8">
-					<div id="main-content-area" class="space-y-4">
-						@contentStyles()
-						if child != nil {
-							@child
-						} else {
-							{ children... }
-						}
-					</div>
-				</div>
+			<main class="flex-grow py-8">
+				if child != nil {
+					@child
+				} else {
+					{ children... }
+				}
 			</main>
 			@footer()
 		</body>
@@ -65,9 +60,10 @@ templ Base(child templ.Component) {
 }
 
 templ header() {
-	<header data-testid="headerTemplate" class="bg-[#1e1e2e] text-[#cdd6f4] sticky top-0 z-10">
+	<header data-testid="headerTemplate" class="bg-mantle sticky top-0 z-10">
 		@navBar()
 	</header>
+	<div class="p-4 sm:p-6 space-y-4"></div>
 }
 
 templ navBar() {
@@ -79,7 +75,7 @@ templ navBar() {
 						hx-get={ item.url }
 						hx-target="body"
 						hx-push-url="true"
-						class={ "flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded transition-colors text-sm sm:text-base " + item.color }
+						class={ "flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded transition-colors  " + item.color }
 					>
 						if item.icon != nil {
 							<span class="flex items-center justify-center">
@@ -96,21 +92,21 @@ templ navBar() {
 }
 
 templ footer() {
-	<footer data-testid="footerTemplate" class="bg-[#1e1e2e] text-[#cdd6f4] p-4 text-center">
+	<footer data-testid="footerTemplate" class="bg-mantle text-text p-4 text-center mt-auto">
 		<div class="flex justify-center items-center gap-4 mb-2">
 			for _, link := range socialLinks {
 				<a
 					href={ templ.SafeURL(link.url) }
 					target="_blank"
 					rel="noopener noreferrer"
-					class="text-[#f5e0dc] hover:text-[#fab387] transition-colors"
+					class="text-text hover:text-yellow transition-colors"
 					aria-label={ link.label }
 				>
 					@link.icon
 				</a>
 			}
 		</div>
-		<div class="text-sm sm:text-base">&copy; { fmt.Sprintf("%d", time.Now().Year()) } Léon-Pierre Dufour</div>
+		<div class="text-sm sm:text-text">&copy; { fmt.Sprintf("%d", time.Now().Year()) } Léon-Pierre Dufour</div>
 	</footer>
 }
 
@@ -158,118 +154,4 @@ templ linkedinIcon() {
 			d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
 		></path>
 	</svg>
-}
-
-templ contentStyles() {
-	<style>
-:root {
-    --rosewater: #f5e0dc;
-    --flamingo: #f2cdcd;
-    --pink: #f5c2e7;
-    --mauve: #cba6f7;
-    --red: #f38ba8;
-    --maroon: #eba0ac;
-    --peach: #fab387;
-    --yellow: #f9e2af;
-    --green: #a6e3a1;
-    --teal: #94e2d5;
-    --sky: #89dceb;
-    --sapphire: #74c7ec;
-    --blue: #89b4fa;
-    --lavender: #b4befe;
-    --text: #cdd6f4;
-    --subtext1: #bac2de;
-    --subtext0: #a6adc8;
-    --overlay2: #9399b2;
-    --overlay1: #7f849c;
-    --overlay0: #6c7086;
-    --surface2: #585b70;
-    --surface1: #45475a;
-    --surface0: #313244;
-    --base: #1e1e2e;
-    --mantle: #181825;
-    --crust: #11111b;
-}
-
-.prose {
-    color: var(--text);
-    padding-left: 0;
-    padding-right: 0;
-}
-
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-    color: var(--flamingo);
-    font-weight: bold;
-}
-
-.prose p, .prose ul, .prose ol {
-    color: var(--text);
-}
-
-.prose strong {
-    color: var(--red);
-    font-weight: bold;
-}
-
-.prose em {
-    color: var(--mauve);
-    font-weight: semibold;
-  }
-.prose a {
-    color: var(--pink);
-    text-decoration: underline;
-    transition: color 0.3s ease;
-}
-
-.prose a:hover {
-    color: var(--mauve);
-}
-
-.prose blockquote {
-    border-left: 4px solid var(--overlay0);
-    padding-left: 1rem;
-    color: var(--subtext0);
-}
-
-.prose code {
-    background-color: var(--surface0);
-    color: var(--green);
-    padding: 0.2em 0.4em;
-    border-radius: 3px;
-}
-
-.prose pre {
-    background-color: var(--surface0);
-    padding: 1rem;
-    border-radius: 5px;
-    overflow-x: auto;
-}
-
-.prose img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
-}
-
-.prose hr {
-    border: none;
-    border-top: 1px solid var(--surface1);
-    margin: 2rem 0;
-}
-
-.prose table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-.prose th, .prose td {
-    border: 1px solid var(--surface1);
-    padding: 0.5rem;
-}
-
-.prose th {
-    background-color: var(--surface0);
-    font-weight: bold;
-}
-    </style>
 }

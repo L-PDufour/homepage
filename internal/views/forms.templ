@@ -2,27 +2,8 @@ package views
 
 import (
 	"fmt"
-	"homepage/internal/models"
 	"strconv"
 )
-
-templ EditContentForm(props models.ContentProps) {
-	<form
-		id={ "edit-form-" + strconv.Itoa(int(props.Content.ID)) }
-		hx-post={ "/content/update?id=" + strconv.Itoa(int(props.Content.ID)) }
-		hx-target={ "#content-" + strconv.Itoa(int(props.Content.ID)) }
-		hx-swap="outerHTML"
-	>
-		<input type="hidden" name="id" value={ strconv.Itoa(int(props.Content.ID)) }/>
-		@FormInput("title", "Title", props.Content.Title, "text")
-		@FormTextarea("content", "Content", props.Content.Markdown.String, 10)
-		if props.Content.ContentType == "project" {
-			@FormInput("link", "Project Link", props.Content.Link.String, "url")
-		}
-		@FormInput("image_url", "Image URL", props.Content.ImageUrl.String, "url")
-		@FormButtons(props.Content.ID)
-	</form>
-}
 
 templ FormInput(name, label, value, inputType string) {
 	<div class="mb-4">

@@ -2,26 +2,8 @@ package server
 
 import (
 	efs "homepage"
-	"homepage/internal/views"
 	"net/http"
-
-	"github.com/a-h/templ"
 )
-
-type Route struct {
-	Method  string
-	Path    string
-	Handler http.Handler
-}
-
-func (s *Server) registerRoute(mux *http.ServeMux, method, path string, handler http.Handler) {
-	switch method {
-	case "GET":
-		mux.Handle(path, handler)
-	default:
-		mux.Handle(path, handler)
-	}
-}
 
 func (s *Server) registerRoutes() http.Handler {
 	mux := http.NewServeMux()
@@ -29,34 +11,23 @@ func (s *Server) registerRoutes() http.Handler {
 	fileServer := http.FileServer(http.FS(efs.Files))
 	mux.Handle("/assets/", fileServer)
 
-	routes := []Route{
-		{"GET", "/bio", s.Handler.UnifiedView("bio")},
-		{"GET", "/projects", s.Handler.UnifiedView("project")},
-		{"GET", "/blog", s.Handler.UnifiedView("blog")},
-		{"GET", "/cv", s.Handler.ServeResume()},
-		{"GET", "/kids", templ.Handler(views.Kids())},
-		{"GET", "/admin", http.HandlerFunc(s.Handler.Admin)},
-		{"GET", "/admin/auth", s.Handler.AdminAuth()},
+	// Define your routes directly in the mux
+	mux.HandleFunc("/bio", s.Handler.ListContent("bio"))
+	mux.HandleFunc("/projects", s.Handler.ListContent("project"))
+	mux.HandleFunc("/blog", s.Handler.ListContent("blog"))
+	mux.HandleFunc("/cv", s.Handler.ServeResume())
+	mux.HandleFunc("/admin", http.HandlerFunc(s.Handler.Admin))
+	mux.HandleFunc("/admin/auth", s.Handler.AdminAuth())
 
-		{"GET", "/content/full", http.HandlerFunc(s.Handler.GetFullContent)},
-		{"GET", "/content/truncated", http.HandlerFunc(s.Handler.GetTruncatedContent)},
-		{"GET", "/content/list", http.HandlerFunc(s.Handler.ListContentHandler)},
-		{"GET", "/content/view", http.HandlerFunc(s.Handler.ViewContentHandler)},
-		{"GET", "/content/new", http.HandlerFunc(s.Handler.NewContentFormHandler)},
-		{"POST", "/content/create", http.HandlerFunc(s.Handler.CreateContentHandler)},
-		{"GET", "/content/edit", http.HandlerFunc(s.Handler.EditContentHandler)},
-		{"GET", "/content/get", http.HandlerFunc(s.Handler.GetContentHandler)},
-		{"POST", "/content/update", http.HandlerFunc(s.Handler.UpdateContentHandler)},
-		{"DELETE", "/content/delete", http.HandlerFunc(s.Handler.DeleteContentHandler)},
-	}
-
-	for _, route := range routes {
-		s.registerRoute(mux, route.Method, route.Path, route.Handler)
-	}
-
+	mux.HandleFunc("/content/list", s.Handler.ListContent(""))
+	mux.HandleFunc("/content/", s.Handler.GetContent())
+	// mux.HandleFunc("POST /content", s.Handler...)
+	// mux.HandleFunc("PUT /content/", s.Handler...)
+	// mux.HandleFunc("DELETE /content/", s.Handler.DeleteContent)
+	// mux.HandleFunc("/content/view", s.Handler.ViewContentHandler)
+	// Catch-all redirect to /bio
 	mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/bio", http.StatusFound)
 	})
-
 	return mux
 }

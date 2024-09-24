@@ -15,6 +15,7 @@ import (
 	"homepage/internal/database"
 	"homepage/internal/handler"
 	"homepage/internal/middleware"
+	"homepage/internal/service"
 
 	_ "github.com/lib/pq"
 )
@@ -37,8 +38,9 @@ func NewServer() (*http.Server, error) {
 		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	}
 	dbQueries := database.New(db)
+	contentService := service.NewContentService(dbQueries)
 
-	handler := handler.NewHandler(dbQueries)
+	handler := handler.NewHandler(dbQueries, contentService)
 	authenticator, err := auth.NewAuthenticator()
 	if err != nil {
 		log.Fatalf("Failed to create authenticator: %v", err)
@@ -51,6 +53,7 @@ func NewServer() (*http.Server, error) {
 	}
 
 	stack := middleware.CreateStack(
+		middleware.HTMXMiddleware,
 		middleware.AllowCors,
 		middleware.WithAuthenticator(authenticator),
 		middleware.Logging,

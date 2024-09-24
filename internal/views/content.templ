@@ -1,89 +1,46 @@
 package views
 
 import (
-	"homepage/internal/models"
 	"fmt"
 	"strconv"
 	"homepage/internal/utils"
+	"homepage/internal/models"
 )
 
-templ ContentList(props models.ListProps) {
+templ ContentList(props models.ContentProps) {
 	@Base(nil) {
-		<div class="max-w-10xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="flex flex-col lg:flex-row justify-center">
-				<main class="lg:w-4/5 w-full max-w-10xl">
-					<div class="bg-[#414559] rounded-lg shadow-lg overflow-hidden">
-						<div class="p-4 sm:p-6 space-y-4">
-							for _, content := range props.Contents {
-								if content.ContentType == props.ContentType {
-									@ContentItem(models.ContentProps{
-										Content:   content,
-										IsAdmin:   props.IsAdmin,
-										IsEditing: false,
-									})
-								}
-							}
-						</div>
-						if props.IsAdmin {
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<div class="bg-surface0 rounded-lg shadow-lg overflow-hidden p-6">
+				<div class="flex flex-col lg:flex-row justify-center">
+					<div id="content" class="w-full">
+						for _, content := range props.Content {
+							<div id={ "content-" + strconv.Itoa(int(content.ID)) } class="w-full mx-auto mb-8 rounded-lg overflow-hidden bg-base shadow-md">
+								<div class="p-4">
+									<div class="mt-4 prose lg:prose-xl max-w-full mx-auto">
+										if htmlContent, err := utils.GetHTMLContent(content.Markdown.String); err == nil {
+											if len(htmlContent) > 500 || len(props.Content) > 1 {
+												@templ.Raw(utils.TruncateMarkdown(htmlContent, 500))
+											} else {
+												@templ.Raw(htmlContent)
+											}
+										} else {
+											<p class="text-red-500">Error rendering content.</p>
+										}
+									</div>
+								</div>
+								<div class="flex space-x-4 p-4">
+									if content.ContentType == "blog" {
+										@ReadMoreButton(content.ID)
+									}
+									if props.IsAdmin {
+										@Button("Edit", "blue", fmt.Sprintf("/content/edit?id=%d", content.ID))
+									}
+								</div>
+							</div>
 						}
 					</div>
-				</main>
-				if props.CurrentPath == "/blog" {
-					@Sidebar(props.Contents)
-				}
+				</div>
 			</div>
 		</div>
 	}
-}
-
-templ ContentItem(props models.ContentProps) {
-	<div id={ "content-" + strconv.Itoa(int(props.Content.ID)) } class="w-full mx-auto rounded-lg overflow-hidden bg-[#1e1e2e] shadow-md">
-		if !props.IsEditing {
-			<div class="p-4">
-				<h2 class="text-2xl font-bold mb-4">{ props.Content.Title }</h2>
-				<div class="mt-4 prose lg:prose-xl max-w-full mx-auto">
-					if htmlContent, err := utils.GetHTMLContent(props.Content.Markdown.String); err == nil {
-						if props.Content.ContentType == "bio" || props.Content.ContentType == "project" {
-							@templ.Raw(htmlContent)
-						} else {
-							@templ.Raw(utils.TruncateMarkdown(htmlContent, 200))
-						}
-					} else {
-						<p class="text-red-500">Error rendering content.</p>
-					}
-				</div>
-			</div>
-			<div class="flex space-x-4 p-4">
-				if props.Content.ContentType == "blog" {
-					@Button("Read More", "green", fmt.Sprintf("/content/full?id=16"))
-				}
-				if props.IsAdmin {
-					@Button("Edit", "blue", fmt.Sprintf("/content/edit?id=%d", props.Content.ID))
-				}
-			</div>
-		} else {
-			@EditContentForm(props)
-		}
-	</div>
-}
-
-templ FullContentView(props models.ContentProps) {
-	<div id={ fmt.Sprintf("full-content-%d", props.Content.ID) } class="w-full mx-auto rounded-lg overflow-hidden bg-[#1e1e2e] shadow-md">
-		<div class="p-6">
-			<h1 class="text-3xl font-bold mb-4">{ props.Content.Title }</h1>
-			<div class="mt-6 prose lg:prose-xl max-w-full mx-auto">
-				if htmlContent, err := utils.GetHTMLContent(props.Content.Markdown.String); err == nil {
-					@templ.Raw(htmlContent)
-				} else {
-					<p class="text-red-500">Error rendering content.</p>
-				}
-			</div>
-		</div>
-		if props.IsAdmin {
-			<div class="flex space-x-4 p-4">
-				@Button("Edit", "blue", fmt.Sprintf("/content/edit?id=%d", props.Content.ID))
-				@Button("Back to List", "gray", fmt.Sprintf("/%s", props.Content.ContentType))
-			</div>
-		}
-	</div>
 }

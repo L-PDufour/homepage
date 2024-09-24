@@ -18,10 +18,10 @@ templ Button(text, color, action string) {
 
 templ ReadMoreButton(contentID int32) {
 	<button
-		hx-get={ "/content/full?id=" + strconv.Itoa(int(contentID)) }
-		hx-target="#main-content-area"
+		hx-get={ "/content/?fullView=true&id=" + strconv.Itoa(int(contentID)) }
+		hx-target="#switch"
 		hx-swap="outerHTML"
-		hx-push-url={ "/content/full?id=" + strconv.Itoa(int(contentID)) }
+		hx-push-url={ "/content/?fullView=true&id=" + strconv.Itoa(int(contentID)) }
 		class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200 ease-in-out"
 	>
 		Read More

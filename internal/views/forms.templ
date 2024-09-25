@@ -1,68 +1,15 @@
 package views
 
 import (
-	"fmt"
 	"strconv"
+	"homepage/internal/database"
 )
 
-templ FormInput(name, label, value, inputType string) {
-	<div class="mb-4">
-		<label for={ name } class="block text-sm font-medium text-gray-700">{ label }</label>
-		<input
-			type={ inputType }
-			id={ name }
-			name={ name }
-			value={ value }
-			class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-		/>
-	</div>
-}
-
-templ FormTextarea(name, label, value string, rows int) {
-	<div class="mb-4">
-		<label for={ name } class="block text-sm font-medium text-gray-700">{ label }</label>
-		<textarea
-			id={ name }
-			name={ name }
-			rows={ strconv.Itoa(rows) }
-			class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-		>
-			{ value }
-		</textarea>
-	</div>
-}
-
-templ FormButtons(contentID int32) {
-	<div class="flex space-x-2">
-		@Button("Save Changes", "green", "")
-		@Button("Cancel", "red", fmt.Sprintf("/content/view?id=%d", contentID))
-		@Button("Delete", "red", fmt.Sprintf("/content/delete?id=%d", contentID))
-	</div>
-}
-
-templ EditFormButtons(contentID int32) {
-	<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">Save Changes</button>
-	<button
-		type="button"
-		hx-get={ "/content/view?id=" + strconv.Itoa(int(contentID)) }
-		hx-target={ "#content-" + strconv.Itoa(int(contentID)) }
-		hx-swap="outerHTML"
-		class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
-	>Cancel</button>
-	<button
-		type="button"
-		hx-delete={ "/content/delete?id=" + strconv.Itoa(int(contentID)) }
-		hx-confirm="Are you sure you want to delete this content?"
-		hx-on="htmx:afterRequest: window.location.reload()"
-		class="mt-2 ml-2 bg-red-500 text-white px-4 py-2 rounded"
-	>Delete</button>
-}
-
-templ NewContentForm() {
+templ NewForm() {
 	<form
-		hx-post="/content/create"
-		hx-target="#content-form"
-		hx-swap="innerHTML"
+		hx-post="/content/new"
+		hx-target="#main-body"
+		hx-swap="outerHTML"
 		class="mt-4 p-4 border rounded"
 	>
 		<select name="type" class="w-full p-2 border rounded mb-2" required>
@@ -75,6 +22,25 @@ templ NewContentForm() {
 		<textarea name="markdown" rows="10" placeholder="Content" class="w-full p-2 border rounded mb-2" required></textarea>
 		<input type="url" name="image_url" placeholder="Image URL" class="w-full p-2 border rounded mb-2"/>
 		<input type="url" name="link" placeholder="Link (for projects)" class="w-full p-2 border rounded mb-2"/>
-		<button type="submit" class="mt-2 bg-green-500 text-white px-4 py-2 rounded">Submit</button>
+		@FormButton()
+	</form>
+}
+
+templ EditForm(content database.Content) {
+	<form
+		hx-post={ "/content/update?id=" + strconv.Itoa(int(content.ID)) }
+		hx-target={ "#main-body" }
+		hx-swap="outerHTML"
+	>
+		<select name="type" class="w-full p-2 border rounded mb-2" required>
+			<option value="">Select Content Type</option>
+			<option value="blog">Blog Post</option>
+			<option value="project">Project</option>
+			<option value="bio">Bio</option>
+		</select>
+		<input type="hidden" name="id" value={ strconv.Itoa(int(content.ID)) }/>
+		<input name="title" value={ content.Title } class="w-full p-2 border rounded mb-2"/>
+		<textarea name="markdown" rows="10" class="w-full p-2 border rounded mb-2">{ content.Markdown.String }</textarea>
+		@FormButton()
 	</form>
 }

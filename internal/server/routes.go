@@ -21,11 +21,12 @@ func (s *Server) registerRoutes() http.Handler {
 
 	mux.HandleFunc("/content/list", s.Handler.ListContent(""))
 	mux.HandleFunc("/content", s.Handler.GetContent())
-	// mux.HandleFunc("POST /content", s.Handler...)
-	// mux.HandleFunc("PUT /content/", s.Handler...)
-	// mux.HandleFunc("DELETE /content/", s.Handler.DeleteContent)
-	// mux.HandleFunc("/content/view", s.Handler.ViewContentHandler)
-	// Catch-all redirect to /bio
+	mux.HandleFunc("DELETE /content", s.Handler.DeleteContent())
+	mux.HandleFunc("/content/new", s.Handler.GetForm())
+	mux.HandleFunc("POST /content/new", s.Handler.CreateContent())
+	mux.HandleFunc("/content/update", s.Handler.GetUpdateForm())
+	mux.HandleFunc("POST /content/update", s.Handler.UpdateContent())
+
 	mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/bio", http.StatusFound)
 	})

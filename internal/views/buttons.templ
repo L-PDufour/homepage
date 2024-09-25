@@ -22,24 +22,60 @@ templ ReadMoreButton(contentID int32) {
 		hx-target="#main-body"
 		hx-swap="innerHTML settle:1s"
 		hx-push-url={ "/content?id=" + strconv.Itoa(int(contentID)) }
-		class="bg-green text-base px-4 py-2 rounded hover:bg-teal transition duration-200 ease-in-out"
+		class="text-text underline px-4 py-2 hover:text-green transition duration-200 ease-in-out"
 	>
-		Read More
+		Agrandir
 	</button>
 }
 
 templ EditButton(contentID int32) {
 	<button
-		hx-get={ "/content/edit?id=" + strconv.Itoa(int(contentID)) }
-		hx-target={ "#content-" + strconv.Itoa(int(contentID)) }
+		hx-get={ "/content/update?id=" + strconv.Itoa(int(contentID)) }
+		hx-target={ "#main-body" }
 		hx-swap="outerHTML"
-		class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 ease-in-out"
+		class="text-text underline px-4 py-2 hover:text-blue transition duration-200 ease-in-out"
 	>
 		Edit
 	</button>
 }
 
-templ NewContentButton(contentType string) {
-	@Button("Add New "+contentType, "blue", "/content/new?type="+contentType)
-	<div id="content-form"></div>
+templ NewContentButton() {
+	<button
+		hx-get={ "/content/new" }
+		hx-target={ "#main-body" }
+		hx-swap="outerHTML"
+		class="text-text underline px-4 py-2 rounded hover:text-blue transition duration-200 ease-in-out"
+	>
+		Add
+	</button>
+}
+
+templ FormButton() {
+	<button
+		type="submit"
+		class="text-text underline px-4 py-2 rounded hover:text-blue transition duration-200 ease-in-out"
+	>
+		Submit
+	</button>
+	<button
+		hx-get=""
+		hx-trigger="click"
+		hx-target="body"
+		hx-push-url="true"
+		hx-indicator="#loading"
+	>
+		Cancel
+	</button>
+}
+
+templ DeleteButton(contentID int32) {
+	<button
+		hx-delete={ "/content?id=" + strconv.Itoa(int(contentID)) }
+		hx-confirm="Are you sure you want to delete this content?"
+		hx-target="closest div"
+		hx-swap="outerHTML"
+		class="text-text underline px-4 py-2 rounded hover:text-red transition duration-200 ease-in-out"
+	>
+		Delete
+	</button>
 }

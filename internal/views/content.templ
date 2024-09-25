@@ -1,7 +1,6 @@
 package views
 
 import (
-	"fmt"
 	"strconv"
 	"homepage/internal/utils"
 	"homepage/internal/models"
@@ -21,6 +20,10 @@ templ ContentList(props models.ContentProps) {
 											@templ.Raw(utils.TruncateMarkdown(htmlContent, 500))
 										} else {
 											@templ.Raw(htmlContent)
+											if props.IsAdmin {
+												@EditButton(content.ID)
+												@DeleteButton(content.ID)
+											}
 										}
 									} else {
 										<p class="text-red-500">Error rendering content.</p>
@@ -31,12 +34,14 @@ templ ContentList(props models.ContentProps) {
 								if len(props.Content) > 1 {
 									@ReadMoreButton(content.ID)
 								}
-								if props.IsAdmin {
-									@Button("Edit", "blue", fmt.Sprintf("/content/edit?id=%d", content.ID))
-								}
 							</div>
 						</div>
 					}
+					<div class="flex space-x-4 p-4">
+						if len(props.Content) > 1 && props.IsAdmin {
+							@NewContentButton()
+						}
+					</div>
 				</div>
 			</div>
 		</div>

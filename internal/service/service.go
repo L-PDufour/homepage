@@ -2,15 +2,19 @@ package service
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"homepage/internal/database"
 	"homepage/internal/models"
 	"homepage/internal/utils"
+	"log"
 )
 
 type ContentService interface {
 	GetContentsByType(ctx context.Context, contentTypeStr string) (models.ContentProps, error)
 	GetContentById(ctx context.Context, id int) (models.ContentProps, error)
+	DeleteContent(ctx context.Context, id int) error
 }
 
 type contentService struct {
@@ -65,4 +69,24 @@ func (s *contentService) GetContentById(ctx context.Context, id int) (models.Con
 		ContentType: content.ContentType,
 		IsAdmin:     isAdmin,
 	}, nil
+}
+
+func (s *contentService) DeleteContent(ctx context.Context, id int) error {
+	_, err := s.DB.GetContentById(ctx, int32(id))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("content with id %d not found", id)
+		}
+		return fmt.Errorf("failed to check content existence: %w", err)
+	}
+
+	err = s.DB.DeleteContent(ctx, int32(id))
+	if err != nil {
+		return fmt.Errorf("failed to delete content: %w", err)
+	}
+
+	// Optional: Log the deletion
+	log.Printf("Content with id %d has been deleted", id)
+
+	return nil
 }

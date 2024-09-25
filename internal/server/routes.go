@@ -20,7 +20,7 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.HandleFunc("/admin/auth", s.Handler.AdminAuth())
 
 	mux.HandleFunc("/content/list", s.Handler.ListContent(""))
-	mux.HandleFunc("/content/", s.Handler.GetContent())
+	mux.HandleFunc("/content", s.Handler.GetContent())
 	// mux.HandleFunc("POST /content", s.Handler...)
 	// mux.HandleFunc("PUT /content/", s.Handler...)
 	// mux.HandleFunc("DELETE /content/", s.Handler.DeleteContent)

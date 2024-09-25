@@ -47,7 +47,7 @@ templ Base(child templ.Component) {
 		</head>
 		<body id="main-body" class="flex flex-col min-h-screen bg-surface1">
 			@header()
-			<main class="flex-grow py-8">
+			<main class="flex-grow py-4">
 				if child != nil {
 					@child
 				} else {
@@ -63,7 +63,6 @@ templ header() {
 	<header data-testid="headerTemplate" class="bg-mantle sticky top-0 z-10">
 		@navBar()
 	</header>
-	<div class="p-4 sm:p-6 space-y-4"></div>
 }
 
 templ navBar() {

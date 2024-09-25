@@ -8,39 +8,37 @@ import (
 )
 
 templ ContentList(props models.ContentProps) {
-	@Base(nil) {
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-			<div class="bg-surface0 rounded-lg shadow-lg overflow-hidden p-6">
-				<div class="flex flex-col lg:flex-row justify-center">
-					<div id="content" class="w-full">
-						for _, content := range props.Content {
-							<div id={ "content-" + strconv.Itoa(int(content.ID)) } class="w-full mx-auto mb-8 rounded-lg overflow-hidden bg-base shadow-md">
-								<div class="p-4">
-									<div class="mt-4 prose lg:prose-xl max-w-full mx-auto">
-										if htmlContent, err := utils.GetHTMLContent(content.Markdown.String); err == nil {
-											if len(htmlContent) > 500 || len(props.Content) > 1 {
-												@templ.Raw(utils.TruncateMarkdown(htmlContent, 500))
-											} else {
-												@templ.Raw(htmlContent)
-											}
+	<div class="max-w-7xl mx-auto p-4">
+		<div class="bg-surface0 rounded-lg shadow-lg overflow-hidden p-6">
+			<div class="flex flex-col lg:flex-row justify-center">
+				<div class="w-full">
+					for _, content := range props.Content {
+						<div id={ "content-" + strconv.Itoa(int(content.ID)) } class="w-full mx-auto mb-8 rounded-lg overflow-hidden bg-base shadow-md">
+							<div class="p-4">
+								<div class="mt-4 prose lg:prose-xl max-w-full mx-auto">
+									if htmlContent, err := utils.GetHTMLContent(content.Markdown.String); err == nil {
+										if len(htmlContent) > 500 && len(props.Content) > 1 {
+											@templ.Raw(utils.TruncateMarkdown(htmlContent, 500))
 										} else {
-											<p class="text-red-500">Error rendering content.</p>
+											@templ.Raw(htmlContent)
 										}
-									</div>
-								</div>
-								<div class="flex space-x-4 p-4">
-									if content.ContentType == "blog" {
-										@ReadMoreButton(content.ID)
-									}
-									if props.IsAdmin {
-										@Button("Edit", "blue", fmt.Sprintf("/content/edit?id=%d", content.ID))
+									} else {
+										<p class="text-red-500">Error rendering content.</p>
 									}
 								</div>
 							</div>
-						}
-					</div>
+							<div class="flex space-x-4 p-4">
+								if len(props.Content) > 1 {
+									@ReadMoreButton(content.ID)
+								}
+								if props.IsAdmin {
+									@Button("Edit", "blue", fmt.Sprintf("/content/edit?id=%d", content.ID))
+								}
+							</div>
+						</div>
+					}
 				</div>
 			</div>
 		</div>
-	}
+	</div>
 }

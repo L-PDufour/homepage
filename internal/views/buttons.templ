@@ -18,11 +18,11 @@ templ Button(text, color, action string) {
 
 templ ReadMoreButton(contentID int32) {
 	<button
-		hx-get={ "/content/?fullView=true&id=" + strconv.Itoa(int(contentID)) }
-		hx-target="#switch"
-		hx-swap="outerHTML"
-		hx-push-url={ "/content/?fullView=true&id=" + strconv.Itoa(int(contentID)) }
-		class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200 ease-in-out"
+		hx-get={ "/content?id=" + strconv.Itoa(int(contentID)) }
+		hx-target="#main-body"
+		hx-swap="innerHTML settle:1s"
+		hx-push-url={ "/content?id=" + strconv.Itoa(int(contentID)) }
+		class="bg-green text-base px-4 py-2 rounded hover:bg-teal transition duration-200 ease-in-out"
 	>
 		Read More
 	</button>

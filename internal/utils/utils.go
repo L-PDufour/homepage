@@ -94,7 +94,8 @@ func TruncateMarkdown(content string, length int) string {
 	if len(content) <= length {
 		return content
 	}
-	return content[:length] + "..."
+	//TODO Find a way to look better
+	return content[:length] + " ..."
 }
 
 func removeOldEntries() {

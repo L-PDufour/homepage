@@ -10,8 +10,7 @@ import (
 	"homepage/internal/views"
 	"net/http"
 	"strconv"
-
-	"github.com/a-h/templ"
+	// "github.com/a-h/templ"
 )
 
 type Handler struct {
@@ -193,14 +192,12 @@ func (h *Handler) ListContent(contentTypeStr string) http.HandlerFunc {
 func (h *Handler) GetContent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.URL.Query().Get("id"))
-		fullView := r.URL.Query().Get("fullView") == "true"
 
 		if err != nil {
 			http.Error(w, "", http.StatusNotFound)
 			return
 		}
 		props, err := h.Service.GetContentById(r.Context(), id)
-		props.FullView = fullView
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -211,25 +208,7 @@ func (h *Handler) GetContent() http.HandlerFunc {
 }
 
 func (h *Handler) renderContentList(w http.ResponseWriter, r *http.Request, props models.ContentProps) {
-	views.ContentList(props).Render(r.Context(), w)
-}
-
-func (h *Handler) renderContentItem(w http.ResponseWriter, r *http.Request, props models.ContentProps) {
-	isHtmxRequest := r.Header.Get("HX-Request") == "true"
-
-	if isHtmxRequest {
-		templ.Component(views.ContentList(models.ContentProps{
-			Content:     props.Content,
-			ContentType: props.ContentType,
-			IsAdmin:     props.IsAdmin,
-		})).Render(r.Context(), w)
-	} else {
-		templ.Component(views.Base(views.ContentList(models.ContentProps{
-			Content:     props.Content,
-			ContentType: props.ContentType,
-			IsAdmin:     props.IsAdmin,
-		}))).Render(r.Context(), w)
-	}
+	views.Base(views.ContentList(props)).Render(r.Context(), w)
 }
 
 //

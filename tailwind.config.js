@@ -75,7 +75,8 @@ module.exports = {
               backgroundColor: theme("colors.mantle"),
               padding: "0.25rem",
               borderRadius: "0.25rem",
-              fontWeight: "500",
+              fontWeight: "600",
+              fontFamily: theme("fontFamily.mono"),
             },
             "code::before": {
               content: '""',
@@ -85,18 +86,25 @@ module.exports = {
             },
             pre: {
               backgroundColor: theme("colors.mantle"),
-              color: theme("colors.text"),
-              fontSize: "0.875rem",
+              color: theme("colors.green"),
               padding: "1rem",
+              fontWeight: "600",
+              borderRadius: "0.25rem",
+              whiteSpace: "pre-wrap", // This makes sure the code wraps inside pre blocks
+              overflowX: "auto", // To handle long lines of code with horizontal scrolling
+              fontFamily: theme("fontFamily.mono"),
             },
             blockquote: {
               borderLeftColor: theme("colors.surface0"),
               color: theme("colors.surface1"),
+            },
+            "pre code": {
+              backgroundColor: "transparent", // Prevents nested code block background issues
             },
           },
         },
       }),
     },
   },
-  plugins: [require("@tailwindcss/typography"), require("@tailwindcss/forms")],
+  plugins: [require("@tailwindcss/typography")],
 };

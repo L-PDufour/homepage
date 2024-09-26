@@ -2,7 +2,10 @@ package server
 
 import (
 	efs "homepage"
+	"homepage/internal/views"
 	"net/http"
+
+	"github.com/a-h/templ"
 )
 
 func (s *Server) registerRoutes() http.Handler {
@@ -16,6 +19,7 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.HandleFunc("/projects", s.Handler.ListContent("project"))
 	mux.HandleFunc("/blog", s.Handler.ListContent("blog"))
 	mux.HandleFunc("/cv", s.Handler.ServeResume())
+	mux.Handle("/kids", templ.Handler(views.Kids()))
 	mux.HandleFunc("/admin", http.HandlerFunc(s.Handler.Admin))
 	mux.HandleFunc("/admin/auth", s.Handler.AdminAuth())
 

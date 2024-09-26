@@ -13,8 +13,6 @@ import (
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/yuin/goldmark"
-	"github.com/yuin/goldmark/extension"
-	"github.com/yuin/goldmark/parser"
 	"golang.org/x/sync/singleflight"
 )
 
@@ -42,13 +40,7 @@ func hash(s string) string {
 
 func convertAndSanitize(markdown string) (string, error) {
 	var htmlContent bytes.Buffer
-	md := goldmark.New(
-		goldmark.WithExtensions(extension.GFM),
-		goldmark.WithParserOptions(
-			parser.WithAutoHeadingID(),
-		),
-	)
-	if err := md.Convert([]byte(markdown), &htmlContent); err != nil {
+	if err := goldmark.Convert([]byte(markdown), &htmlContent); err != nil {
 		return "", err
 	}
 

@@ -22,7 +22,7 @@ templ ReadMoreButton(contentID int32) {
 		hx-target="#main-body"
 		hx-swap="innerHTML settle:1s"
 		hx-push-url={ "/content?id=" + strconv.Itoa(int(contentID)) }
-		class="text-text underline px-4 py-2 hover:text-green transition duration-200 ease-in-out"
+		class="text-text underline px-4 py-2 hover:text-green transition duration-200 ease-in-out not-prose"
 	>
 		Agrandir
 	</button>
@@ -33,7 +33,7 @@ templ EditButton(contentID int32) {
 		hx-get={ "/content/update?id=" + strconv.Itoa(int(contentID)) }
 		hx-target={ "#main-body" }
 		hx-swap="outerHTML"
-		class="text-text underline px-4 py-2 hover:text-blue transition duration-200 ease-in-out"
+		class="text-text underline px-4 py-2 hover:text-blue transition duration-200 ease-in-out not-prose"
 	>
 		Edit
 	</button>

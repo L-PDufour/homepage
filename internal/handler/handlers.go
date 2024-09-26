@@ -120,7 +120,7 @@ func (h *Handler) GetForm() http.HandlerFunc {
 		if isAdmin {
 			h.renderNewForm(w, r)
 		} else {
-			http.Error(w, "Nope", http.StatusUnauthorized)
+			http.Redirect(w, r, "/bio", http.StatusUnauthorized)
 		}
 	}
 }
@@ -128,7 +128,7 @@ func (h *Handler) GetForm() http.HandlerFunc {
 func (h *Handler) GetUpdateForm() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !utils.IsUserAdmin(r.Context()) {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			http.Redirect(w, r, "/bio", http.StatusUnauthorized)
 			return
 		}
 
@@ -156,7 +156,7 @@ func (h *Handler) GetUpdateForm() http.HandlerFunc {
 func (h *Handler) CreateContent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !utils.IsUserAdmin(r.Context()) {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			http.Redirect(w, r, "/bio", http.StatusUnauthorized)
 			return
 		}
 
@@ -188,7 +188,7 @@ func (h *Handler) CreateContent() http.HandlerFunc {
 func (h *Handler) UpdateContent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !utils.IsUserAdmin(r.Context()) {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			http.Redirect(w, r, "/bio", http.StatusUnauthorized)
 			return
 		}
 

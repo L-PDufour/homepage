@@ -15,8 +15,8 @@ var (
 	CfTeamDomain = os.Getenv("CF_TEAM_DOMAIN")
 	cfAudTag     = os.Getenv("CF_AUD_TAG")
 	IsProduction = os.Getenv("GO_ENV") == "production"
-	cfAPIKey     = os.Getenv("CF_API_KEY")  // Token for Cloudflare API access
-	adminEmail   = os.Getenv("ADMIN_EMAIL") // Token for Cloudflare API access
+	cfAPIKey     = os.Getenv("CF_API_KEY")
+	adminEmail   = os.Getenv("ADMIN_EMAIL")
 )
 
 type AuthenticatedUser struct {
@@ -26,35 +26,34 @@ type AuthenticatedUser struct {
 
 type Authenticator struct {
 	verifier      *oidc.IDTokenVerifier
-	cfAPI         *cloudflare.API // Cloudflare API client
-	cloudflareCtx context.Context // Cloudflare request context}
+	cfAPI         *cloudflare.API
+	cloudflareCtx context.Context
 }
 
-// NewAuthenticator initializes the Authenticator with OIDC or mocks for non-production
 func NewAuthenticator() (*Authenticator, error) {
-	// Initialize Cloudflare API client (optional, only needed for certain Cloudflare API operations)
-	cfAPI, err := cloudflare.NewWithAPIToken(cfAPIKey)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize Cloudflare API client: %v", err)
+	var cfAPI *cloudflare.API = nil
+	var err error = nil
+	if IsProduction {
+		cfAPI, err = cloudflare.NewWithAPIToken(cfAPIKey)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize Cloudflare API client: %v", err)
+		}
 	}
 	cfCtx := context.Background()
 
-	// If not in production, return the Authenticator without OIDC setup
 	if !IsProduction {
 		return &Authenticator{verifier: nil, cfAPI: cfAPI, cloudflareCtx: cfCtx}, nil
 	}
 
-	// Initialize OIDC provider for Cloudflare Access
 	oidcCtx := context.Background()
-	providerURL := fmt.Sprintf("https://%s.cloudflareaccess.com", CfTeamDomain) // OIDC issuer URL for Cloudflare Access
+	providerURL := fmt.Sprintf("https://%s.cloudflareaccess.com", CfTeamDomain)
 	provider, err := oidc.NewProvider(oidcCtx, providerURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create OIDC provider: %v", err)
 	}
 
-	// Initialize the token verifier with the audience tag (from Cloudflare Access)
 	verifier := provider.Verifier(&oidc.Config{
-		ClientID: cfAudTag, // Client ID (audience tag) for Cloudflare Access
+		ClientID: cfAudTag,
 	})
 
 	return &Authenticator{
@@ -64,7 +63,6 @@ func NewAuthenticator() (*Authenticator, error) {
 	}, nil
 }
 
-// VerifyToken checks the Cloudflare Access token (JWT) from a user's request
 func (a *Authenticator) VerifyToken(r *http.Request) (*AuthenticatedUser, error) {
 	cookie, err := r.Cookie("CF_Authorization")
 	if err != nil {

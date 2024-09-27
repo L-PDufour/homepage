@@ -34,18 +34,16 @@ templ ContentList(props models.ContentProps) {
 							</div>
 							<div class="flex space-x-4 p-4">
 								if len(props.Content) > 1 {
-									<div class="not-prose">
-										@ReadMoreButton(content.ID)
-									</div>
+									@ReadMoreButton(content.ID)
 								}
 							</div>
 						</div>
 					}
-				</div>
-				<div class="flex space-x-4 p-4">
-					if len(props.Content) > 1 && props.IsAdmin {
-						@NewContentButton()
-					}
+					<div class="flex space-x-4 p-4">
+						if len(props.Content) > 1 && props.IsAdmin {
+							@NewContentButton()
+						}
+					</div>
 				</div>
 			</div>
 		</div>

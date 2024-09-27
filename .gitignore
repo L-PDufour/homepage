@@ -33,6 +33,6 @@ bin/
 # .env file
 .env
 .envrc
-
+run-goose.sh
 # Project build
 

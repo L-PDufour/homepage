@@ -28,7 +28,7 @@ NULL, NULL, NOW(), NOW()),
 Ce projet, toujours en développement, marque mes débuts dans un environnement de développement collaboratif. Il m''a permis d''appliquer mes connaissances théoriques à un cas pratique, tout en apprenant de mes collègues plus expérimentés.',
 NULL, NULL, NOW(), NOW()),
 
-('project', 'gitHub',
+('project', 'github',
 'Mon profil [GitHub](https://github.com/L-PDufour/) témoigne de mon parcours d''apprentissage. Il regroupe divers projets, exercices et tutoriels que j''ai réalisés pour développer mes compétences.
 
 ### Langages explorés et apprentissages :

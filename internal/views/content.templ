@@ -16,8 +16,8 @@ templ ContentList(props models.ContentProps) {
 							<div class="p-4">
 								<div class="mt-4 prose lg:prose-xl max-w-full mx-auto">
 									if htmlContent, err := utils.GetHTMLContent(content.Markdown.String); err == nil {
-										if len(htmlContent) > 500 && len(props.Content) > 1 {
-											@templ.Raw(utils.TruncateMarkdown(htmlContent, 500))
+										if len(htmlContent) > 300 && len(props.Content) > 1 {
+											@templ.Raw(utils.TruncateMarkdown(htmlContent, 300))
 										} else {
 											@templ.Raw(htmlContent)
 											if props.IsAdmin {

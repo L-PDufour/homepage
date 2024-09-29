@@ -75,11 +75,6 @@
             };
             Env = [
               "IN_CONTAINER=true"
-              "DB_HOST=localhost" # Added for PostgreSQL connection
-              "DB_PORT=5433" # Added for PostgreSQL connection
-              "DB_NAME=mydatabase" # Added for PostgreSQL connection
-              "DB_USER=myuser" # Added for PostgreSQL connection
-              "DB_PASSWORD=mypassword" # Added for PostgreSQL connection
             ];
           };
         };
@@ -88,12 +83,12 @@
           run = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "run" ''
               if [ -f .env ]; then
-                 export $(cat .env | xargs)
-               else
-                 echo ".env file not found"
-                 exit 1
-               fi
-               ${pkgs.go}/bin/go run cmd/api/main.go
+                export $(cat .env | xargs)
+              else
+                echo ".env file not found"
+                exit 1
+              fi
+              ${pkgs.go}/bin/go run cmd/api/main.go
             '';
           };
           test = flake-utils.lib.mkApp {

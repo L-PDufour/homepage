@@ -1,52 +1,118 @@
 package views
 
+var skills = []string{"Go", "C", "JS/TS", "Nix", "Linux"}
+var softSkills = []string{"Communication", "Travail d'équipe", "Résolution de problèmes"}
+var interests = []string{"Ébénisterie", "Électronique", "Informatique"}
+
 templ ResumeTemplate() {
 	@Base(nil) {
-		<style>
-			#pdf-viewer {
-				max-width: 100%;
-				height: 100vh;
-				overflow-y: auto;
-			}
-			.pdf-page {
-				margin-bottom: 10px;
-			}
-		</style>
-		<div class="flex justify-center items-start py-4 ">
-			<div id="pdf-viewer"></div>
+		<div class="container mx-auto  bg-white shadow-lg my-4 max-w-[215.9mm] min-h-[279.4mm]">
+			<div class="flex flex-col max-w-full bg-sky-400 p-4 w-full">
+				<h1 class="font-bold text-white text-2xl">Léon-Pierre Dufour</h1>
+				<section class="mt-4">
+					<p class="text-sm text-white">
+						Développeur junior passionné en reconversion professionnelle, combinant une solide expérience en service client avec une formation intensive en programmation. Autodidacte motivé, je cherche à apporter ma créativité, ma rigueur et mes compétences techniques à une équipe de développement dynamique.
+					</p>
+				</section>
+			</div>
+			<div class="flex flex-row p-4">
+				<!-- Left Column -->
+				<div class="w-1/4 pr-4 border-r border-gray-300">
+					<header class="mb-4">
+						<div class="text-sm text-gray-700">
+							<p class="font-semibold mt-2">Courriel</p>
+							<p class="mb-1">leon@lpdufour.xyz</p>
+							<p class="font-semibold mt-2">Site</p>
+							<p class="mb-1">dev.lpdufour.xyz</p>
+							<p class="font-semibold mt-2">Github</p>
+							<p class="mb-1">github.com/l-pdufour</p>
+							<p class="font-semibold">Linkedin</p>
+							<p class="mb-1">linkedin.com/in/l-pdufour</p>
+						</div>
+					</header>
+					<section class="mb-4">
+						<h2 class="text-lg font-semibold text-sky-500 mb-1">Compétences techniques</h2>
+						<div class="flex flex-col gap-1">
+							for _, skill := range skills {
+								<span class="w-fit bg-gray-200 text-gray-700 px-1 py-0.5 rounded text-xs">{ skill }</span>
+							}
+						</div>
+					</section>
+					<section class="mb-4">
+						<h2 class="text-lg font-semibold text-sky-500 mb-1">Compétences transversales</h2>
+						<div class="flex flex-col gap-1">
+							for _, skill := range softSkills {
+								<span class="whitespace-nowrap w-fit bg-gray-200 text-gray-700 px-1 py-0.5 rounded text-xs">{ skill }</span>
+							}
+						</div>
+					</section>
+					<section>
+						<h2 class="text-lg font-semibold text-sky-500 mb-1">Intérêts</h2>
+						<div class="flex flex-col gap-1">
+							for _, interest := range interests {
+								<span class="w-fit bg-gray-200 text-gray-700 px-1 py-0.5 rounded text-xs">{ interest }</span>
+							}
+						</div>
+					</section>
+				</div>
+				<!-- Right Column -->
+				<div class="w-3/4 pl-4">
+					<section class="mb-4">
+						<h2 class="text-xl font-semibold text-sky-500 mb-2">Expérience professionnelle</h2>
+						<div class="p-2 rounded">
+							<h4 class="text-sm font-semibold">Centre de pédiatrie sociale de Québec</h4>
+							<p class="text-xs text-gray-600">10/2023 - Aujourd'hui</p>
+							<p class="text-sm text-gray-700 mt-1">Participation bénévole au développement d'une application web pour l'inscription et la gestion des bénévoles pour la guignolée.</p>
+						</div>
+						<div class="bg-gray-100 p-2 rounded">
+							<h3 class="font-semibold text-sm">Postes Canada</h3>
+							<p class="text-xs text-gray-600">2013 - 2023</p>
+							<p class="text-sm text-gray-700 mt-1">
+								Gérer, acheminer le courrier et les colis en plus d'assurer un bon service à la clientèle
+							</p>
+						</div>
+						<div class="p-2">
+							<h4 class="font-semibold text-sm">Agent de recherche</h4>
+							<p class="text-xs text-gray-600">2010</p>
+							<p class="text-sm text-gray-700 mt-1">
+								Analyser et rédiger des données statistiques et des rapports de recherche
+							</p>
+						</div>
+					</section>
+					<section class="mb-4">
+						<h2 class="text-xl font-semibold text-sky-500 mb-2">Formation</h2>
+						<div class="bg-gray-100 p-2 rounded">
+							<h3 class="font-semibold text-sm">Boot.dev</h3>
+							<p class="text-xs text-gray-600">02/2024 - Aujourd'hui</p>
+							<p class="text-sm text-gray-700 mt-1">
+								• Achèvement du cursus principal sur le développement backend
+								<br/>
+								• Pratique de divers concepts passant de la programmation orientée objet aux bases de données
+								<br/>
+								• Réalisation de projets pratiques intégrant les concepts appris
+							</p>
+						</div>
+						<div class=" p-2 rounded">
+							<h3 class="font-semibold text-sm">École 42</h3>
+							<p class="text-xs text-gray-600">02/2023 - Aujourd'hui</p>
+							<p class="text-sm text-gray-700 mt-1">
+								• Introduction à la programmation en C
+								<br/>
+								• Acquisition de compétences en algorithmique et en programmation système
+							</p>
+						</div>
+						<div class="bg-gray-100 p-2 rounded">
+							<h3 class="font-semibold text-sm">Baccalauréat en développement social et analyse des problèmes sociaux</h3>
+							<p class="text-xs text-gray-600">UQAR | 2010</p>
+							<p class="text-sm text-gray-700 mt-1">
+								• Développement de compétences analytiques et de recherche
+								<br/>
+								• Rédaction de rapports et présentation de résultats de recherche
+							</p>
+						</div>
+					</section>
+				</div>
+			</div>
 		</div>
-		<script type="module">
-			// URL of your PDF file
-			var url = '/assets/CV.pdf';
-
-			// Load the PDF document
-			pdfjsLib.getDocument(url).promise.then(function(pdf) {
-				// Get div#pdf-viewer
-				var viewer = document.getElementById('pdf-viewer');
-
-				// Loop through each page
-				for(var pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-					pdf.getPage(pageNumber).then(function(page) {
-						var scale = 1.5;
-						var viewport = page.getViewport({scale: scale});
-
-						// Create a canvas for each page
-						var canvas = document.createElement('canvas');
-						canvas.className = 'pdf-page';
-						canvas.height = viewport.height;
-						canvas.width = viewport.width;
-						viewer.appendChild(canvas);
-
-						// Render the page on the canvas
-						var context = canvas.getContext('2d');
-						var renderContext = {
-							canvasContext: context,
-							viewport: viewport
-						};
-						page.render(renderContext);
-					});
-				}
-			});
-		</script>
 	}
 }

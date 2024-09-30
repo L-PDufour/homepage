@@ -19,7 +19,7 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.HandleFunc("/projects", s.Handler.ListContent("project"))
 	mux.HandleFunc("/blog", s.Handler.ListContent("blog"))
 	mux.HandleFunc("/cv", s.Handler.ServeResume())
-	mux.Handle("/kids", templ.Handler(views.Kids()))
+	// mux.Handle("/kids", templ.Handler(views.Kids()))
 	mux.Handle("/plan", templ.Handler(views.Plan()))
 	mux.HandleFunc("/admin", http.HandlerFunc(s.Handler.Admin))
 	mux.HandleFunc("/admin/auth", s.Handler.AdminAuth())

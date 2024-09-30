@@ -17,7 +17,6 @@ var navItems = []NavItem{
 	{"/cv", "CV", "text-mauve hover:bg-mauve hover:text-base", nil},
 	{"/projects", "Projets", "text-blue hover:bg-blue hover:text-base", nil},
 	{"/blog", "Blogue", "text-green hover:bg-green hover:text-base", nil},
-	{"/kids", "Enfants", "text-red hover:bg-red hover:text-base", nil},
 	{"/plan", "Planif", "text-teal hover:bg-teal hover:text-base", nil},
 }
 
@@ -61,7 +60,7 @@ templ Base(child templ.Component) {
 }
 
 templ header() {
-	<header data-testid="headerTemplate" class="bg-mantle sticky top-0 z-10">
+	<header data-testid="headerTemplate" class="print-hide bg-mantle sticky top-0 z-10">
 		@navBar()
 	</header>
 }
@@ -92,7 +91,7 @@ templ navBar() {
 }
 
 templ footer() {
-	<footer data-testid="footerTemplate" class="bg-mantle text-text p-4 text-center mt-auto">
+	<footer data-testid="footerTemplate" class="print-hide bg-mantle text-text p-4 text-center mt-auto">
 		<div class="flex justify-center items-center gap-4 mb-2">
 			for _, link := range socialLinks {
 				<a

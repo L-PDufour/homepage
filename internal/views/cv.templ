@@ -6,7 +6,7 @@ var interests = []string{"Ébénisterie", "Électronique", "Informatique"}
 
 templ ResumeTemplate() {
 	@Base(nil) {
-		<div class="container mx-auto  bg-white shadow-lg my-4 max-w-[215.9mm] min-h-[279.4mm]">
+		<div id="printArea" class="container mx-auto bg-white shadow-lg my-4 max-w-[215.9mm] min-h-[279.4mm] print:shadow-none print:my-0">
 			<div class="flex flex-col max-w-full bg-sky-400 p-4 w-full">
 				<h1 class="font-bold text-white text-2xl">Léon-Pierre Dufour</h1>
 				<section class="mt-4">
@@ -113,6 +113,44 @@ templ ResumeTemplate() {
 					</section>
 				</div>
 			</div>
+			<div class="print-hide bg-gray-100 p-4 mt-4 text-sm max-w-[215.9mm] mx-auto">
+				<h3 class="font-bold text-lg mb-2">Exporter en PDF</h3>
+				<p class="mb-2">Cliquez sur le bouton ci-dessous pour imprimer cette page en PDF:</p>
+				<button onclick="window.print()" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">
+					Imprimer en PDF
+				</button>
+			</div>
 		</div>
+		<style>
+                @media print {
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        print-color-adjust: exact;
+                        -webkit-print-color-adjust: exact;
+                    }
+                    @page {
+                        size: Letter;
+                        margin: 0;
+                    }
+                    #printArea {
+                        width: 215.9mm;
+                        height: 279.4mm;
+                        margin: 0;
+                        padding: 0.5in;
+                        overflow: hidden;
+                        page-break-after: avoid;
+                    }
+                    .print-hide {
+                        display: none !important;
+                    }
+                }
+                @media screen {
+                    #printArea {
+                        max-width: 215.9mm;
+                        margin: auto;
+                    }
+                }
+            </style>
 	}
 }

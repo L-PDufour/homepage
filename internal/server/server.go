@@ -73,8 +73,23 @@ func NewServer() (*http.Server, error) {
 }
 
 func connectDB() (*sql.DB, error) {
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
+	var host, port, user, password, dbname string
 
+	if os.Getenv("GO_ENV") == "production" {
+		host = os.Getenv("PROD_DB_HOST")
+		port = os.Getenv("PROD_DB_PORT")
+		user = os.Getenv("PROD_DB_USER")
+		password = os.Getenv("PROD_DB_PASSWORD")
+		dbname = os.Getenv("PROD_DB_NAME")
+	} else {
+		host = os.Getenv("DEV_DB_HOST")
+		port = os.Getenv("DEV_DB_PORT")
+		user = os.Getenv("DEV_DB_USER")
+		password = os.Getenv("DEV_DB_PASSWORD")
+		dbname = os.Getenv("DEV_DB_NAME")
+	}
+
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
 	return sql.Open("postgres", connStr)
 }

@@ -113,7 +113,7 @@ func (q *Queries) GetContentByTitle(ctx context.Context, arg GetContentByTitlePa
 }
 
 const getContentsByType = `-- name: GetContentsByType :many
-SELECT id, title, markdown, image_url, link, created_at, updated_at, content_type FROM content WHERE content_type = $1
+SELECT id, title, markdown, image_url, link, created_at, updated_at, content_type FROM content WHERE content_type = $1 ORDER BY updated_at DESC
 `
 
 func (q *Queries) GetContentsByType(ctx context.Context, contentType ContentType) ([]Content, error) {

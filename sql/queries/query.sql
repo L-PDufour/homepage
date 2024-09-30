@@ -11,7 +11,7 @@ SELECT * FROM content WHERE id = $1;
 SELECT * FROM content WHERE content_type = $1 AND title = $2;
 
 -- name: GetContentsByType :many
-SELECT * FROM content WHERE content_type = $1;
+SELECT * FROM content WHERE content_type = $1 ORDER BY updated_at DESC;
 
 -- name: UpdateContent :one
 UPDATE content

@@ -21,13 +21,13 @@ templ ResumeTemplate() {
 					<header class="mb-4">
 						<div class="text-sm text-gray-700">
 							<p class="font-semibold mt-2">Courriel</p>
-							<p class="mb-1">leon@lpdufour.xyz</p>
+							<p class="mb-1"><a href="mailto:leon@lpdufour.xyz">leon@lpdufour.xyz</a></p>
 							<p class="font-semibold mt-2">Site</p>
-							<p class="mb-1">dev.lpdufour.xyz</p>
+							<p class="mb-1"><a href="https://dev.lpdufour.xyz" target="_blank">dev.lpdufour.xyz</a></p>
 							<p class="font-semibold mt-2">Github</p>
-							<p class="mb-1">github.com/l-pdufour</p>
+							<p class="mb-1"><a href="https://github.com/l-pdufour" target="_blank">github.com/l-pdufour</a></p>
 							<p class="font-semibold">Linkedin</p>
-							<p class="mb-1">linkedin.com/in/l-pdufour</p>
+							<p class="mb-1"><a href="https://linkedin.com/in/l-pdufour" target="_blank">linkedin.com/in/l-pdufour</a></p>
 						</div>
 					</header>
 					<section class="mb-4">
@@ -114,8 +114,6 @@ templ ResumeTemplate() {
 				</div>
 			</div>
 			<div class="print-hide bg-gray-100 p-4 mt-4 text-sm max-w-[215.9mm] mx-auto">
-				<h3 class="font-bold text-lg mb-2">Exporter en PDF</h3>
-				<p class="mb-2">Cliquez sur le bouton ci-dessous pour imprimer cette page en PDF:</p>
 				<button onclick="window.print()" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">
 					Imprimer en PDF
 				</button>
@@ -143,6 +141,10 @@ templ ResumeTemplate() {
                     }
                     .print-hide {
                         display: none !important;
+                    }
+                    a {
+                        color: inherit;
+                        text-decoration: none;
                     }
                 }
                 @media screen {

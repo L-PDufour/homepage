@@ -9,20 +9,12 @@
         flake-utils.follows = "flake-utils";
       };
     };
-    templ = {
-      url = "github:a-h/templ";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        gomod2nix.follows = "gomod2nix";
-      };
-    };
   };
   outputs =
     {
       self,
       flake-utils,
       nixpkgs,
-      templ,
       gomod2nix,
     }:
     flake-utils.lib.eachDefaultSystem (
@@ -38,7 +30,7 @@
           buildInputs = [ pkgs.sqlcipher ];
           modules = ./gomod2nix.toml;
           preBuild = ''
-            ${templ.packages.${system}.templ}/bin/templ generate
+            ${pkgs.templ}/bin/templ generate
             ${pkgs.tailwindcss}/bin/tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify
           '';
         };
@@ -50,12 +42,18 @@
           buildInputs = with pkgs; [
             jq
             go
+            gopls
+            golangci-lint-langserver
+            semgrep
             go-tools
             air
             gomod2nix.packages.${system}.default
-            templ.packages.${system}.templ
+            templ
+            vscode-langservers-extracted
+            tailwindcss-language-server
             tailwindcss
             postgresql
+            htmx-lsp
             docker-compose
           ];
         };

@@ -228,3 +228,11 @@ func (h *Handler) UpdateContent() http.HandlerFunc {
 		}
 	}
 }
+
+func (h *Handler) Test() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_ = r.ParseForm()
+		test := r.FormValue("prompt")
+		log.Println(test)
+	}
+}

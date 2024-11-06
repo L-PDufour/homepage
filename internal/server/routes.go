@@ -32,6 +32,9 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.HandleFunc("/content/update", s.Handler.GetUpdateForm())
 	mux.HandleFunc("POST /content/update", s.Handler.UpdateContent())
 
+	mux.Handle("/game", templ.Handler(views.Game()))
+	mux.HandleFunc("POST /game/input", s.Handler.Test())
+
 	mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/bio", http.StatusFound)
 	})

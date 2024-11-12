@@ -51,6 +51,10 @@
             templ
             vscode-langservers-extracted
             tailwindcss-language-server
+            nodejs
+            nodePackages.typescript
+            nodePackages.typescript-language-server
+            typescript-language-server
             tailwindcss
             postgresql
             htmx-lsp

@@ -2,28 +2,7 @@ package views
 
 templ Game() {
 	@Base(nil) {
-		<canvas id="canvas" width="400" height="200" class="playable-canvas"></canvas>
-		<form
-			hx-post="/game/input"
-			hx-trigger="input"
-			hx-target="#prompt"
-		>
-			<input type="text" name="prompt" id="prompt" class="playable-prompt" placeholder="Enter text to display"/>
-		</form>
-		<script>
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
-      const promptInput = document.getElementById("prompt");
-
-      function drawCanvas() {
-       const promptText = promptInput.value;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.font = "24px monospace";
-       ctx.fillText(promptText, 10, 50);
-      }
-
-      promptInput.addEventListener("input", drawCanvas);
-      window.addEventListener("load", drawCanvas);
-    </script>
+		<canvas id="canvas" width="600" height="300" class="playable-canvas"></canvas>
+		<script type="application/javascript" src="/assets/js/game.js"></script>
 	}
 }

@@ -2,20 +2,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    gomod2nix = {
-      url = "github:nix-community/gomod2nix";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        flake-utils.follows = "flake-utils";
-      };
-    };
-    templ = {
-      url = "github:a-h/templ";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        gomod2nix.follows = "gomod2nix";
-      };
-    };
+    gomod2nix.url = "github:nix-community/gomod2nix";
+    templ.url = "github:a-h/templ";
   };
   outputs =
     {

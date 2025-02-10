@@ -13,6 +13,19 @@ func (s *Server) registerRoutes() http.Handler {
 
 	fileServer := http.FileServer(http.FS(efs.Files))
 	mux.Handle("/assets/", fileServer)
+	mux.HandleFunc("assets/index.js", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/javascript")
+		fileServer.ServeHTTP(w, r)
+	})
+
+	// Serve WebAssembly files with the correct MIME type
+	mux.HandleFunc("/index.wasm", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/wasm")
+		fileServer.ServeHTTP(w, r)
+	})
+	mux.HandleFunc("/game", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "assets/index.html") // Adjust the path as necessary
+	})
 
 	// Define your routes directly in the mux
 	mux.HandleFunc("/bio", s.Handler.ListContent("bio"))

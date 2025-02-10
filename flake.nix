@@ -17,21 +17,26 @@
       };
     };
   };
-  outputs =
-    {
-      self,
-      flake-utils,
-      nixpkgs,
-      templ,
-      gomod2nix,
-    }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
+  outputs = { self, flake-utils, nixpkgs, templ, gomod2nix, }:
+    flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ gomod2nix.overlays.default ];
         };
+        htmx-lsp-latest = pkgs.htmx-lsp.overrideAttrs (oldAttrs: {
+          version = "0.1.0-unstable-2025-06-28";
+          src = pkgs.fetchFromGitHub {
+            owner = "ThePrimeagen";
+            repo = "htmx-lsp";
+            rev =
+              "c45f55b2bf8be2d92489fd6d69a3db07fe5f214b"; # Get this from: git ls-remote https://github.com/ThePrimeagen/htmx-lsp.git HEAD
+            hash =
+              "sha256-7CAlYYwsanlOCGeY7gYE5Fzk5IEO4hThgINiJmXql7s"; # Leave empty initially, Nix will tell you the correct hash
+          };
+          cargoHash =
+            "sha256-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX="; # Leave empty initially
+        });
         homepage = pkgs.buildGoApplication {
           name = "api";
           src = ./.;
@@ -42,14 +47,15 @@
             ${pkgs.tailwindcss}/bin/tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify
           '';
         };
-      in
-      rec {
+      in rec {
         formatter = pkgs.nixpkgs-fmt;
         packages.default = homepage;
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             jq
             go
+            htmx-lsp-latest
+            vscode-langservers-extracted
             go-tools
             air
             gomod2nix.packages.${system}.default
@@ -62,20 +68,12 @@
         packages.container = pkgs.dockerTools.buildLayeredImage {
           name = "ldufour/goserver";
           tag = "latest";
-          contents = [
-            packages.default
-            pkgs.postgresql
-            pkgs.cacert
-          ];
+          contents = [ packages.default pkgs.postgresql pkgs.cacert ];
           config = {
             Cmd = [ "${packages.default}/bin/api" ];
             WorkingDir = "/";
-            Volumes = {
-              "/data" = { };
-            };
-            Env = [
-              "IN_CONTAINER=true"
-            ];
+            Volumes = { "/data" = { }; };
+            Env = [ "IN_CONTAINER=true" ];
           };
         };
         apps = {
@@ -103,6 +101,5 @@
             '';
           };
         };
-      }
-    );
+      });
 }

@@ -4,7 +4,7 @@ import (
 	efs "homepage"
 	"homepage/internal/views"
 	"net/http"
-
+  "strings"
 	"github.com/a-h/templ"
 )
 
@@ -44,9 +44,11 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.HandleFunc("POST /content/new", s.Handler.CreateContent())
 	mux.HandleFunc("/content/update", s.Handler.GetUpdateForm())
 	mux.HandleFunc("POST /content/update", s.Handler.UpdateContent())
-
-	mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/bio", http.StatusFound)
-	})
+mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+    // Only redirect if it's the root path or an unmatched path
+    if r.URL.Path == "/" || !strings.HasPrefix(r.URL.Path, "/assets/") {
+        http.Redirect(w, r, "/bio", http.StatusFound)
+    }
+})
 	return mux
 }

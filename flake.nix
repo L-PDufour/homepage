@@ -29,6 +29,10 @@
             ${templ.packages.${system}.templ}/bin/templ generate
             ${pkgs.tailwindcss}/bin/tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify
           '';
+          postInstall = ''
+            mkdir -p $out/assets
+            cp -r assets/* $out/assets/
+          '';
         };
       in
       rec {

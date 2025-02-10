@@ -2,5 +2,5 @@ package homepage
 
 import "embed"
 
-//go:embed "assets"
+//go:embed assets/*
 var Files embed.FS

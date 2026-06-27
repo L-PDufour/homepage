@@ -167,9 +167,9 @@ func (h *Handler) CreateContent() http.HandlerFunc {
 		}
 
 		params := database.CreateContentParams{
-			ContentType: database.ContentType(r.Form.Get("type")),
+			ContentType: r.Form.Get("type"),
 			Title:       r.FormValue("title"),
-			Markdown:    sql.NullString{String: r.FormValue("markdown"), Valid: true},
+			Content:    sql.NullString{String: r.FormValue("markdown"), Valid: true},
 			ImageUrl:    sql.NullString{String: r.FormValue("image_url"), Valid: r.FormValue("image_url") != ""},
 			Link:        sql.NullString{String: r.FormValue("link"), Valid: r.FormValue("link") != ""},
 		}
@@ -205,12 +205,12 @@ func (h *Handler) UpdateContent() http.HandlerFunc {
 		}
 
 		params := database.UpdateContentParams{
-			ContentType: database.ContentType(r.Form.Get("type")),
+			ContentType: r.Form.Get("type"),
 			Title:       r.FormValue("title"),
-			Markdown:    sql.NullString{String: r.FormValue("markdown"), Valid: true},
+			Content:    sql.NullString{String: r.FormValue("markdown"), Valid: true},
 			ImageUrl:    sql.NullString{String: r.FormValue("image_url"), Valid: r.FormValue("image_url") != ""},
 			Link:        sql.NullString{String: r.FormValue("link"), Valid: r.FormValue("link") != ""},
-			ID:          int32(id),
+			ID:          int64(id),
 		}
 
 		content, err := h.DB.UpdateContent(r.Context(), params)

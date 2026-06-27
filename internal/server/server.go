@@ -17,7 +17,7 @@ import (
 	"homepage/internal/middleware"
 	"homepage/internal/service"
 
-	_ "github.com/lib/pq"
+	_ "modernc.org/sqlite"
 )
 
 type Server struct {
@@ -53,7 +53,6 @@ func NewServer() (*http.Server, error) {
 	}
 
 	stack := middleware.CreateStack(
-		middleware.HTMXMiddleware,
 		middleware.AllowCors,
 		middleware.WithAuthenticator(authenticator),
 		middleware.Logging,
@@ -73,23 +72,23 @@ func NewServer() (*http.Server, error) {
 }
 
 func connectDB() (*sql.DB, error) {
-	var host, port, user, password, dbname string
-
-	if os.Getenv("GO_ENV") == "production" {
-		host = os.Getenv("PROD_DB_HOST")
-		port = os.Getenv("PROD_DB_PORT")
-		user = os.Getenv("PROD_DB_USER")
-		password = os.Getenv("PROD_DB_PASSWORD")
-		dbname = os.Getenv("PROD_DB_NAME")
-	} else {
-		host = os.Getenv("DEV_DB_HOST")
-		port = os.Getenv("DEV_DB_PORT")
-		user = os.Getenv("DEV_DB_USER")
-		password = os.Getenv("DEV_DB_PASSWORD")
-		dbname = os.Getenv("DEV_DB_NAME")
-	}
-
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	return sql.Open("postgres", connStr)
+    dbPath := os.Getenv("DB_PATH")
+    if dbPath == "" {
+        dbPath = "dev.db"
+    }
+    db, err := sql.Open("sqlite", dbPath)
+    if err != nil {
+        return nil, err
+    }
+    if err := db.Ping(); err != nil {
+        return nil, err
+    }
+    schema, err := os.ReadFile("sql/schema.sql")
+    if err != nil {
+        return nil, err
+    }
+    if _, err := db.Exec(string(schema)); err != nil {
+        return nil, err
+    }
+    return db, nil
 }

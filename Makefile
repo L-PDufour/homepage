@@ -18,6 +18,10 @@ build:
 run:
 	@go run cmd/api/main.go
 
+.PHONY: sqlc
+sqlc:
+	sqlc generate
+
 # Create DB container
 docker-run:
 	@if docker compose up 2>/dev/null; then \

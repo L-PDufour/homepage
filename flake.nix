@@ -32,7 +32,10 @@
             go-tools
             air
             gomod2nix.packages.${system}.default
+            gopls
             nixd
+
+            sqlc
           ];
         };
         packages.container = pkgs.dockerTools.buildLayeredImage {

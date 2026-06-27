@@ -27,13 +27,13 @@ func NewContentService(db *database.Queries) ContentService {
 	}
 }
 
-func ParseContentType(s string) (database.ContentType, error) {
-	switch s {
-	case "blog", "project", "bio":
-		return database.ContentType(s), nil
-	default:
-		return "", fmt.Errorf("invalid content type: %s", s)
-	}
+func ParseContentType(s string) (string, error) {
+    switch s {
+    case "blog", "project", "bio":
+        return s, nil
+    default:
+        return "", fmt.Errorf("invalid content type: %s", s)
+    }
 }
 
 func (s *contentService) GetContentsByType(ctx context.Context, contentTypeStr string) (models.ContentProps, error) {
@@ -57,7 +57,7 @@ func (s *contentService) GetContentsByType(ctx context.Context, contentTypeStr s
 }
 
 func (s *contentService) GetContentById(ctx context.Context, id int) (models.ContentProps, error) {
-	content, err := s.DB.GetContentById(ctx, int32(id))
+	content, err := s.DB.GetContentById(ctx, int64(id))
 	if err != nil {
 		return models.ContentProps{}, fmt.Errorf("failed to fetch contents: %w", err)
 	}
@@ -72,7 +72,7 @@ func (s *contentService) GetContentById(ctx context.Context, id int) (models.Con
 }
 
 func (s *contentService) DeleteContent(ctx context.Context, id int) error {
-	_, err := s.DB.GetContentById(ctx, int32(id))
+	_, err := s.DB.GetContentById(ctx, int64(id))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return fmt.Errorf("content with id %d not found", id)
@@ -80,7 +80,7 @@ func (s *contentService) DeleteContent(ctx context.Context, id int) error {
 		return fmt.Errorf("failed to check content existence: %w", err)
 	}
 
-	err = s.DB.DeleteContent(ctx, int32(id))
+	err = s.DB.DeleteContent(ctx, int64(id))
 	if err != nil {
 		return fmt.Errorf("failed to delete content: %w", err)
 	}

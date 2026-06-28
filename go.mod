@@ -39,4 +39,6 @@ require (
 	github.com/gorilla/css v1.0.1 // indirect
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sync v0.20.0
+	maragu.dev/gomponents v1.3.0
+	maragu.dev/gomponents-datastar v0.3.3
 )

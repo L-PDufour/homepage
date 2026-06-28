@@ -36,6 +36,7 @@
             nixd
 
             sqlc
+            sqlite
           ];
         };
         packages.container = pkgs.dockerTools.buildLayeredImage {

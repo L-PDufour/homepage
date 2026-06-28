@@ -4,14 +4,8 @@ MAKEFILE_PATH ?= ./Makefile
 # Build the application
 all: build
 
-.PHONY: tailwind-build
-tailwind-build:
-	@tailwindcss -i ./assets/css/input.css -o ./assets/css/output.css --minify
-
 build:
 	@echo "Building..."
-	@templ generate
-	@make tailwind-build
 	@go build -o main cmd/api/main.go
 
 # Run the application

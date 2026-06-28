@@ -3,6 +3,11 @@ package handler
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"homepage/internal/auth"
 	"homepage/internal/database"
 	"homepage/internal/middleware"
@@ -10,10 +15,6 @@ import (
 	"homepage/internal/service"
 	"homepage/internal/utils"
 	"homepage/internal/views"
-	"log"
-	"net/http"
-	"strconv"
-	"strings"
 	// "github.com/a-h/templ"
 )
 
@@ -43,7 +44,7 @@ func (h *Handler) Admin(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "private, max-age=0, no-cache")
-	views.Adminpage().Render(r.Context(), w)
+	views.Adminpage().Render(w)
 }
 
 func (h *Handler) ListContent(contentTypeStr string) http.HandlerFunc {
@@ -65,7 +66,6 @@ func (h *Handler) ListContent(contentTypeStr string) http.HandlerFunc {
 func (h *Handler) GetContent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.URL.Query().Get("id"))
-
 		if err != nil {
 			http.Error(w, "", http.StatusNotFound)
 			return
@@ -153,6 +153,7 @@ func (h *Handler) GetUpdateForm() http.HandlerFunc {
 		h.renderUpdateForm(w, r, props.Content[0])
 	}
 }
+
 func (h *Handler) CreateContent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !utils.IsUserAdmin(r.Context()) {
@@ -169,7 +170,7 @@ func (h *Handler) CreateContent() http.HandlerFunc {
 		params := database.CreateContentParams{
 			ContentType: r.Form.Get("type"),
 			Title:       r.FormValue("title"),
-			Content:    sql.NullString{String: r.FormValue("markdown"), Valid: true},
+			Content:     sql.NullString{String: r.FormValue("markdown"), Valid: true},
 			ImageUrl:    sql.NullString{String: r.FormValue("image_url"), Valid: r.FormValue("image_url") != ""},
 			Link:        sql.NullString{String: r.FormValue("link"), Valid: r.FormValue("link") != ""},
 		}
@@ -207,7 +208,7 @@ func (h *Handler) UpdateContent() http.HandlerFunc {
 		params := database.UpdateContentParams{
 			ContentType: r.Form.Get("type"),
 			Title:       r.FormValue("title"),
-			Content:    sql.NullString{String: r.FormValue("markdown"), Valid: true},
+			Content:     sql.NullString{String: r.FormValue("markdown"), Valid: true},
 			ImageUrl:    sql.NullString{String: r.FormValue("image_url"), Valid: r.FormValue("image_url") != ""},
 			Link:        sql.NullString{String: r.FormValue("link"), Valid: r.FormValue("link") != ""},
 			ID:          int64(id),

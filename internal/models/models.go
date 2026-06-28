@@ -1,8 +1,9 @@
 package models
 
 import (
-	"homepage/internal/database"
 	"time"
+
+	"homepage/internal/database"
 )
 
 type CachedHTML struct {
@@ -15,6 +16,6 @@ type ContentProps struct {
 	Content     []database.Content
 	IsAdmin     bool
 	IsEditing   bool
-	ContentType database.ContentType
+	ContentType string
 	FullView    bool
 }

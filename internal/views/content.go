@@ -1,11 +1,10 @@
 package views
 
 import (
-	"strconv"
-
 	"homepage/internal/database"
 	"homepage/internal/models"
 	"homepage/internal/utils"
+	"strconv"
 
 	g "maragu.dev/gomponents"
 	h "maragu.dev/gomponents/html"
@@ -33,18 +32,20 @@ func ContentList(props models.ContentProps) g.Node {
 }
 
 func contentItem(content database.Content, props models.ContentProps) g.Node {
-	var body g.Node
+	isList := len(props.Content) > 1
 
+	var body g.Node
 	htmlContent, err := utils.GetHTMLContent(content.Content.String)
+
 	switch {
 	case err != nil:
 		body = h.P(h.Class("content-error"), g.Text("Error rendering content."))
-	case len(htmlContent) > 300 && len(props.Content) > 1:
-		body = g.Raw(utils.TruncateMarkdown(htmlContent, 300))
+	case isList:
+		body = h.P(g.Text(content.Title))
 	default:
 		var adminActions g.Node
 		if props.IsAdmin {
-			adminActions = h.Div(h.Class("content-admin-actions not-prose"),
+			adminActions = h.Div(h.Class("content-admin-actions"),
 				EditButton(content.ID),
 				DeleteButton(content.ID),
 			)
@@ -56,7 +57,7 @@ func contentItem(content database.Content, props models.ContentProps) g.Node {
 	}
 
 	var readMore g.Node
-	if len(props.Content) > 1 {
+	if isList {
 		readMore = h.Div(h.Class("content-footer"), ReadMoreButton(content.ID))
 	}
 

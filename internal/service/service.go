@@ -28,12 +28,12 @@ func NewContentService(db *database.Queries) ContentService {
 }
 
 func ParseContentType(s string) (string, error) {
-    switch s {
-    case "blog", "project", "bio":
-        return s, nil
-    default:
-        return "", fmt.Errorf("invalid content type: %s", s)
-    }
+	switch s {
+	case "blog", "project", "bio":
+		return s, nil
+	default:
+		return "", fmt.Errorf("invalid content type: %s", s)
+	}
 }
 
 func (s *contentService) GetContentsByType(ctx context.Context, contentTypeStr string) (models.ContentProps, error) {

@@ -11,11 +11,11 @@ import (
 	"homepage/internal/auth"
 	"homepage/internal/database"
 	"homepage/internal/middleware"
-	"homepage/internal/models"
+
+	"github.com/starfederation/datastar-go/datastar"
 	"homepage/internal/service"
 	"homepage/internal/utils"
 	"homepage/internal/views"
-	// "github.com/a-h/templ"
 )
 
 type Handler struct {
@@ -160,22 +160,19 @@ func (h *Handler) CreateContent() http.HandlerFunc {
 			http.Redirect(w, r, "/bio", http.StatusUnauthorized)
 			return
 		}
-
-		err := r.ParseForm()
-		if err != nil {
-			http.Error(w, "Unable to parse form", http.StatusBadRequest)
+		signals := &Content{}
+		if err := datastar.ReadSignals(r, signals); err != nil {
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
 			return
 		}
 
 		params := database.CreateContentParams{
-			ContentType: r.Form.Get("type"),
-			Title:       r.FormValue("title"),
-			Content:     sql.NullString{String: r.FormValue("markdown"), Valid: true},
-			ImageUrl:    sql.NullString{String: r.FormValue("image_url"), Valid: r.FormValue("image_url") != ""},
-			Link:        sql.NullString{String: r.FormValue("link"), Valid: r.FormValue("link") != ""},
+			ContentType: signals.Type,
+			Title:       signals.Title,
+			Content:     sql.NullString{String: signals.Content, Valid: true},
 		}
 
-		_, err = h.DB.CreateContent(r.Context(), params)
+		_, err := h.DB.CreateContent(r.Context(), params)
 		if err != nil {
 			http.Error(w, "Unable to create content", http.StatusInternalServerError)
 			log.Printf("Error creating content: %v", err)
@@ -186,46 +183,57 @@ func (h *Handler) CreateContent() http.HandlerFunc {
 	}
 }
 
+type Content struct {
+	Type    string `json:"type"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
 func (h *Handler) UpdateContent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !utils.IsUserAdmin(r.Context()) {
-			http.Redirect(w, r, "/bio", http.StatusUnauthorized)
-			return
-		}
-
-		err := r.ParseForm()
-		if err != nil {
-			http.Error(w, "Unable to parse form", http.StatusBadRequest)
-			return
-		}
+		// if !utils.IsUserAdmin(r.Context()) {
+		// 	http.Redirect(w, r, "/bio", http.StatusUnauthorized)
+		// 	return
+		// }
 
 		id, err := strconv.Atoi(r.URL.Query().Get("id"))
 		if err != nil {
+			log.Printf("UpdateContent: invalid id param %q: %v", r.URL.Query().Get("id"), err)
 			http.Error(w, "Invalid content ID", http.StatusBadRequest)
 			return
 		}
 
+		signals := &Content{}
+		if err := datastar.ReadSignals(r, signals); err != nil {
+			log.Printf("UpdateContent[id=%d]: failed to read signals: %v", id, err)
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+		log.Printf("UpdateContent[id=%d]: signals received: type=%s title=%q content_len=%d",
+			id, signals.Type, signals.Title, len(signals.Content))
+
 		params := database.UpdateContentParams{
-			ContentType: r.Form.Get("type"),
-			Title:       r.FormValue("title"),
-			Content:     sql.NullString{String: r.FormValue("markdown"), Valid: true},
-			ImageUrl:    sql.NullString{String: r.FormValue("image_url"), Valid: r.FormValue("image_url") != ""},
-			Link:        sql.NullString{String: r.FormValue("link"), Valid: r.FormValue("link") != ""},
+			ContentType: signals.Type,
+			Title:       signals.Title,
+			Content:     sql.NullString{String: signals.Content, Valid: true},
 			ID:          int64(id),
 		}
 
 		content, err := h.DB.UpdateContent(r.Context(), params)
 		if err != nil {
+			log.Printf("UpdateContent[id=%d]: DB update failed: %v", id, err)
 			http.Error(w, "Unable to update content", http.StatusInternalServerError)
-			log.Printf("Error updating content: %v", err)
 			return
 		}
+		log.Printf("UpdateContent[id=%d]: update succeeded (type=%s, title=%q)", id, content.ContentType, content.Title)
 
-		if r.Header.Get("HX-Request") == "true" {
-			w.Header().Set("HX-Trigger", "contentUpdated")
-			h.renderContentList(w, r, models.ContentProps{Content: []database.Content{content}})
-		} else {
-			http.Redirect(w, r, "/blog", http.StatusSeeOther)
-		}
+		// if r.Header.Get("HX-Request") == "true" {
+		// 	log.Printf("UpdateContent[id=%d]: HX-Request, rendering content list fragment", id)
+		// 	w.Header().Set("HX-Trigger", "contentUpdated")
+		// 	h.renderContentList(w, r, models.ContentProps{Content: []database.Content{content}})
+		// } else {
+		// 	log.Printf("UpdateContent[id=%d]: non-HX request, redirecting to /blog", id)
+		// 	http.Redirect(w, r, "/blog", http.StatusSeeOther)
+		// }
 	}
 }

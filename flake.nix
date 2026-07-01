@@ -30,6 +30,7 @@
             go
             vscode-langservers-extracted
             go-tools
+            golangci-lint
             air
             gomod2nix.packages.${system}.default
             gopls

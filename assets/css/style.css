@@ -189,11 +189,34 @@ html {
 
 /* Content layout */
 .content-page { max-width: 1280px; margin: 0 auto; padding: 1rem; }
-.content-panel { background-color: var(--surface0); border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); overflow: hidden; padding: 1.5rem; }
 .content-panel-inner { width: 100%; }
-.content-list { display: flex; flex-direction: column; gap: 1.5rem; }
-.content-card { width: 100%; border-radius: 0.5rem; overflow: hidden; background-color: var(--base); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
-.content-card-body { padding: 1rem; }
+
+.content-card {
+  width: 100%;
+  border-radius: 0.5rem;
+  background-color: var(--base);
+  border: 1px solid var(--surface2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.content-card-body {
+  padding: 1rem;
+}
+
+.content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* make the outer panel a bit more distinct from the page bg */
+.content-panel {
+  background-color: var(--surface0);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+}
+
 .content-footer { display: flex; gap: 1rem; padding: 1rem; }
 .content-admin-actions { display: flex; gap: 1rem; margin-top: 1rem; }
 .content-actions { display: flex; gap: 1rem; padding: 1rem; margin-top: 1.5rem; }
@@ -223,4 +246,138 @@ html {
 @media (min-width: 1024px) {
   .content-page > div { display: flex; flex-direction: row; justify-content: center; }
   .sidebar { width: 20%; max-width: 320px; margin-top: 0; padding-left: 1rem; }
+}
+
+/* CV page */
+.cv-page,
+.cv-banner,
+.cv-body {
+  box-sizing: border-box;
+  width: 100%;
+}
+.cv-page {
+  max-width: 215.9mm;
+  min-height: 279.4mm;
+  margin: 1rem auto;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.cv-banner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--blue);
+}
+
+.cv-name {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.cv-summary {
+  margin-top: 1rem;
+}
+
+.cv-summary p {
+  font-size: 0.875rem;
+  color: #fff;
+}
+
+.cv-body {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  color: #1f2125;
+}
+
+.cv-sidebar {
+  width: 25%;
+  padding-right: 1rem;
+  border-right: 1px solid #d1d5db;
+}
+
+.cv-contact { margin-bottom: 1rem; }
+.cv-label { font-weight: 600; margin-top: 0.5rem; font-size: 0.875rem; }
+.cv-value { margin-bottom: 0.25rem; font-size: 0.875rem; }
+.cv-value a { color: inherit; text-decoration: none; }
+
+.cv-section { margin-bottom: 1rem; }
+.cv-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--blue);
+  margin-bottom: 0.25rem;
+}
+.cv-section-title--lg { font-size: 1.25rem; margin-bottom: 0.5rem; }
+
+.cv-tag-list { display: flex; flex-direction: column; gap: 0.25rem; }
+.cv-tag {
+  width: fit-content;
+  background-color: #e5e7eb;
+  color: #374151;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.cv-main { width: 75%; padding-left: 1rem; }
+
+.cv-entry { padding: 0.5rem; border-radius: 0.25rem; }
+.cv-entry--striped { background-color: #f3f4f6; }
+.cv-entry-title { font-size: 0.875rem; font-weight: 600; }
+.cv-entry-period { font-size: 0.75rem; color: #6b7280; }
+.cv-entry-body { font-size: 0.875rem; margin-top: 0.25rem; }
+.cv-entry-list { font-size: 0.875rem; margin-top: 0.25rem; padding-left: 1.25rem; }
+.cv-entry-list li { margin-bottom: 0.125rem; }
+
+.cv-print-bar {
+  background-color: #f3f4f6;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  max-width: 215.9mm;
+  margin-left: auto;
+  margin-right: auto;
+}
+.cv-print-btn {
+  background-color: var(--blue);
+  color: #fff;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+}
+.cv-print-btn:hover { background-color: var(--lavender); }
+
+@media print {
+  body { margin: 0; padding: 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  @page { size: Letter; margin: 0.5in; }
+
+  .site-header,
+  .site-footer,
+  .print-hide { display: none !important; }
+
+  .main-content { padding: 0; }
+
+  .cv-page {
+    width: 100%;
+    max-width: 100%;
+    min-height: unset;   /* don't force a height */
+    height: auto;        /* let content breathe */
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .cv-page a { color: inherit; text-decoration: none; }
+}
+
+@media screen {
+  .cv-page { max-width: 215.9mm; margin: auto; }
 }

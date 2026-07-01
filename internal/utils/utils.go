@@ -1,18 +1,18 @@
 package utils
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"homepage/internal/middleware"
 	"homepage/internal/models"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/yuin/goldmark"
+	"github.com/niklasfasching/go-org/org"
 	"golang.org/x/sync/singleflight"
 )
 
@@ -38,16 +38,15 @@ func hash(s string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func convertAndSanitize(markdown string) (string, error) {
-	var htmlContent bytes.Buffer
-	if err := goldmark.Convert([]byte(markdown), &htmlContent); err != nil {
+func convertAndSanitize(content string) (string, error) {
+	doc := org.New().Parse(strings.NewReader(content), "")
+	html, err := doc.Write(org.NewHTMLWriter())
+	if err != nil {
 		return "", err
 	}
 
 	p := bluemonday.UGCPolicy()
-	sanitized := p.Sanitize(htmlContent.String())
-
-	return sanitized, nil
+	return p.Sanitize(html), nil
 }
 
 func GetHTMLContent(markdownContent string) (string, error) {
@@ -138,4 +137,20 @@ func removeOldEntries() {
 func IsUserAdmin(ctx context.Context) bool {
 	user, _ := middleware.GetUserFromContext(ctx)
 	return user != nil && user.IsAdmin
+}
+
+func StripTags(s string) string {
+	var result strings.Builder
+	inTag := false
+	for _, r := range s {
+		switch {
+		case r == '<':
+			inTag = true
+		case r == '>':
+			inTag = false
+		case !inTag:
+			result.WriteRune(r)
+		}
+	}
+	return result.String()
 }

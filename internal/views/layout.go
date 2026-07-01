@@ -18,9 +18,9 @@ type NavItem struct {
 var navItems = []NavItem{
 	{"/bio", "", "nav-link nav-link--rosewater", homeIcon()},
 	{"/cv", "CV", "nav-link nav-link--mauve", nil},
-	{"/projects", "Projets", "nav-link nav-link--blue", nil},
+	// {"/projects", "Projets", "nav-link nav-link--blue", nil},
 	{"/blog", "Blogue", "nav-link nav-link--green", nil},
-	{"/plan", "Planif", "nav-link nav-link--teal", nil},
+	// {"/plan", "Planif", "nav-link nav-link--teal", nil},
 }
 
 type SocialLink struct {
@@ -45,6 +45,7 @@ func Base(child g.Node) g.Node {
 				h.Link(h.Rel("stylesheet"), h.Href("/assets/css/style.css")),
 				h.Link(h.Rel("icon"), h.Href("/assets/favicon.ico")),
 				h.TitleEl(g.Text("Page personnelle")),
+				h.Script(h.Src("https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.2/bundles/datastar.js"), h.Type("module")),
 				h.Script(h.Src("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.min.mjs"), h.Type("module")),
 				h.Script(h.Src("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs"), h.Type("module")),
 			),

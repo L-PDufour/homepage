@@ -72,23 +72,23 @@ func NewServer() (*http.Server, error) {
 }
 
 func connectDB() (*sql.DB, error) {
-    dbPath := os.Getenv("DB_PATH")
-    if dbPath == "" {
-        dbPath = "dev.db"
-    }
-    db, err := sql.Open("sqlite", dbPath)
-    if err != nil {
-        return nil, err
-    }
-    if err := db.Ping(); err != nil {
-        return nil, err
-    }
-    schema, err := os.ReadFile("sql/schema.sql")
-    if err != nil {
-        return nil, err
-    }
-    if _, err := db.Exec(string(schema)); err != nil {
-        return nil, err
-    }
-    return db, nil
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "dev.db"
+	}
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return nil, err
+	}
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+	schema, err := os.ReadFile("sql/schema.sql")
+	if err != nil {
+		return nil, err
+	}
+	if _, err := db.Exec(string(schema)); err != nil {
+		return nil, err
+	}
+	return db, nil
 }

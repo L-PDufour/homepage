@@ -46,9 +46,25 @@ func NewContentButton() g.Node {
 	)
 }
 
-func FormButton() g.Node {
+func FormButton(id string) g.Node {
 	return g.Group([]g.Node{
-		h.Button(h.Type("submit"), h.Class("link-btn link-btn--blue"), g.Text("Submit")),
+		h.Button(
+			h.Type("button"),
+			ds.On("click", "@put('/content/update?id="+id+"')"),
+			h.Class("link-btn link-btn--blue"),
+			g.Text("Submit test"),
+		),
+		h.A(h.Href("javascript:history.back()"), g.Text("Cancel")),
+	})
+}
+func NewFormButton() g.Node {
+	return g.Group([]g.Node{
+		h.Button(
+			h.Type("button"),
+			ds.On("click", "@post('/content/new')"),
+			h.Class("link-btn link-btn--blue"),
+			g.Text("Submit test"),
+		),
 		h.A(h.Href("javascript:history.back()"), g.Text("Cancel")),
 	})
 }

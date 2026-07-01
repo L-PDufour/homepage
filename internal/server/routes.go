@@ -29,7 +29,7 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.HandleFunc("/bio", s.Handler.ListContent("bio"))
 	mux.HandleFunc("/projects", s.Handler.ListContent("project"))
 	mux.HandleFunc("/blog", s.Handler.ListContent("blog"))
-	// mux.HandleFunc("/cv", s.Handler.ServeResume())
+	mux.HandleFunc("/cv", s.Handler.ServeResume())
 	// mux.Handle("/kids", templ.Handler(views.Kids()))
 	// mux.Handle("/plan", templ.Handler(views.Plan()))
 	mux.HandleFunc("/admin", http.HandlerFunc(s.Handler.Admin))
@@ -41,7 +41,7 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.HandleFunc("/content/new", s.Handler.GetForm())
 	mux.HandleFunc("POST /content/new", s.Handler.CreateContent())
 	mux.HandleFunc("/content/update", s.Handler.GetUpdateForm())
-	mux.HandleFunc("POST /content/update", s.Handler.UpdateContent())
+	mux.HandleFunc("PUT /content/update", s.Handler.UpdateContent())
 
 	mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/bio", http.StatusFound)

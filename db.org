@@ -1,0 +1,9 @@
+#+begin_src sql :engine sqlite :db dev.db :colnames yes
+SELECT id, content_type, title FROM content;
+#+end_src
+
+#+begin_src sqlite :db dev.db 
+SELECT id, content_type, title FROM content;
+#+end_src
+
+#+RESULTS:

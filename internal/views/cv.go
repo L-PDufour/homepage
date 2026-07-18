@@ -5,9 +5,11 @@ import (
 	h "maragu.dev/gomponents/html"
 )
 
-var skills = []string{"Go", "C", "TypeScript", "Datastar", "PostgreSQL", "Nix", "Linux"}
-var softSkills = []string{"Communication", "Travail d'équipe", "Résolution de problèmes"}
-var interests = []string{"Ébénisterie", "Électronique", "Informatique"}
+var (
+	skills     = []string{"Go", "C", "TypeScript", "PostgreSQL", "Nix", "Linux"}
+	softSkills = []string{"Autonome", "Vulgarisation technique", "Résolution de problèmes"}
+	interests  = []string{"Ébénisterie", "Électronique", "Informatique"}
+)
 
 type cvJob struct {
 	Title   string
@@ -18,26 +20,23 @@ type cvJob struct {
 
 var jobs = []cvJob{
 	{
-		Title:  "Développeur — Amérifor",
+		Title:  "Développeur full stack - Amérifor Électronique",
 		Period: "2025 - Aujourd'hui",
-		Body:   []string{"Développeur, responsable de l'ensemble du cycle de développement : conception, implémentation, déploiement et maintenance des applications."},
+		Body: []string{
+			"Responsable de l'ensemble du cycle de développement : conception, implémentation, déploiement et maintenance.",
+			"Conception d'une application web de modélisation de produits (Go, TypeScript, PostgreSQL).",
+			"Développement d'un tableau de bord collaboratif permettant l'édition et le partage de données entre les employées (Go, PostgreSQL).",
+		},
 	},
 	{
-		Title:   "Centre de pédiatrie sociale de Québec",
-		Period:  "10/2023 - Aujourd'hui",
+		Title:   "Développeur bénévole - Centre de pédiatrie sociale de Québec",
+		Period:  "2023 - 2025",
 		Body:    []string{"Participation bénévole au développement d'une application web pour l'inscription et la gestion des bénévoles pour la guignolée."},
 		Striped: true,
 	},
 	{
-		Title:  "Postes Canada",
+		Title:  "Facteur - Postes Canada",
 		Period: "2013 - 2023",
-		Body:   []string{"Gérer, acheminer le courrier et les colis en plus d'assurer un bon service à la clientèle."},
-	},
-	{
-		Title:   "Agent de recherche",
-		Period:  "2010",
-		Body:    []string{"Analyser et rédiger des données statistiques et des rapports de recherche."},
-		Striped: true,
 	},
 }
 
@@ -50,10 +49,6 @@ type cvEducation struct {
 
 var education = []cvEducation{
 	{
-		Title:  "Certificat en informatique — Université Laval",
-		Period: "01/2025 - Aujourd'hui",
-	},
-	{
 		Title:  "Boot.dev",
 		Period: "2024",
 		Bullets: []string{
@@ -64,21 +59,13 @@ var education = []cvEducation{
 		Striped: true,
 	},
 	{
-		Title:  "École 42",
-		Period: "02/2023 - Aujourd'hui",
-		Bullets: []string{
-			"Introduction à la programmation en C",
-			"Acquisition de compétences en algorithmique et en programmation système",
-		},
-	},
-	{
-		Title:  "Baccalauréat en développement social et analyse des problèmes sociaux — UQAR",
+		Title:  "Baccalauréat en développement social et analyse des problèmes sociaux - UQAR",
 		Period: "2010",
 		Bullets: []string{
 			"Développement de compétences analytiques et de recherche",
 			"Rédaction de rapports et présentation de résultats de recherche",
 		},
-		Striped: true,
+		Striped: false,
 	},
 }
 
@@ -96,7 +83,7 @@ func ResumeTemplate() g.Node {
 			h.Div(h.Class("cv-banner"),
 				h.H1(h.Class("cv-name"), g.Text("Léon-Pierre Dufour")),
 				h.Section(h.Class("cv-summary"),
-					h.P(g.Text("Développeur passionné, seul développeur au sein d'une PME où je conçois, implémente et maintiens des solutions logicielles de bout en bout. Autodidacte rigoureux, j'aime explorer en profondeur les technologies que j'utilise, du backend Go jusqu'à l'administration système avec Nix.")),
+					h.P(g.Text("Développeur full stack, je conçois, implémente et maintiens des solutions logicielles de bout en bout au sein d'une PME. Autodidacte, j'aime explorer en profondeur les technologies que j'utilise, du backend avec Go jusqu'à l'administration système avec Nix.")),
 				),
 			),
 			h.Div(h.Class("cv-body"),

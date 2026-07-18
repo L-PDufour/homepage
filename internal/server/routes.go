@@ -1,9 +1,10 @@
 package server
 
 import (
+	"net/http"
+
 	"homepage/internal/games"
 	"homepage/internal/views"
-	"net/http"
 
 	efs "homepage"
 )
@@ -13,13 +14,13 @@ func (s *Server) registerRoutes() http.Handler {
 
 	fileServer := http.FileServer(http.FS(efs.Files))
 	mux.Handle("/assets/", fileServer)
-	mux.HandleFunc("GET /games", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /projects", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		if err := views.GamesPage(games.All).Render(w); err != nil {
 			http.Error(w, "failed to render page", http.StatusInternalServerError)
 		}
 	})
-	mux.HandleFunc("GET /games/{slug}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /projects/{slug}", func(w http.ResponseWriter, r *http.Request) {
 		game, ok := games.BySlug(r.PathValue("slug"))
 		if !ok {
 			http.NotFound(w, r)

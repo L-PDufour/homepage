@@ -18,7 +18,7 @@ type NavItem struct {
 var navItems = []NavItem{
 	{"/bio", "", "nav-link nav-link--rosewater", homeIcon()},
 	{"/cv", "CV", "nav-link nav-link--mauve", nil},
-	{"/games", "Jeux", "nav-link nav-link--teal", nil},
+	{"/projects", "Projets", "nav-link nav-link--teal", nil},
 	// {"/projects", "Projets", "nav-link nav-link--blue", nil},
 	{"/blog", "Blogue", "nav-link nav-link--green", nil},
 	// {"/plan", "Planif", "nav-link nav-link--teal", nil},
@@ -35,6 +35,27 @@ var socialLinks = []SocialLink{
 	{"https://linkedin.com/in/l-pdufour", linkedinIcon(), "LinkedIn"},
 }
 
+var themes = []string{
+	"solarized", "gruvbox", "everforest", "rosepine",
+	"catppuccin", "nord", "kanagawa",
+}
+
+func ThemePicker() g.Node {
+	opts := make([]g.Node, 0, len(themes))
+	for _, t := range themes {
+		opts = append(opts, h.Option(h.Value(t), g.Text(t)))
+	}
+	return h.Div(h.Class("theme-picker"),
+		h.Select(h.ID("theme-select"), g.Group(opts)),
+		h.Button(
+			h.ID("mode-toggle"),
+			h.Class("theme-toggle"),
+			g.Attr("aria-label", "Basculer clair/sombre"),
+			g.Text("◐"),
+		),
+	)
+}
+
 func Base(child g.Node) g.Node {
 	return h.Doctype(
 		h.HTML(
@@ -46,6 +67,14 @@ func Base(child g.Node) g.Node {
 				h.Link(h.Rel("stylesheet"), h.Href("/assets/css/style.css")),
 				h.Link(h.Rel("icon"), h.Href("/assets/favicon.ico")),
 				h.TitleEl(g.Text("Page personnelle")),
+				h.Script(g.Raw(`
+(function() {
+  const theme = localStorage.getItem("theme") || "solarized";
+  const mode = localStorage.getItem("mode") ||
+    (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+  document.documentElement.dataset.theme = theme + "-" + mode;
+})();
+`)),
 				h.Script(h.Src("https://cdn.jsdelivr.net/gh/starfederation/datastar@v1.0.2/bundles/datastar.js"), h.Type("module")),
 				h.Script(h.Src("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.min.mjs"), h.Type("module")),
 				h.Script(h.Src("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs"), h.Type("module")),
@@ -58,6 +87,27 @@ func Base(child g.Node) g.Node {
 					g.If(child != nil, child),
 				),
 				footer(),
+				h.Script(g.Raw(`
+const apply = () => {
+  const theme = localStorage.getItem("theme") || "solarized";
+  const mode = localStorage.getItem("mode") || "dark";
+  document.documentElement.dataset.theme = theme + "-" + mode;
+};
+
+const select = document.getElementById("theme-select");
+select.value = localStorage.getItem("theme") || "solarized";
+select.addEventListener("change", () => {
+  localStorage.setItem("theme", select.value);
+  apply();
+});
+
+document.getElementById("mode-toggle").addEventListener("click", () => {
+  const current = localStorage.getItem("mode") || "dark";
+  localStorage.setItem("mode", current === "light" ? "dark" : "light");
+  apply();
+})
+
+	`)),
 			),
 		),
 	)
@@ -87,7 +137,9 @@ func navBar() g.Node {
 		))
 	}
 	return h.Nav(h.Class("nav"),
-		h.Ul(h.Class("nav-list"), g.Group(items)),
+		h.Ul(h.Class("nav-list"), g.Group(items),
+			h.Li(ThemePicker()),
+		),
 	)
 }
 

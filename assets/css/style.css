@@ -1,31 +1,86 @@
 /* Catppuccin Mocha (dark) */
-:root {
-  --text:      #cdd6f4;
-  --base:      #1e1e2e;
-  --surface0:  #313244;
-  --surface2:  #585b70;
-  --blue:      #89b4fa;
-  --teal:      #94e2d5;
-  --lavender:  #b4befe;
-  --peach:     #fab387;
-  --yellow:    #f9e2af;
-  --green:     #a6e3a1;
-  --rosewater: #f5e0dc;
+/* ============ Solarized (défaut) ============ */
+:root, [data-theme="solarized-dark"] {
+  --text: #839496; --base: #002b36; --surface0: #073642; --surface2: #586e75;
+  --blue: #268bd2; --teal: #2aa198; --lavender: #6c71c4; --peach: #cb4b16;
+  --yellow: #b58900; --green: #859900; --rosewater: #d33682;
+}
+[data-theme="solarized-light"] {
+  --text: #657b83; --base: #fdf6e3; --surface0: #eee8d5; --surface2: #93a1a1;
+  --blue: #268bd2; --teal: #2aa198; --lavender: #6c71c4; --peach: #cb4b16;
+  --yellow: #b58900; --green: #859900; --rosewater: #d33682;
 }
 
-/* Catppuccin Latte (light) */
-[data-theme="light"] {
-  --text:      #4c4f69;
-  --base:      #eff1f5;
-  --surface0:  #ccd0da;
-  --surface2:  #acb0be;
-  --blue:      #1e66f5;
-  --teal:      #179299;
-  --lavender:  #7287fd;
-  --peach:     #fe640b;
-  --yellow:    #df8e1d;
-  --green:     #40a02b;
-  --rosewater: #dc8a78;
+/* ============ Gruvbox ============ */
+[data-theme="gruvbox-dark"] {
+  --text: #ebdbb2; --base: #282828; --surface0: #3c3836; --surface2: #665c54;
+  --blue: #83a598; --teal: #8ec07c; --lavender: #d3869b; --peach: #fe8019;
+  --yellow: #fabd2f; --green: #b8bb26; --rosewater: #fb4934;
+}
+[data-theme="gruvbox-light"] {
+  --text: #3c3836; --base: #fbf1c7; --surface0: #ebdbb2; --surface2: #bdae93;
+  --blue: #076678; --teal: #427b58; --lavender: #8f3f71; --peach: #af3a03;
+  --yellow: #b57614; --green: #79740e; --rosewater: #9d0006;
+}
+
+/* ============ Everforest ============ */
+[data-theme="everforest-dark"] {
+  --text: #d3c6aa; --base: #2d353b; --surface0: #343f44; --surface2: #859289;
+  --blue: #7fbbb3; --teal: #83c092; --lavender: #d699b6; --peach: #e69875;
+  --yellow: #dbbc7f; --green: #a7c080; --rosewater: #e67e80;
+}
+[data-theme="everforest-light"] {
+  --text: #5c6a72; --base: #fdf6e3; --surface0: #f4f0d9; --surface2: #a6b0a0;
+  --blue: #3a94c5; --teal: #35a77c; --lavender: #df69ba; --peach: #f57d26;
+  --yellow: #dfa000; --green: #8da101; --rosewater: #f85552;
+}
+
+/* ============ Rosé Pine ============ */
+[data-theme="rosepine-dark"] {
+  --text: #e0def4; --base: #191724; --surface0: #1f1d2e; --surface2: #6e6a86;
+  --blue: #31748f; --teal: #9ccfd8; --lavender: #c4a7e7; --peach: #ebbcba;
+  --yellow: #f6c177; --green: #56949f; --rosewater: #eb6f92;
+}
+[data-theme="rosepine-light"] { /* Dawn */
+  --text: #575279; --base: #faf4ed; --surface0: #fffaf3; --surface2: #9893a5;
+  --blue: #286983; --teal: #56949f; --lavender: #907aa9; --peach: #d7827e;
+  --yellow: #ea9d34; --green: #618774; --rosewater: #b4637a;
+}
+
+/* ============ Catppuccin ============ */
+[data-theme="catppuccin-dark"] { /* Mocha */
+  --text: #cdd6f4; --base: #1e1e2e; --surface0: #313244; --surface2: #585b70;
+  --blue: #89b4fa; --teal: #94e2d5; --lavender: #b4befe; --peach: #fab387;
+  --yellow: #f9e2af; --green: #a6e3a1; --rosewater: #f5e0dc;
+}
+[data-theme="catppuccin-light"] { /* Latte */
+  --text: #4c4f69; --base: #eff1f5; --surface0: #ccd0da; --surface2: #acb0be;
+  --blue: #1e66f5; --teal: #179299; --lavender: #7287fd; --peach: #fe640b;
+  --yellow: #df8e1d; --green: #40a02b; --rosewater: #dc8a78;
+}
+
+/* ============ Nord ============ */
+[data-theme="nord-dark"] {
+  --text: #d8dee9; --base: #2e3440; --surface0: #3b4252; --surface2: #4c566a;
+  --blue: #81a1c1; --teal: #88c0d0; --lavender: #b48ead; --peach: #d08770;
+  --yellow: #ebcb8b; --green: #a3be8c; --rosewater: #bf616a;
+}
+[data-theme="nord-light"] { /* palette inversée officieuse */
+  --text: #2e3440; --base: #eceff4; --surface0: #e5e9f0; --surface2: #aeb8c4;
+  --blue: #5e81ac; --teal: #8fbcbb; --lavender: #b48ead; --peach: #d08770;
+  --yellow: #d08770; --green: #a3be8c; --rosewater: #bf616a;
+}
+
+/* ============ Kanagawa ============ */
+[data-theme="kanagawa-dark"] { /* Wave */
+  --text: #dcd7ba; --base: #1f1f28; --surface0: #2a2a37; --surface2: #54546d;
+  --blue: #7e9cd8; --teal: #6a9589; --lavender: #957fb8; --peach: #ffa066;
+  --yellow: #e6c384; --green: #98bb6c; --rosewater: #d27e99;
+}
+[data-theme="kanagawa-light"] { /* Lotus */
+  --text: #545464; --base: #f2ecbc; --surface0: #e7dba0; --surface2: #8a8980;
+  --blue: #4d699b; --teal: #597b75; --lavender: #624c83; --peach: #cc6d00;
+  --yellow: #77713f; --green: #6f894e; --rosewater: #c84053;
 }
 
 html {
@@ -377,6 +432,15 @@ a:hover {
   border: 0;
   background-color: #000;
 }
+.theme-toggle {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+}
+.theme-toggle:hover { color: var(--yellow); }
 
 @media print {
   body { margin: 0; padding: 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
@@ -405,3 +469,4 @@ a:hover {
 @media screen {
   .cv-page { max-width: 215.9mm; margin: auto; }
 }
+

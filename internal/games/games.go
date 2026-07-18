@@ -30,7 +30,7 @@ func (g Game) AssetsPath() string {
 
 // URL is the page the game is playable on.
 func (g Game) URL() string {
-	return "/games/" + g.Slug
+	return "/projects/" + g.Slug
 }
 
 var All = []Game{

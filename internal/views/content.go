@@ -41,7 +41,7 @@ func contentItem(content database.Content, props models.ContentProps) g.Node {
 	case err != nil:
 		body = h.P(h.Class("content-error"), g.Text("Error rendering content."))
 	case isList:
-		body = h.P(g.Text(content.Title))
+		body = ReadMoreButton(content.ID, content.Title)
 	default:
 		var adminActions g.Node
 		if props.IsAdmin {
@@ -56,17 +56,11 @@ func contentItem(content database.Content, props models.ContentProps) g.Node {
 		})
 	}
 
-	var readMore g.Node
-	if isList {
-		readMore = h.Div(h.Class("content-footer"), ReadMoreButton(content.ID))
-	}
-
 	return h.Div(
 		h.ID("content-"+strconv.Itoa(int(content.ID))),
 		h.Class("content-card"),
 		h.Div(h.Class("content-card-body"),
 			h.Div(h.Class("prose"), body),
 		),
-		g.If(readMore != nil, readMore),
 	)
 }

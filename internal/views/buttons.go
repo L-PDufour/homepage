@@ -18,12 +18,12 @@ func Button(text, color, action string) g.Node {
 }
 
 // ReadMoreButton navigates to the full content view — plain anchor.
-func ReadMoreButton(contentID int64) g.Node {
+func ReadMoreButton(contentID int64, title string) g.Node {
 	id := strconv.FormatInt(contentID, 10)
 	return h.A(
 		h.Href("/content?id="+id),
 		h.Class("link-btn link-btn--green not-prose"),
-		g.Text("Agrandir"),
+		g.Text(title),
 	)
 }
 

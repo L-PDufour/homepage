@@ -18,6 +18,7 @@ type NavItem struct {
 var navItems = []NavItem{
 	{"/bio", "", "nav-link nav-link--rosewater", homeIcon()},
 	{"/cv", "CV", "nav-link nav-link--mauve", nil},
+	{"/games", "Jeux", "nav-link nav-link--teal", nil},
 	// {"/projects", "Projets", "nav-link nav-link--blue", nil},
 	{"/blog", "Blogue", "nav-link nav-link--green", nil},
 	// {"/plan", "Planif", "nav-link nav-link--teal", nil},

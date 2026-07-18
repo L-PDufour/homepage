@@ -1,6 +1,7 @@
 package server
 
 import (
+	"homepage/internal/games"
 	"homepage/internal/views"
 	"net/http"
 
@@ -12,18 +13,27 @@ func (s *Server) registerRoutes() http.Handler {
 
 	fileServer := http.FileServer(http.FS(efs.Files))
 	mux.Handle("/assets/", fileServer)
-	mux.HandleFunc("assets/index.js", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/javascript")
-		fileServer.ServeHTTP(w, r)
+	mux.HandleFunc("GET /games", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := views.GamesPage(games.All).Render(w); err != nil {
+			http.Error(w, "failed to render page", http.StatusInternalServerError)
+		}
 	})
+	mux.HandleFunc("GET /games/{slug}", func(w http.ResponseWriter, r *http.Request) {
+		game, ok := games.BySlug(r.PathValue("slug"))
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	// Serve WebAssembly files with the correct MIME type
-	mux.HandleFunc("/index.wasm", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/wasm")
-		fileServer.ServeHTTP(w, r)
+		if err := views.GamePage(game).Render(w); err != nil {
+			http.Error(w, "failed to render page", http.StatusInternalServerError)
+		}
 	})
-
-	// Define your routes directly in the mux
+	mux.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/bio", http.StatusFound)
+	})
 	mux.HandleFunc("/bio", s.Handler.ListContent("bio"))
 	mux.HandleFunc("/projects", s.Handler.ListContent("project"))
 	mux.HandleFunc("/blog", s.Handler.ListContent("blog"))
@@ -47,8 +57,5 @@ func (s *Server) registerRoutes() http.Handler {
 	mux.HandleFunc("/content/update", s.Handler.GetUpdateForm())
 	mux.HandleFunc("PUT /content/update", s.Handler.UpdateContent())
 
-	mux.HandleFunc("/*", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/bio", http.StatusFound)
-	})
 	return mux
 }

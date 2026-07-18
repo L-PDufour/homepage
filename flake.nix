@@ -10,7 +10,7 @@
       };
     };
   };
-  outputs = { self, flake-utils, nixpkgs, gomod2nix }:
+  outputs = { self, flake-utils, nixpkgs, gomod2nix, }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
@@ -27,29 +27,15 @@
         packages.default = homepage;
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
+            jq
             go
+            gopls
             vscode-langservers-extracted
             go-tools
-            golangci-lint
             air
             gomod2nix.packages.${system}.default
-            gopls
-            nixd
-
-            sqlc
             sqlite
           ];
-        };
-        packages.container = pkgs.dockerTools.buildLayeredImage {
-          name = "ldufour/goserver";
-          tag = "latest";
-          contents = [ packages.default pkgs.cacert ];
-          config = {
-            Cmd = [ "${packages.default}/bin/api" ];
-            WorkingDir = "/";
-            Volumes = { "/data" = { }; };
-            Env = [ "IN_CONTAINER=true" ];
-          };
         };
         apps = {
           default = flake-utils.lib.mkApp { drv = homepage; };

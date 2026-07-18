@@ -40,6 +40,15 @@ html {
   }
 }
 
+a {
+  color: var(--blue);
+}
+a:visited {
+  color: var(--mauve);
+}
+a:hover {
+  color: var(--sky);
+}
 .prose {
   color: var(--text);
   padding-left: 0;
@@ -353,6 +362,21 @@ html {
   cursor: pointer;
 }
 .cv-print-btn:hover { background-color: var(--lavender); }
+
+.game-frame {
+  margin-top: 1.5rem;
+  border: 1px solid var(--surface2);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.game-canvas {
+  display: block;
+  width: 100%;
+  border: 0;
+  background-color: #000;
+}
 
 @media print {
   body { margin: 0; padding: 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; }

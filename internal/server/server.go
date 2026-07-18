@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"time"
 
+	"homepage"
+
 	_ "github.com/joho/godotenv/autoload"
 
 	"homepage/internal/auth"
@@ -27,7 +29,6 @@ type Server struct {
 }
 
 func NewServer() (*http.Server, error) {
-
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
 		return nil, fmt.Errorf("invalid port: %v", err)
@@ -83,7 +84,8 @@ func connectDB() (*sql.DB, error) {
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
-	schema, err := os.ReadFile("sql/schema.sql")
+
+	schema, err := homepage.SQLFiles.ReadFile("sql/schema.sql")
 	if err != nil {
 		return nil, err
 	}

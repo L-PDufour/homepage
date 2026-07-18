@@ -36,3 +36,4 @@ bin/
 run-goose.sh
 # Project build
 
+/result

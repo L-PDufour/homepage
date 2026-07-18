@@ -77,6 +77,17 @@ func connectDB() (*sql.DB, error) {
 	if dbPath == "" {
 		dbPath = "dev.db"
 	}
+
+	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		seed, err := homepage.SeedDB.ReadFile("dev.db")
+		if err != nil {
+			return nil, err
+		}
+		if err := os.WriteFile(dbPath, seed, 0o644); err != nil {
+			return nil, err
+		}
+	}
+
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, err
@@ -92,5 +103,6 @@ func connectDB() (*sql.DB, error) {
 	if _, err := db.Exec(string(schema)); err != nil {
 		return nil, err
 	}
+
 	return db, nil
 }

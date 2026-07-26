@@ -10,8 +10,26 @@
       };
     };
   };
-  outputs = { self, flake-utils, nixpkgs, gomod2nix, }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      flake-utils,
+      nixpkgs,
+      gomod2nix,
+    }:
+    # nixosModules is system-independent, so it stays outside eachDefaultSystem.
+    # Inside, it would be exposed as nixosModules.<system>.default and every
+    # consumer would have to name the system to import it.
+    {
+      nixosModules.default =
+        { pkgs, lib, ... }:
+        {
+          imports = [ ./module.nix ];
+          services.homepage.package = lib.mkDefault self.packages.${pkgs.system}.default;
+        };
+    }
+    // flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -22,7 +40,8 @@
           src = ./.;
           modules = ./gomod2nix.toml;
         };
-      in rec {
+      in
+      {
         formatter = pkgs.nixpkgs-fmt;
         packages.default = homepage;
         devShells.default = pkgs.mkShell {
@@ -62,5 +81,6 @@
             '';
           };
         };
-      });
+      }
+    );
 }

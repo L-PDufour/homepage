@@ -37,3 +37,4 @@ run-goose.sh
 # Project build
 
 /result
+/.homepage-tabspaces-session.el

@@ -25,7 +25,7 @@ var jobs = []cvJob{
 		Body: []string{
 			"Responsable de l'ensemble du cycle de développement : conception, implémentation, déploiement et maintenance.",
 			"Conception d'une application web de modélisation de produits (Go, TypeScript, PostgreSQL).",
-			"Développement d'un tableau de bord collaboratif permettant l'édition et le partage de données entre les employées (Go, PostgreSQL).",
+			"Développement d'un tableau de bord collaboratif permettant l'édition et le partage de données entre les employés (Go, PostgreSQL).",
 		},
 	},
 	{
@@ -79,50 +79,63 @@ func tagList(items []string) g.Node {
 
 func ResumeTemplate() g.Node {
 	return Base(
-		h.Div(h.ID("printArea"), h.Class("cv-page"),
-			h.Div(h.Class("cv-banner"),
+		h.Div(
+			h.ID("printArea"), h.Class("cv-page"),
+			h.Div(
+				h.Class("cv-banner"),
 				h.H1(h.Class("cv-name"), g.Text("Léon-Pierre Dufour")),
-				h.Section(h.Class("cv-summary"),
+				h.Section(
+					h.Class("cv-summary"),
 					h.P(g.Text("Développeur full stack, je conçois, implémente et maintiens des solutions logicielles de bout en bout au sein d'une PME. Autodidacte, j'aime explorer en profondeur les technologies que j'utilise, du backend avec Go jusqu'à l'administration système avec Nix.")),
 				),
 			),
-			h.Div(h.Class("cv-body"),
-				h.Div(h.Class("cv-sidebar"),
-					h.Header(h.Class("cv-contact"),
+			h.Div(
+				h.Class("cv-body"),
+				h.Div(
+					h.Class("cv-sidebar"),
+					h.Header(
+						h.Class("cv-contact"),
 						h.P(h.Class("cv-label"), g.Text("Courriel")),
-						h.P(h.Class("cv-value"), h.A(h.Href("mailto:leon@lpdufour.xyz"), g.Text("leon@lpdufour.xyz"))),
+						h.P(h.Class("cv-value"), h.A(h.Href("mailto:leonpierre.dufour@gmail.com"), g.Text("leonpierre.dufour@gmail.com"))),
 						h.P(h.Class("cv-label"), g.Text("Site")),
-						h.P(h.Class("cv-value"), h.A(h.Href("https://dev.lpdufour.xyz"), h.Target("_blank"), g.Text("dev.lpdufour.xyz"))),
+						h.P(h.Class("cv-value"), h.A(h.Href("https://www.lpdufour.xyz"), h.Target("_blank"), g.Text("lpdufour.xyz"))),
 						h.P(h.Class("cv-label"), g.Text("Github")),
 						h.P(h.Class("cv-value"), h.A(h.Href("https://github.com/l-pdufour"), h.Target("_blank"), g.Text("github.com/l-pdufour"))),
 						h.P(h.Class("cv-label"), g.Text("Linkedin")),
 						h.P(h.Class("cv-value"), h.A(h.Href("https://linkedin.com/in/l-pdufour"), h.Target("_blank"), g.Text("linkedin.com/in/l-pdufour"))),
 					),
-					h.Section(h.Class("cv-section"),
+					h.Section(
+						h.Class("cv-section"),
 						h.H2(h.Class("cv-section-title"), g.Text("Compétences techniques")),
 						tagList(skills),
 					),
-					h.Section(h.Class("cv-section"),
+					h.Section(
+						h.Class("cv-section"),
 						h.H2(h.Class("cv-section-title"), g.Text("Compétences transversales")),
 						tagList(softSkills),
 					),
-					h.Section(h.Class("cv-section"),
+					h.Section(
+						h.Class("cv-section"),
 						h.H2(h.Class("cv-section-title"), g.Text("Intérêts")),
 						tagList(interests),
 					),
 				),
-				h.Div(h.Class("cv-main"),
-					h.Section(h.Class("cv-section"),
+				h.Div(
+					h.Class("cv-main"),
+					h.Section(
+						h.Class("cv-section"),
 						h.H2(h.Class("cv-section-title cv-section-title--lg"), g.Text("Expérience professionnelle")),
 						g.Group(renderJobs(jobs)),
 					),
-					h.Section(h.Class("cv-section"),
+					h.Section(
+						h.Class("cv-section"),
 						h.H2(h.Class("cv-section-title cv-section-title--lg"), g.Text("Formation")),
 						g.Group(renderEducation(education)),
 					),
 				),
 			),
-			h.Div(h.Class("cv-print-bar print-hide"),
+			h.Div(
+				h.Class("cv-print-bar print-hide"),
 				h.Button(
 					g.Attr("onclick", "window.print()"),
 					h.Class("cv-print-btn"),
@@ -144,7 +157,8 @@ func renderJobs(items []cvJob) []g.Node {
 		for _, b := range j.Body {
 			bodyNodes = append(bodyNodes, h.P(h.Class("cv-entry-body"), g.Text(b)))
 		}
-		nodes = append(nodes, h.Div(h.Class(class),
+		nodes = append(nodes, h.Div(
+			h.Class(class),
 			h.H3(h.Class("cv-entry-title"), g.Text(j.Title)),
 			h.P(h.Class("cv-entry-period"), g.Text(j.Period)),
 			g.Group(bodyNodes),
@@ -168,7 +182,8 @@ func renderEducation(items []cvEducation) []g.Node {
 			}
 			bullets = h.Ul(h.Class("cv-entry-list"), g.Group(items))
 		}
-		nodes = append(nodes, h.Div(h.Class(class),
+		nodes = append(nodes, h.Div(
+			h.Class(class),
 			h.H3(h.Class("cv-entry-title"), g.Text(e.Title)),
 			h.P(h.Class("cv-entry-period"), g.Text(e.Period)),
 			g.If(bullets != nil, bullets),

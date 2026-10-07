@@ -31,7 +31,7 @@ func NewHandler(db *database.Queries, service service.ContentService) *Handler {
 }
 
 func redirectToLogin(w http.ResponseWriter, r *http.Request) {
-	loginURL := fmt.Sprintf("https://%s.cloudflareaccess.com/cdn-cgi/access/login?redirect_url=%s", auth.CfTeamDomain, "https://dev.lpdufour.xyz/admin/auth")
+	loginURL := fmt.Sprintf("https://%s.cloudflareaccess.com/cdn-cgi/access/login?redirect_url=%s", auth.CfTeamDomain, "https://www.lpdufour.xyz/admin/auth")
 	w.Header().Set("Cache-Control", "no-store, must-revalidate")
 	http.Redirect(w, r, loginURL, http.StatusTemporaryRedirect)
 }
@@ -191,10 +191,10 @@ type Content struct {
 
 func (h *Handler) UpdateContent() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// if !utils.IsUserAdmin(r.Context()) {
-		// 	http.Redirect(w, r, "/bio", http.StatusUnauthorized)
-		// 	return
-		// }
+		if !utils.IsUserAdmin(r.Context()) {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
 		id, err := strconv.Atoi(r.URL.Query().Get("id"))
 		if err != nil {
